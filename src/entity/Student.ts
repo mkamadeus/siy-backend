@@ -2,7 +2,7 @@ import {
   BaseEntity,
   Column,
   Entity,
-  OneToMany,
+  //OneToMany,
   PrimaryColumn,
 } from "typeorm";
 //import StudentGrade from "./StudentGrade";
@@ -13,10 +13,10 @@ export default class Student extends BaseEntity {
   nim: number;
 
   @Column()
-  nama: string;
+  name: string;
 
   @Column()
-  imgpath: string;
+  imgPath: string;
 
   @Column("float")
   ipk: number;
