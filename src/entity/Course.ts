@@ -13,13 +13,25 @@ import Assignment from "./Assignment";
 @Entity()
 export default class Course extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: string;
 
   @Column()
   code: string;
 
   @Column()
+  sks: number;
+
+  @Column()
   name: string;
+
+  @Column()
+  silabusRingkas: string;
+
+  @Column()
+  silabusLengkap: string;
+
+  @Column()
+  outcome: string;
 
   @CreateDateColumn()
   @Exclude()
