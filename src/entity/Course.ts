@@ -13,7 +13,7 @@ import Assignment from "./Assignment";
 @Entity()
 export default class Course extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
   @Column()
   code: string;
