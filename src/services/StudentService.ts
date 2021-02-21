@@ -2,7 +2,6 @@ import Student from "@/entity/Student";
 import Course from "@/entity/Course";
 import { Service } from "typedi";
 import { getRepository, Repository } from "typeorm";
-import { table } from "console";
 
 enum index {
   A = 4,
@@ -17,21 +16,31 @@ enum index {
 @Service()
 export class StudentService {
   private studentRepository: Repository<Student> = getRepository(Student);
-  private courseRepository: Repository<Course> = getRepository(Course);
 
+  /**
+   * Get all students from database.
+   */
   public async getAll(): Promise<Student[]> {
     return await this.studentRepository.find().then((student) => student);
   }
 
+  /**
+   * Get student by database ID
+   * @param id ID of the student
+   */
   public async getOne(id: number): Promise<Student> {
     return await this.studentRepository
       .findOne({ where: { id } })
       .then((student) => student);
   }
 
-  public async getByNIM(id: number): Promise<Student[]> {
+  /**
+   * Get student by NIM
+   * @param nim NIM of the student
+   */
+  public async getByNIM(nim: number): Promise<Student[]> {
     return await this.studentRepository
-      .find({ where: { nim: id } })
+      .find({ where: { nim } })
       .then((student) => student);
   }
 
@@ -47,7 +56,7 @@ export class StudentService {
       .getOne();
   }
 
-  public async getGradeThisSemester(
+  public async getGradeBySemester(
     nim: number,
     year: number,
     semester: number
@@ -127,15 +136,28 @@ export class StudentService {
     return nr;
   }
 
+  /**
+   * Create new student
+   * @param student Student object that is going to be created
+   */
   public async create(student: Student): Promise<Student> {
     return await this.studentRepository.save(student);
   }
 
-  public async update(id: number, student: Student): Promise<Student> {
+  /**
+   * Update student by ID
+   * @param id Student ID in database
+   * @param student Student object that is going to be updated
+   */
+  public async update(id: number, student: Partial<Student>): Promise<Student> {
     student.id = id;
     return await this.studentRepository.save(student);
   }
 
+  /**
+   * Delete student by ID
+   * @param id Student ID
+   */
   public async delete(id: number): Promise<void> {
     await this.studentRepository.delete(id);
     return;
