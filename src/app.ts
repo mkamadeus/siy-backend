@@ -8,6 +8,7 @@ useContainer(Container);
 
 const app = createExpressServer({
   controllers: [__dirname + "/controllers/*.ts"],
+  cors: true,
 }) as Express;
 
 mainLoader(app)

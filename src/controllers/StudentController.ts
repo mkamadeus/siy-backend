@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import Student from "@/entity/Student";
 import { StudentService } from "@/services/StudentService";
-import { IsNumber, IsString } from "class-validator";
+import { IsNumber, IsOptional, IsString } from "class-validator";
 import {
   Body,
   Delete,
@@ -29,9 +29,31 @@ export class CreateStudentBody extends StudentBase {
   public name: string;
 }
 
-export class StudentResponse extends StudentBase {
+export class UpdateStudentBody extends StudentBase {
+  @IsOptional()
+  @IsNumber()
+  public nim: number;
+
+  @IsOptional()
+  @IsString()
+  public name: string;
+}
+
+export class StudentResponse {
   @IsNumber()
   public id: number;
+
+  @IsNumber()
+  public nim: number;
+
+  @IsString()
+  public name: string;
+
+  @IsString()
+  public imgPath: string;
+
+  @IsNumber()
+  public ipk: number;
 }
 
 @JsonController("/students")
@@ -57,7 +79,7 @@ export class StudentController {
   @Get("/nim/:id")
   @ResponseSchema(StudentResponse)
   @OpenAPI({
-    description: "Get student data by nim",
+    description: "Get student data by NIM",
     responses: {
       "200": {
         description: "OK",
@@ -78,12 +100,12 @@ export class StudentController {
       },
     },
   })
-  public getStudentGradeThisSemester(
+  public getStudentGradeBySemester(
     @Param("nim") nim: number,
     @Param("year") year: number,
     @Param("semester") semester: number
   ) {
-    return this.studentService.getGradeThisSemester(nim, year, semester);
+    return this.studentService.getGradeBySemester(nim, year, semester);
   }
 
   @Get("/grades/:nim")
@@ -166,7 +188,7 @@ export class StudentController {
   @Put("/:id")
   @ResponseSchema(StudentResponse)
   @OpenAPI({
-    description: "Update student",
+    description: "Update student, allows partial update",
     responses: {
       "200": {
         description: "OK",
@@ -175,7 +197,7 @@ export class StudentController {
   })
   public updateStudent(
     @Param("id") id: number,
-    @Body() student: CreateStudentBody
+    @Body() student: UpdateStudentBody
   ) {
     return this.studentService.update(id, student as Student);
   }
