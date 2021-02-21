@@ -8,7 +8,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import Assignment from "./Assignment";
+
+import StudentGrade from "./StudentGrade";
 
 @Entity()
 export default class Course extends BaseEntity {
@@ -41,6 +42,7 @@ export default class Course extends BaseEntity {
   @Exclude()
   updatedAt: Date;
 
-  @OneToMany(() => Assignment, (assignment) => assignment.id)
-  assignment: Assignment;
+  @OneToMany(() => StudentGrade, studentGrade => studentGrade.course)
+  public studentGrades!: StudentGrade[];
+  
 }
