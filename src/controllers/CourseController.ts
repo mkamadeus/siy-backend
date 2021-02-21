@@ -14,19 +14,28 @@ import {
 import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
 
 export class CourseBase {
-  @IsString()
-  public code: string;
-
-  @IsString()
-  public name: string;
+  @IsNumber()
+  public id: number;
 }
 
 export class CreateCourseBody extends CourseBase {
   @IsString()
   public code: string;
 
+  @IsNumber()
+  public sks: number;
+
   @IsString()
   public name: string;
+
+  @IsString()
+  public silabusRingkas: string;
+
+  @IsString()
+  public silabusLengkap: string;
+
+  @IsString()
+  public outcome: string;
 }
 
 export class CourseResponse extends CourseBase {
@@ -43,7 +52,7 @@ export class CourseController {
   @Get("/")
   @ResponseSchema(CourseResponse, { isArray: true })
   @OpenAPI({
-    description: "Get all assignments",
+    description: "Get all courses",
     responses: {
       "200": {
         description: "OK",
