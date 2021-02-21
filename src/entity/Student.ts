@@ -1,15 +1,21 @@
+import { Exclude } from "class-transformer";
 import {
   BaseEntity,
   Column,
   Entity,
-  //OneToMany,
-  PrimaryColumn,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+  PrimaryGeneratedColumn,
 } from "typeorm";
-//import StudentGrade from "./StudentGrade";
+import StudentGrade from "./StudentGrade";
 
 @Entity()
 export default class Student extends BaseEntity {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
   nim: number;
 
   @Column()
@@ -21,6 +27,15 @@ export default class Student extends BaseEntity {
   @Column("float")
   ipk: number;
 
-  //@OneToMany(() => StudentGrade, (studentGrade) => studentGrade.nim)
-  //studentGrade: studentGrade;
+  @CreateDateColumn()
+  @Exclude()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  @Exclude()
+  updatedAt: Date;
+
+  @OneToMany(() => StudentGrade, studentGrade => studentGrade.student)
+  public studentGrades!: StudentGrade[];
+
 }
