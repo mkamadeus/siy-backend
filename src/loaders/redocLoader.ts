@@ -18,7 +18,7 @@ export const redocLoader = (expressApp: Express) => {
   <!DOCTYPE html>
   <html>
     <head>
-      <title>Hans-Bot Documentation</title>
+      <title>SIY Documentation</title>
       <!-- needed for adaptive design -->
       <meta charset="utf-8"/>
       <meta name="viewport" content="width=device-width, initial-scale=1">
