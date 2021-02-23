@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import StudentGrade from "@/entity/StudentGrade";
 import { GradeService } from "@/services/GradeService";
-import { IsNumber } from "class-validator";
+import { IsEnum, IsNumber, IsOptional } from "class-validator";
 import {
   Body,
   Delete,
@@ -12,6 +12,7 @@ import {
   Put,
 } from "routing-controllers";
 import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
+import { IndexEnum } from "@/enum/IndexEnum";
 
 export class GradeBase {
   @IsNumber()
@@ -21,17 +22,62 @@ export class GradeBase {
   public courseId: number;
 }
 
-export class CreateGradeBody extends GradeBase {
+export class CreateGradeBody {
   @IsNumber()
   public studentId: number;
 
   @IsNumber()
   public courseId: number;
+
+  @IsEnum(IndexEnum)
+  public indeks: string;
+
+  @IsNumber()
+  public semester: number;
+
+  @IsNumber()
+  public year: number;
+}
+export class UpdateGradeBody {
+  @IsNumber()
+  @IsOptional()
+  public studentId: number;
+
+  @IsNumber()
+  @IsOptional()
+  public courseId: number;
+
+  @IsEnum(IndexEnum)
+  @IsOptional()
+  public indeks: string;
+
+  @IsNumber()
+  @IsOptional()
+  public semester: number;
+
+  @IsNumber()
+  @IsOptional()
+  public year: number;
 }
 
-export class GradeResponse extends GradeBase {
+export class GradeResponse {
   @IsNumber()
   public id: number;
+
+  @IsNumber()
+  public studentId: number;
+
+  @IsEnum(IndexEnum)
+  public indeks: string;
+
+  @IsNumber()
+  public courseId: number;
+
+  @IsNumber()
+  public semester: number;
+
+  @IsNumber()
+  public year: number;
 }
 
 @JsonController("/grades")
@@ -54,24 +100,24 @@ export class GradeController {
     return this.gradeService.getAll();
   }
 
-  @Get("/std/:id")
+  @Get("/student/:id")
   @ResponseSchema(GradeResponse)
   @OpenAPI({
-    description: "Get grade data by studentID",
+    description: "Get grade data by student ID",
     responses: {
       "200": {
         description: "OK",
       },
     },
   })
-  public getGradeByNIM(@Param("id") id: number) {
+  public getGradeByStudentId(@Param("id") id: number) {
     return this.gradeService.getByStdID(id);
   }
 
   @Get("/:id")
   @ResponseSchema(GradeResponse)
   @OpenAPI({
-    description: "Get grade data by ID",
+    description: "Get grade data by grade ID",
     responses: {
       "200": {
         description: "OK",
@@ -102,14 +148,14 @@ export class GradeController {
   @Put("/:id")
   @ResponseSchema(GradeResponse)
   @OpenAPI({
-    description: "Update grade",
+    description: "Update grade, allows partial update.",
     responses: {
       "200": {
         description: "OK",
       },
     },
   })
-  public updateGrade(@Param("id") id: number, @Body() grade: CreateGradeBody) {
+  public updateGrade(@Param("id") id: number, @Body() grade: UpdateGradeBody) {
     return this.gradeService.update(id, grade as StudentGrade);
   }
 

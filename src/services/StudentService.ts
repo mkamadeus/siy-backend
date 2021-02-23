@@ -1,17 +1,7 @@
 import Student from "@/entity/Student";
-import Course from "@/entity/Course";
 import { Service } from "typedi";
 import { getRepository, Repository } from "typeorm";
-
-enum index {
-  A = 4,
-  AB = 3.5,
-  B = 3,
-  BC = 2.5,
-  C = 2,
-  D = 1,
-  E = 0,
-}
+import { IndexValueEnum } from "@/enum/IndexEnum";
 
 @Service()
 export class StudentService {
@@ -89,7 +79,7 @@ export class StudentService {
     var totalsks = 0;
     for (let iter of stud) {
       //console.log("hoi");
-      var indeks = parseFloat(index[iter["studentGrade_indeks"]]);
+      var indeks = parseFloat(IndexValueEnum[iter["studentGrade_indeks"]]);
       var sks = iter["studentGrades.courseId = courses.id_sks"];
       total += indeks * sks;
       totalsks += sks;
@@ -123,7 +113,7 @@ export class StudentService {
     var totalsks = 0;
     for (let iter of stud) {
       //console.log("hoi");
-      var indeks = parseFloat(index[iter["studentGrade_indeks"]]);
+      var indeks = parseFloat(IndexValueEnum[iter["studentGrade_indeks"]]);
       var sks = iter["studentGrades.courseId = courses.id_sks"];
       total += indeks * sks;
       totalsks += sks;
