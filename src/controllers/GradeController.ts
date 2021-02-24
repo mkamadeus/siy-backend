@@ -13,7 +13,7 @@ import {
   UploadedFile,
 } from "routing-controllers";
 import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
-import { fileUploadOptions } from "@/services/UploadService";
+import { fileUploadOptions, UploadService } from "@/services/UploadService";
 
 export class GradeBase {
   @IsNumber()
@@ -38,9 +38,10 @@ export class GradeResponse extends GradeBase {
 
 @JsonController("/grades")
 export class GradeController {
-  constructor(private gradeService: GradeService) {
-    this.gradeService = gradeService;
-  }
+  constructor(
+    private gradeService: GradeService,
+    private uploadService: UploadService
+  ) {}
 
   @Get("/")
   @ResponseSchema(GradeResponse, { isArray: true })
@@ -106,8 +107,10 @@ export class GradeController {
     @UploadedFile("file", { required: true, options: fileUploadOptions() })
     file: Express.Multer.File
   ) {
-    console.log(file);
-    return "OK";
+    // TODO: Fix upload grade using the excel function
+    const fileContent = this.uploadService.parseExcel(file.filename);
+
+    return;
   }
 
   @Put("/:id")
