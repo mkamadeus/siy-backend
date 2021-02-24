@@ -10,8 +10,10 @@ import {
   Param,
   Post,
   Put,
+  UploadedFile,
 } from "routing-controllers";
 import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
+import { fileUploadOptions } from "@/services/UploadService";
 
 export class GradeBase {
   @IsNumber()
@@ -97,6 +99,15 @@ export class GradeController {
   })
   public createGrade(@Body() grade: CreateGradeBody) {
     return this.gradeService.create(grade as StudentGrade);
+  }
+
+  @Post("/upload")
+  public uploadGrade(
+    @UploadedFile("file", { required: true, options: fileUploadOptions() })
+    file: Express.Multer.File
+  ) {
+    console.log(file);
+    return "OK";
   }
 
   @Put("/:id")
