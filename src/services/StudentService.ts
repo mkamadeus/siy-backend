@@ -1,17 +1,7 @@
 import Student from "@/entity/Student";
-import Course from "@/entity/Course";
 import { Service } from "typedi";
 import { getRepository, Repository } from "typeorm";
-
-enum index {
-  A = 4,
-  AB = 3.5,
-  B = 3,
-  BC = 2.5,
-  C = 2,
-  D = 1,
-  E = 0,
-}
+import { IndexValueEnum } from "@/enum/IndexEnum";
 
 @Service()
 export class StudentService {
@@ -20,31 +10,47 @@ export class StudentService {
   /**
    * Get all students from database.
    */
-  public async getAll(): Promise<Student[]> {
-    return await this.studentRepository.find().then((student) => student);
+  public async getAll(withGrades: boolean = true): Promise<Student[]> {
+    if (withGrades) {
+      return await this.studentRepository
+        .createQueryBuilder("student")
+        .innerJoinAndSelect("student.studentGrades", "studentGrade")
+        .innerJoinAndSelect(
+          "studentGrade.course",
+          "studentGrades.courseId = courses.id"
+        )
+        .getMany();
+    }
+    return await this.studentRepository.find();
   }
 
   /**
    * Get student by database ID
    * @param id ID of the student
    */
-  public async getOne(id: number): Promise<Student> {
-    return await this.studentRepository
-      .findOne({ where: { id } })
-      .then((student) => student);
+  public async getOne(
+    id: number,
+    withGrades: boolean = true
+  ): Promise<Student> {
+    if (withGrades) {
+      return await this.studentRepository
+        .createQueryBuilder("student")
+        .innerJoinAndSelect("student.studentGrades", "studentGrade")
+        .innerJoinAndSelect(
+          "studentGrade.course",
+          "studentGrades.courseId = courses.id"
+        )
+        .where("student.id = :id", { id })
+        .getOne();
+    }
+    return await this.studentRepository.findOne({ where: { id } });
   }
 
   /**
-   * Get student by NIM
+   * Get student grades by NIM
    * @param nim NIM of the student
    */
-  public async getByNIM(nim: number): Promise<Student[]> {
-    return await this.studentRepository
-      .find({ where: { nim } })
-      .then((student) => student);
-  }
-
-  public async getGradeByNIM(nim: number): Promise<Student> {
+  public async getGradesByNim(nim: number): Promise<Student> {
     return await this.studentRepository
       .createQueryBuilder("student")
       .innerJoinAndSelect("student.studentGrades", "studentGrade")
@@ -56,7 +62,31 @@ export class StudentService {
       .getOne();
   }
 
-  public async getGradeBySemester(
+  /**
+   * Get grade by semester
+   * @param nim NIM of the student
+   * @param year Year queried
+   */
+  public async getGradesByYear(nim: number, year: number): Promise<Student> {
+    return await this.studentRepository
+      .createQueryBuilder("student")
+      .innerJoinAndSelect("student.studentGrades", "studentGrade")
+      .innerJoinAndSelect(
+        "studentGrade.course",
+        "studentGrades.courseId = courses.id"
+      )
+      .where("student.nim = :nim", { nim })
+      .andWhere("studentGrade.year = :year", { year })
+      .getOne();
+  }
+
+  /**
+   * Get grades by semester
+   * @param nim NIM of the student
+   * @param year Year queried
+   * @param semester Semester queried
+   */
+  public async getGradesBySemester(
     nim: number,
     year: number,
     semester: number
@@ -68,13 +98,17 @@ export class StudentService {
         "studentGrade.course",
         "studentGrades.courseId = courses.id"
       )
-      .where("student.nim = :nim", { nim: nim })
-      .andWhere("studentGrade.year = :year", { year: year })
-      .andWhere("studentGrade.semester = :sem", { sem: semester })
+      .where("student.nim = :nim", { nim })
+      .andWhere("studentGrade.year = :year", { year })
+      .andWhere("studentGrade.semester = :semester", { semester })
       .getOne();
   }
 
-  public async getIP(nim: number): Promise<number> {
+  /**
+   * Get the IPK of student by NIM
+   * @param nim NIM of the student
+   */
+  public async getIpkByNim(nim: number): Promise<number> {
     const stud = await this.studentRepository
       .createQueryBuilder("student")
       .innerJoinAndSelect("student.studentGrades", "studentGrade")
@@ -88,21 +122,22 @@ export class StudentService {
     var total = 0;
     var totalsks = 0;
     for (let iter of stud) {
-      //console.log("hoi");
-      var indeks = parseFloat(index[iter["studentGrade_indeks"]]);
+      var indeks = parseFloat(IndexValueEnum[iter["studentGrade_indeks"]]);
       var sks = iter["studentGrades.courseId = courses.id_sks"];
       total += indeks * sks;
       totalsks += sks;
-      //console.log(indeks);
-      //console.log(sks);
-      //total += index[iter["studentGrade_indeks"]];
     }
     var ip = total / totalsks;
-    //console.log(ip);
     return ip;
   }
 
-  public async getNR(
+  /**
+   * Get the IP of the student by NIM
+   * @param nim NIM of the student
+   * @param year The academic year queried
+   * @param semester The semester queried
+   */
+  public async GetIpByNim(
     nim: number,
     year: number,
     semester: number
@@ -122,17 +157,12 @@ export class StudentService {
     var total = 0;
     var totalsks = 0;
     for (let iter of stud) {
-      //console.log("hoi");
-      var indeks = parseFloat(index[iter["studentGrade_indeks"]]);
+      var indeks = parseFloat(IndexValueEnum[iter["studentGrade_indeks"]]);
       var sks = iter["studentGrades.courseId = courses.id_sks"];
       total += indeks * sks;
       totalsks += sks;
-      //console.log(indeks);
-      //console.log(sks);
-      //total += index[iter["studentGrade_indeks"]];
     }
     var nr = total / totalsks;
-    //console.log(ip);
     return nr;
   }
 
