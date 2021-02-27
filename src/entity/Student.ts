@@ -9,6 +9,7 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import StudentGrade from "./StudentGrade";
+import Answer from './Answer';
 
 @Entity()
 export default class Student extends BaseEntity {
@@ -38,4 +39,6 @@ export default class Student extends BaseEntity {
   @OneToMany(() => StudentGrade, studentGrade => studentGrade.student)
   public studentGrades!: StudentGrade[];
 
+  @OneToMany(() => Answer, answer => answer.student)
+  public answer!: Answer[];
 }
