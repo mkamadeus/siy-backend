@@ -18,15 +18,6 @@ export default class Answer extends BaseEntity {
     id: number;
 
     @Column()
-    questionID: number;
-
-    @Column()
-    code: string;
-
-    @Column()
-    nim: number;
-
-    @Column()
     answer: string;
 
     @CreateDateColumn()
