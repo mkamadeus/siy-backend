@@ -29,25 +29,25 @@ export default class LOSupplement extends BaseEntity {
   @Column()
   year: number;
 
-  @Column({ name: "lo_a" })
+  @Column({ name: "lo_a", type: "float" })
   loA: number;
 
-  @Column({ name: "lo_b" })
+  @Column({ name: "lo_b", type: "float" })
   loB: number;
 
-  @Column({ name: "lo_c" })
+  @Column({ name: "lo_c", type: "float" })
   loC: number;
 
-  @Column({ name: "lo_d" })
+  @Column({ name: "lo_d", type: "float" })
   loD: number;
 
-  @Column({ name: "lo_e" })
+  @Column({ name: "lo_e", type: "float" })
   loE: number;
 
-  @Column({ name: "lo_f" })
+  @Column({ name: "lo_f", type: "float" })
   loF: number;
 
-  @Column({ name: "lo_g" })
+  @Column({ name: "lo_g", type: "float" })
   loG: number;
 
   @ManyToOne(() => Student, (student) => student.id)
