@@ -17,17 +17,6 @@ export default class Answer extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
-    answer: string;
-
-    @CreateDateColumn()
-    @Exclude()
-    createdAt: Date;
-
-    @UpdateDateColumn()
-    @Exclude()
-    updatedAt: Date;
-
     @ManyToOne(() => Question, question => question.answer)
     public question: Question;
 
@@ -36,4 +25,30 @@ export default class Answer extends BaseEntity {
 
     @ManyToOne(() => Course, course => course.answer)
     public course!: Course;
+
+    @Column({
+        "default": ""
+    })
+    strAnswer: string;
+
+    @Column({
+        "default": "0"
+    })
+    intAnswer: number;
+
+    @Column({
+        "default": ""
+    })
+    fileAnswer: string;
+
+    @Column()
+    formId: number;
+
+    @CreateDateColumn()
+    @Exclude()
+    createdAt: Date;
+
+    @UpdateDateColumn()
+    @Exclude()
+    updatedAt: Date;
 }

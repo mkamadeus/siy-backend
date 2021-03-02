@@ -18,6 +18,9 @@ export default class Question extends BaseEntity {
     @Column()
     question: string;
 
+    @Column()
+    answerType: string;
+
     @CreateDateColumn()
     @Exclude()
     createdAt: Date;
