@@ -78,7 +78,7 @@ export class QuestionController {
         return this.questionService.getOne(id);
     }
 
-    @Get("/:answerType")
+    @Get("/answerType/:answerType")
     @ResponseSchema(QuestionResponse, {isArray: true})
     @OpenAPI({
         description: "Get list of questions with given answer type",
