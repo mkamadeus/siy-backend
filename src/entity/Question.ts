@@ -3,7 +3,7 @@ import {
     BaseEntity,
     Column,
     Entity,
-    PrimaryColumn,
+    PrimaryGeneratedColumn,
     CreateDateColumn,
     UpdateDateColumn,
     OneToMany
@@ -12,7 +12,7 @@ import Answer from './Answer';
 
 @Entity()
 export default class Question extends BaseEntity {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
     id: number;
 
     @Column()
