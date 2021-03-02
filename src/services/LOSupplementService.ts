@@ -20,6 +20,12 @@ export default class LOSupplementService {
       .then((loSupplement) => loSupplement);
   }
 
+  public async getByStudentId(studentId: number): Promise<LOSupplement> {
+    return await this.loSupplementRepository
+      .findOne({ where: { studentId } })
+      .then((loSupplement) => loSupplement);
+  }
+
   public async create(loSupplement: LOSupplement): Promise<LOSupplement> {
     const lo = await this.loSupplementRepository.save(loSupplement);
     return await this.getOne(lo.id);
