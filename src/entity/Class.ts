@@ -18,6 +18,12 @@ export default class Class extends BaseEntity {
   @Column()
   name: string;
 
+  @Column()
+  semester: number;
+
+  @Column()
+  year: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
