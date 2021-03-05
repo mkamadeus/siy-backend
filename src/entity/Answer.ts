@@ -17,14 +17,14 @@ export default class Answer extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => Question, question => question.answer)
-    public question: Question;
+    @Column()
+    questionId: number;
 
-    @ManyToOne(() => Student, student => student.answer)
-    public student!: Student;
+    @Column()
+    studentId: number;
 
-    @ManyToOne(() => Course, course => course.answer)
-    public course!: Course;
+    @Column()
+    courseId: number;
 
     @Column({
         "default": ""
@@ -51,4 +51,13 @@ export default class Answer extends BaseEntity {
     @UpdateDateColumn()
     @Exclude()
     updatedAt: Date;
+
+    @ManyToOne(() => Question, question => question.answer)
+    public question!: Question;
+
+    @ManyToOne(() => Student, student => student.answer)
+    public student!: Student;
+
+    @ManyToOne(() => Course, course => course.answer)
+    public course!: Course;
 }
