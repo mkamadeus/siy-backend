@@ -1,4 +1,4 @@
-import Class from "@/entity/Class";
+import Class from "@/entity/Lecture";
 import { Service } from "typedi";
 import { getRepository, Repository } from "typeorm";
 

@@ -179,7 +179,7 @@ export class StudentController {
     @Param("year") year: number,
     @Param("semester") semester: number
   ) {
-    return this.studentService.GetIpByNim(nim, year, semester);
+    return this.studentService.getIpByNim(nim, year, semester);
   }
 
   @Post("/")

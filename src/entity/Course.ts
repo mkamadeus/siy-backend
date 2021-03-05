@@ -10,29 +10,29 @@ import {
 } from "typeorm";
 
 import StudentGrade from "./StudentGrade";
-import Answer from './Answer';
+import Answer from "./Answer";
 
 @Entity()
-export default class Course extends BaseEntity {
+export default class Lecture extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ name: "code" })
   code: string;
 
-  @Column()
-  sks: number;
-
-  @Column()
+  @Column({ name: "name" })
   name: string;
 
-  @Column()
-  silabusRingkas: string;
+  @Column({ name: "credits" })
+  credits: number;
 
-  @Column()
-  silabusLengkap: string;
+  @Column({ name: "brief_syllabus" })
+  briefSyllabus: string;
 
-  @Column()
+  @Column({ name: "complete_syllabus" })
+  completeSyllabus: string;
+
+  @Column({ name: "outcome" })
   outcome: string;
 
   @CreateDateColumn()
@@ -43,9 +43,9 @@ export default class Course extends BaseEntity {
   @Exclude()
   updatedAt: Date;
 
-  @OneToMany(() => StudentGrade, studentGrade => studentGrade.course)
+  @OneToMany(() => StudentGrade, (studentGrade) => studentGrade.attendedClass)
   public studentGrades!: StudentGrade[];
-  
-  @OneToMany(() => Answer, answer => answer.course)
+
+  @OneToMany(() => Answer, (answer) => answer.course)
   public answer!: Answer[];
 }

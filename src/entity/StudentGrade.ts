@@ -8,30 +8,66 @@ import {
   UpdateDateColumn,
   CreateDateColumn,
   PrimaryGeneratedColumn,
-  
 } from "typeorm";
 import Student from "./Student";
-import Course from "./Course";
+import { IndexEnum } from "@/enum/IndexEnum";
+import Lecture from "./Course";
 
 @Entity()
 export default class StudentGrade extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id: number;
+
+  @Column({ name: "student_id", nullable: true })
+  studentId: number;
+
+  @Column({ name: "class_id", nullable: true })
+  classId: number;
 
   @Column()
-  studentId!: number;
+  semester: number;
 
   @Column()
-  courseId!: number;
+  year: number;
 
-  @Column()
-  indeks!: string;
+  @Column({ type: "enum" })
+  index: IndexEnum;
 
-  @Column()
-  semester!: number;
+  @Column({ name: "lo_a", type: "float" })
+  loA: number;
 
-  @Column()
-  year!: number;
+  @Column({ name: "lo_b", type: "float" })
+  loB: number;
+
+  @Column({ name: "lo_c", type: "float" })
+  loC: number;
+
+  @Column({ name: "lo_d", type: "float" })
+  loD: number;
+
+  @Column({ name: "lo_e", type: "float" })
+  loE: number;
+
+  @Column({ name: "lo_f", type: "float" })
+  loF: number;
+
+  @Column({ name: "lo_g", type: "float" })
+  loG: number;
+
+  @Column({ name: "mid_test", type: "float" })
+  midTest: number;
+
+  @Column({ name: "quiz", type: "float" })
+  quiz: number;
+
+  @Column({ name: "final_test", type: "float" })
+  finalTest: number;
+
+  @Column({ name: "practicum", type: "float" })
+  practicum: number;
+
+  @Column({ name: "homework", type: "float" })
+  homework: number;
 
   @CreateDateColumn()
   @Exclude()
@@ -41,10 +77,9 @@ export default class StudentGrade extends BaseEntity {
   @Exclude()
   updatedAt: Date;
 
-  @ManyToOne(() => Student, student => student.studentGrades)
-  public student! : Student; 
+  @ManyToOne(() => Student, (student) => student.studentGrades)
+  public student: Student;
 
-  @ManyToOne(() => Course, course => course.studentGrades)
-  public course! : Course; 
-
+  @ManyToOne(() => Lecture, (course) => course.studentGrades)
+  public attendedClass!: Lecture;
 }

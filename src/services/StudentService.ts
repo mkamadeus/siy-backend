@@ -137,7 +137,7 @@ export class StudentService {
    * @param year The academic year queried
    * @param semester The semester queried
    */
-  public async GetIpByNim(
+  public async getIpByNim(
     nim: number,
     year: number,
     semester: number
