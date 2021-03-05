@@ -1,16 +1,19 @@
+import { Exclude } from "class-transformer";
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
-  JoinTable,
   JoinColumn,
-  ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import Answer from "./Answer";
 import Course from "./Course";
+import StudentGrade from "./StudentGrade";
+import Teaches from "./Teaches";
 
 @Entity()
 export default class Lecture extends BaseEntity {
@@ -21,19 +24,10 @@ export default class Lecture extends BaseEntity {
   courseId: number;
 
   @Column()
-  name: string;
-
-  @Column()
   semester: number;
 
   @Column()
   year: number;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 
   // UAS weight
   @Column({ name: "lo_a_final_weight" })
@@ -145,7 +139,24 @@ export default class Lecture extends BaseEntity {
   @Column({ name: "lo_g_practicum_weight" })
   loGPracticumWeight: number;
 
-  @ManyToOne(() => Course, (course) => course.id)
-  @JoinColumn({ name: "course_id" })
+  @CreateDateColumn()
+  @Exclude()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  @Exclude()
+  updatedAt: Date;
+
+  @OneToMany(() => Answer, (ans) => ans.id)
+  answers: Answer[];
+
+  @OneToMany(() => StudentGrade, (grade) => grade.id)
+  studentGrades: StudentGrade[];
+
+  @OneToMany(() => Teaches, (teaches) => teaches.lecture)
+  teaches: Teaches[];
+
+  @ManyToOne(() => Course, (course) => course.lectures)
+  @JoinColumn({ name: "courseId" })
   course: Course;
 }

@@ -18,7 +18,6 @@ import {
   Put,
 } from "routing-controllers";
 import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
-import StudentGrade from "@/entity/StudentGrade";
 import { Type } from "class-transformer";
 import { GradeResponse } from "./GradeController";
 

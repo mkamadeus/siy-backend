@@ -1,26 +1,26 @@
-import Class from "@/entity/Lecture";
+import Lecture from "@/entity/Lecture";
 import { Service } from "typedi";
 import { getRepository, Repository } from "typeorm";
 
 @Service()
-export class ClassService {
-  private assignmentRepository: Repository<Class> = getRepository(Class);
+export class LectureService {
+  private assignmentRepository: Repository<Lecture> = getRepository(Lecture);
 
-  public async getAll(): Promise<Class[]> {
+  public async getAll(): Promise<Lecture[]> {
     return await this.assignmentRepository.find().then((cls) => cls);
   }
 
-  public async getOne(id: number): Promise<Class> {
+  public async getOne(id: number): Promise<Lecture> {
     return await this.assignmentRepository
       .findOne({ where: { id } })
       .then((cls) => cls);
   }
 
-  public async create(assignment: Class): Promise<Class> {
+  public async create(assignment: Lecture): Promise<Lecture> {
     return await this.assignmentRepository.save(assignment);
   }
 
-  public async update(id: number, assignment: Class): Promise<Class> {
+  public async update(id: number, assignment: Lecture): Promise<Lecture> {
     assignment.id = id;
     return await this.assignmentRepository.save(assignment);
   }

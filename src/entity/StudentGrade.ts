@@ -8,10 +8,11 @@ import {
   UpdateDateColumn,
   CreateDateColumn,
   PrimaryGeneratedColumn,
+  JoinColumn,
 } from "typeorm";
 import Student from "./Student";
 import { IndexEnum } from "@/enum/IndexEnum";
-import Lecture from "./Course";
+import Lecture from "./Lecture";
 
 @Entity()
 export default class StudentGrade extends BaseEntity {
@@ -21,8 +22,8 @@ export default class StudentGrade extends BaseEntity {
   @Column({ name: "student_id", nullable: true })
   studentId: number;
 
-  @Column({ name: "class_id", nullable: true })
-  classId: number;
+  @Column({ name: "lecture_id", nullable: true })
+  lectureId: number;
 
   @Column()
   semester: number;
@@ -69,6 +70,14 @@ export default class StudentGrade extends BaseEntity {
   @Column({ name: "homework", type: "float" })
   homework: number;
 
+  @ManyToOne(() => Student, (student) => student.studentGrades)
+  @JoinColumn({ name: "studentId" })
+  student: Student;
+
+  @ManyToOne(() => Lecture, (lecture) => lecture.teaches)
+  @JoinColumn({ name: "lectureId" })
+  lecture: Lecture;
+
   @CreateDateColumn()
   @Exclude()
   createdAt: Date;
@@ -76,10 +85,4 @@ export default class StudentGrade extends BaseEntity {
   @UpdateDateColumn()
   @Exclude()
   updatedAt: Date;
-
-  @ManyToOne(() => Student, (student) => student.studentGrades)
-  public student: Student;
-
-  @ManyToOne(() => Lecture, (course) => course.studentGrades)
-  public attendedClass!: Lecture;
 }

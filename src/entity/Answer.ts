@@ -12,19 +12,29 @@ import Question from "./Question";
 import Student from "./Student";
 import Lecture from "./Lecture";
 
+// FIXME: Recheck
 @Entity()
 export default class Answer extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ nullable: true })
+  questionId: number;
+
+  @Column({ nullable: true })
+  studentId: number;
+
+  @Column({ nullable: true })
+  courseId: number;
+
   @ManyToOne(() => Question, (question) => question.answer)
   public question: Question;
 
   @ManyToOne(() => Student, (student) => student.answer)
-  public student!: Student;
+  public student: Student;
 
-  @ManyToOne(() => Lecture, (course) => course.answer)
-  public course!: Lecture;
+  @ManyToOne(() => Lecture, (lecture) => lecture.answers)
+  public course: Lecture;
 
   @Column({
     default: "",

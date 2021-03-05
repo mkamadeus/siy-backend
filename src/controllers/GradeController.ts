@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import StudentGrade from "@/entity/StudentGrade";
-import { GradeService } from "@/services/GradeService";
+import { StudentGradeService } from "@/services/StudentGradeService";
 import { IsEnum, IsNumber, IsOptional } from "class-validator";
 import {
   Body,
@@ -82,7 +82,7 @@ export class GradeResponse {
 
 @JsonController("/grades")
 export class GradeController {
-  constructor(private gradeService: GradeService) {
+  constructor(private gradeService: StudentGradeService) {
     this.gradeService = gradeService;
   }
 

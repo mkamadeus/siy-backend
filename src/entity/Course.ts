@@ -8,12 +8,12 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-
-import StudentGrade from "./StudentGrade";
 import Answer from "./Answer";
+import Lecture from "./Lecture";
 
+// FIXME: Recheck
 @Entity()
-export default class Lecture extends BaseEntity {
+export default class Course extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -35,6 +35,12 @@ export default class Lecture extends BaseEntity {
   @Column({ name: "outcome" })
   outcome: string;
 
+  @OneToMany(() => Lecture, (lecture) => lecture.course)
+  lectures: Lecture[];
+
+  @OneToMany(() => Answer, (answer) => answer.course)
+  answer: Answer[];
+
   @CreateDateColumn()
   @Exclude()
   createdAt: Date;
@@ -42,10 +48,4 @@ export default class Lecture extends BaseEntity {
   @UpdateDateColumn()
   @Exclude()
   updatedAt: Date;
-
-  @OneToMany(() => StudentGrade, (studentGrade) => studentGrade.attendedClass)
-  public studentGrades!: StudentGrade[];
-
-  @OneToMany(() => Answer, (answer) => answer.course)
-  public answer!: Answer[];
 }

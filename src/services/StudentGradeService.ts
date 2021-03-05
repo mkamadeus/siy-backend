@@ -3,11 +3,15 @@ import { Service } from "typedi";
 import { getRepository, Repository } from "typeorm";
 
 @Service()
-export class GradeService {
-  private gradeRepository: Repository<StudentGrade> = getRepository(StudentGrade);
+export class StudentGradeService {
+  private gradeRepository: Repository<StudentGrade> = getRepository(
+    StudentGrade
+  );
 
   public async getAll(): Promise<StudentGrade[]> {
-    return await this.gradeRepository.find().then((studentGrade) => studentGrade);
+    return await this.gradeRepository
+      .find()
+      .then((studentGrade) => studentGrade);
   }
 
   public async getOne(id: number): Promise<StudentGrade> {
@@ -26,7 +30,10 @@ export class GradeService {
     return await this.gradeRepository.save(student);
   }
 
-  public async update(id: number, student: StudentGrade): Promise<StudentGrade> {
+  public async update(
+    id: number,
+    student: StudentGrade
+  ): Promise<StudentGrade> {
     student.id = id;
     return await this.gradeRepository.save(student);
   }

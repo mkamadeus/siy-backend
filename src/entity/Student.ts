@@ -28,6 +28,12 @@ export default class Student extends BaseEntity {
   @Column("float")
   ipk: number;
 
+  @OneToMany(() => StudentGrade, (studentGrade) => studentGrade.student)
+  studentGrades: StudentGrade[];
+
+  @OneToMany(() => Answer, (answer) => answer.student)
+  answer: Answer[];
+
   @CreateDateColumn()
   @Exclude()
   createdAt: Date;
@@ -35,10 +41,4 @@ export default class Student extends BaseEntity {
   @UpdateDateColumn()
   @Exclude()
   updatedAt: Date;
-
-  @OneToMany(() => StudentGrade, (studentGrade) => studentGrade.student)
-  public studentGrades: StudentGrade[];
-
-  @OneToMany(() => Answer, (answer) => answer.student)
-  public answer: Answer[];
 }
