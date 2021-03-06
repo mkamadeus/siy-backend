@@ -9,10 +9,14 @@ import {
   CreateDateColumn,
   PrimaryGeneratedColumn,
   JoinColumn,
+  AfterInsert,
 } from "typeorm";
 import Student from "./Student";
-import { IndexEnum } from "@/enum/IndexEnum";
+import { IndexEnum, IndexValueEnum } from "@/enum/IndexEnum";
 import Lecture from "./Lecture";
+import Container from "typedi";
+import { StudentGradeService } from "@/services/StudentGradeService";
+import { StudentService } from "@/services/StudentService";
 
 @Entity()
 export default class StudentGrade extends BaseEntity {
@@ -31,7 +35,7 @@ export default class StudentGrade extends BaseEntity {
   @Column()
   year: number;
 
-  @Column({ type: "enum" })
+  @Column({ type: "enum", enum: IndexEnum })
   index: IndexEnum;
 
   @Column({ name: "lo_a", type: "float" })
@@ -85,4 +89,19 @@ export default class StudentGrade extends BaseEntity {
   @UpdateDateColumn()
   @Exclude()
   updatedAt: Date;
+
+  @AfterInsert()
+  async updateIpk() {
+    console.log(this);
+    const nim = this.student.nim;
+    const grades = await Container.get(StudentGradeService).getByNim(nim);
+    let totalScore = 0;
+    let totalCredits = 0;
+    for (const grade of grades) {
+      totalCredits += grade.lecture.course.credits;
+      totalScore += IndexValueEnum[grade.index];
+    }
+    const ipk = totalScore / totalCredits;
+    await Container.get(StudentService).updateByNim(nim, { ipk });
+  }
 }

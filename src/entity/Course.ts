@@ -8,7 +8,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import Answer from "./Answer";
 import Lecture from "./Lecture";
 
 // FIXME: Recheck
@@ -37,9 +36,6 @@ export default class Course extends BaseEntity {
 
   @OneToMany(() => Lecture, (lecture) => lecture.course)
   lectures: Lecture[];
-
-  @OneToMany(() => Answer, (answer) => answer.course)
-  answer: Answer[];
 
   @CreateDateColumn()
   @Exclude()

@@ -4,29 +4,28 @@ import { getRepository, Repository } from "typeorm";
 
 @Service()
 export class LectureService {
-  private assignmentRepository: Repository<Lecture> = getRepository(Lecture);
+  private lectureRepository: Repository<Lecture> = getRepository(Lecture);
 
   public async getAll(): Promise<Lecture[]> {
-    return await this.assignmentRepository.find().then((cls) => cls);
+    return await this.lectureRepository.find().then((cls) => cls);
   }
 
   public async getOne(id: number): Promise<Lecture> {
-    return await this.assignmentRepository
-      .findOne({ where: { id } })
-      .then((cls) => cls);
+    return await this.lectureRepository.findOne({ where: { id } });
   }
 
-  public async create(assignment: Lecture): Promise<Lecture> {
-    return await this.assignmentRepository.save(assignment);
+  public async create(lecture: Lecture): Promise<Lecture> {
+    return await this.lectureRepository.save(lecture);
   }
 
-  public async update(id: number, assignment: Lecture): Promise<Lecture> {
-    assignment.id = id;
-    return await this.assignmentRepository.save(assignment);
+  public async update(id: number, lecture: Lecture): Promise<Lecture> {
+    lecture.id = id;
+    await this.lectureRepository.update(id, lecture);
+    return await this.getOne(id);
   }
 
   public async delete(id: number): Promise<void> {
-    await this.assignmentRepository.delete(id);
+    await this.lectureRepository.delete(id);
     return;
   }
 }

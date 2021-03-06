@@ -18,7 +18,7 @@ export default class Teacher extends BaseEntity {
   @Column({ name: "teacher_name" })
   name: string;
 
-  @OneToMany(() => Teaches, (teaches) => teaches.teacherId)
+  @OneToMany(() => Teaches, (teaches) => teaches.teacher)
   teaches: Teaches[];
 
   @CreateDateColumn()

@@ -20,9 +20,9 @@ export class StudentGradeService {
       .then((studentGrade) => studentGrade);
   }
 
-  public async getByStdID(stdID: number): Promise<StudentGrade[]> {
+  public async getByNim(nim: string): Promise<StudentGrade[]> {
     return await this.gradeRepository
-      .find({ where: { studentId: stdID } })
+      .find({ where: { studentId: nim } })
       .then((studentGrade) => studentGrade);
   }
 

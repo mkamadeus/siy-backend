@@ -22,8 +22,8 @@ export class CourseService {
 
   public async update(id: number, course: Course): Promise<Course> {
     course.id = id;
-    const prevCourse = await this.getOne(id);
-    return await this.courseRepository.save({ ...prevCourse, ...course });
+    await this.courseRepository.update(id, course);
+    return await this.getOne(id);
   }
 
   public async delete(id: number): Promise<void> {

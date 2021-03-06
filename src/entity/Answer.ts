@@ -34,7 +34,7 @@ export default class Answer extends BaseEntity {
   public student: Student;
 
   @ManyToOne(() => Lecture, (lecture) => lecture.answers)
-  public course: Lecture;
+  public lecture: Lecture;
 
   @Column({
     default: "",
