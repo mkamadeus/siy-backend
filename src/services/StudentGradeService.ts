@@ -1,6 +1,8 @@
 import StudentGrade from "@/entity/StudentGrade";
-import { Service } from "typedi";
+import { deserialize, plainToClass } from "class-transformer";
+import Container, { Service } from "typedi";
 import { getRepository, Repository } from "typeorm";
+import { StudentService } from "./StudentService";
 
 @Service()
 export class StudentGradeService {
@@ -21,13 +23,27 @@ export class StudentGradeService {
   }
 
   public async getByNim(nim: string): Promise<StudentGrade[]> {
+    const student = await Container.get(StudentService).getByNim(nim);
     return await this.gradeRepository
-      .find({ where: { studentId: nim } })
+      .find({ where: { studentId: student.id } })
       .then((studentGrade) => studentGrade);
   }
 
-  public async create(student: StudentGrade): Promise<StudentGrade> {
-    return await this.gradeRepository.save(student);
+  public async create(studentGrade: StudentGrade): Promise<StudentGrade> {
+    return await this.gradeRepository.save(studentGrade);
+  }
+
+  public async createByNim(
+    nim: string,
+    studentGrade: StudentGrade
+  ): Promise<StudentGrade> {
+    const student = await Container.get(StudentService).getByNim(nim);
+    return await this.gradeRepository.save(
+      plainToClass(StudentGrade, {
+        studentId: student.id,
+        ...studentGrade,
+      })
+    );
   }
 
   public async update(

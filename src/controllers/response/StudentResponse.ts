@@ -6,7 +6,7 @@ export class StudentResponse {
   @IsNumber()
   public id: number;
 
-  @IsNumber()
+  @IsString()
   public nim: string;
 
   @IsString()

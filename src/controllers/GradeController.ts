@@ -14,8 +14,12 @@ import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
 import { GradeResponse } from "./response/StudentGradeResponse";
 import {
   CreateGradeBody,
+  CreateGradeByNimBody,
   UpdateGradeBody,
 } from "./request/StudentGradeRequest";
+import Container from "typedi";
+import { StudentService } from "@/services/StudentService";
+import { reset } from "chalk";
 
 @JsonController("/grades")
 export class GradeController {
@@ -33,22 +37,22 @@ export class GradeController {
       },
     },
   })
-  public getAllGrades() {
-    return this.gradeService.getAll();
+  public async getAllGrades() {
+    return await this.gradeService.getAll();
   }
 
-  @Get("/student/:id")
+  @Get("/student/:nim")
   @ResponseSchema(GradeResponse)
   @OpenAPI({
-    description: "Get grade data by student ID",
+    description: "Get grade data by NIM",
     responses: {
       "200": {
         description: "OK",
       },
     },
   })
-  public getGradeByStudentId(@Param("id") id: string) {
-    return this.gradeService.getByNim(id);
+  public async getGradeByNim(@Param("nim") nim: string) {
+    return await this.gradeService.getByNim(nim);
   }
 
   @Get("/:id")
@@ -61,8 +65,8 @@ export class GradeController {
       },
     },
   })
-  public getGradeById(@Param("id") id: number) {
-    return this.gradeService.getOne(id);
+  public async getGradeById(@Param("id") id: number) {
+    return await this.gradeService.getOne(id);
   }
 
   @Post("/")
@@ -78,8 +82,28 @@ export class GradeController {
       },
     },
   })
-  public createGrade(@Body() grade: CreateGradeBody) {
-    return this.gradeService.create(grade as StudentGrade);
+  public async createGrade(@Body() grade: CreateGradeBody) {
+    return await this.gradeService.create(grade as StudentGrade);
+  }
+
+  @Post("/student/:nim")
+  @ResponseSchema(GradeResponse)
+  @OpenAPI({
+    description: "Create new grade by NIM",
+    responses: {
+      "200": {
+        description: "OK",
+      },
+      "400": {
+        description: "Bad request",
+      },
+    },
+  })
+  public async createGradeByNim(
+    @Param("nim") nim: string,
+    @Body() grade: CreateGradeByNimBody
+  ) {
+    return this.gradeService.createByNim(nim, grade as StudentGrade);
   }
 
   @Put("/:id")

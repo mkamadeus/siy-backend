@@ -1,7 +1,7 @@
 import { IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateStudentBody {
-  @IsNumber()
+  @IsString()
   public nim: string;
 
   @IsString()
@@ -18,7 +18,7 @@ export class CreateStudentBody {
 
 export class UpdateStudentBody {
   @IsOptional()
-  @IsNumber()
+  @IsString()
   public nim: string;
 
   @IsOptional()

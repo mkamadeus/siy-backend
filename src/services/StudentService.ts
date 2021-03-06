@@ -1,7 +1,8 @@
 import Student from "@/entity/Student";
-import { Service } from "typedi";
+import Container, { Service } from "typedi";
 import { getRepository, Repository } from "typeorm";
 import { IndexValueEnum } from "@/enum/IndexEnum";
+import StudentGrade from "@/entity/StudentGrade";
 
 @Service()
 export class StudentService {
@@ -13,8 +14,8 @@ export class StudentService {
   public async getAll(): Promise<Student[]> {
     return await this.studentRepository
       .createQueryBuilder("student")
-      .innerJoinAndSelect("student.studentGrades", "studentGrade")
-      .innerJoinAndSelect(
+      .leftJoinAndSelect("student.studentGrades", "studentGrade")
+      .leftJoinAndSelect(
         "studentGrade.lecture",
         "studentGrades.lectureId = lectures.id"
       )
@@ -28,8 +29,8 @@ export class StudentService {
   public async getOne(id: number): Promise<Student> {
     return await this.studentRepository
       .createQueryBuilder("student")
-      .innerJoinAndSelect("student.studentGrades", "studentGrade")
-      .innerJoinAndSelect(
+      .leftJoinAndSelect("student.studentGrades", "studentGrade")
+      .leftJoinAndSelect(
         "studentGrade.lecture",
         "studentGrades.lectureId = lectures.id"
       )
@@ -44,12 +45,12 @@ export class StudentService {
   public async getByNim(nim: string): Promise<Student> {
     return await this.studentRepository
       .createQueryBuilder("student")
-      .innerJoinAndSelect("student.studentGrades", "studentGrade")
-      .innerJoinAndSelect(
-        "studentGrade.lecture",
-        "studentGrades.lectureId = lectures.id"
-      )
-      .where("student.nim = :nim", { nim: nim })
+      .leftJoinAndSelect("student.studentGrades", "studentGrade")
+      // .leftJoinAndSelect(
+      //   "studentGrade.lecture",
+      //   "studentGrades.lectureId = lectures.id"
+      // )
+      .where("student.nim = :nim", { nim })
       .getOne();
   }
 
@@ -61,8 +62,8 @@ export class StudentService {
   public async getGradesByYear(nim: number, year: number): Promise<Student> {
     return await this.studentRepository
       .createQueryBuilder("student")
-      .innerJoinAndSelect("student.studentGrades", "studentGrade")
-      .innerJoinAndSelect(
+      .leftJoinAndSelect("student.studentGrades", "studentGrade")
+      .leftJoinAndSelect(
         "studentGrade.lecture",
         "studentGrades.lectureId = lectures.id"
       )
@@ -84,8 +85,8 @@ export class StudentService {
   ): Promise<Student> {
     return await this.studentRepository
       .createQueryBuilder("student")
-      .innerJoinAndSelect("student.studentGrades", "studentGrade")
-      .innerJoinAndSelect(
+      .leftJoinAndSelect("student.studentGrades", "studentGrade")
+      .leftJoinAndSelect(
         "studentGrade.lecture",
         "studentGrades.lectureId = lectures.id"
       )
@@ -102,8 +103,8 @@ export class StudentService {
   public async getIpkByNim(nim: number): Promise<number> {
     const stud = await this.studentRepository
       .createQueryBuilder("student")
-      .innerJoinAndSelect("student.studentGrades", "studentGrade")
-      .innerJoinAndSelect(
+      .leftJoinAndSelect("student.studentGrades", "studentGrade")
+      .leftJoinAndSelect(
         "studentGrade.lecture",
         "studentGrades.lectureId = lectures.id"
       )
@@ -135,8 +136,8 @@ export class StudentService {
   ): Promise<number> {
     const stud = await this.studentRepository
       .createQueryBuilder("student")
-      .innerJoinAndSelect("student.studentGrades", "studentGrade")
-      .innerJoinAndSelect(
+      .leftJoinAndSelect("student.studentGrades", "studentGrade")
+      .leftJoinAndSelect(
         "studentGrade.lecture",
         "studentGrades.lectureId = lectures.id"
       )
@@ -172,7 +173,8 @@ export class StudentService {
    */
   public async update(id: number, student: Partial<Student>): Promise<Student> {
     student.id = id;
-    return await this.studentRepository.save(student);
+    await this.studentRepository.update(id, student);
+    return await Container.get(StudentService).getOne(id);
   }
 
   /**

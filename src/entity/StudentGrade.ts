@@ -10,6 +10,8 @@ import {
   PrimaryGeneratedColumn,
   JoinColumn,
   AfterInsert,
+  AfterUpdate,
+  AfterRemove,
 } from "typeorm";
 import Student from "./Student";
 import { IndexEnum, IndexValueEnum } from "@/enum/IndexEnum";
@@ -17,6 +19,8 @@ import Lecture from "./Lecture";
 import Container from "typedi";
 import { StudentGradeService } from "@/services/StudentGradeService";
 import { StudentService } from "@/services/StudentService";
+import { LectureService } from "@/services/LectureService";
+import { CourseService } from "@/services/CourseService";
 
 @Entity()
 export default class StudentGrade extends BaseEntity {
@@ -38,40 +42,40 @@ export default class StudentGrade extends BaseEntity {
   @Column({ type: "enum", enum: IndexEnum })
   index: IndexEnum;
 
-  @Column({ name: "lo_a", type: "float" })
+  @Column({ name: "lo_a", type: "float", default: 0 })
   loA: number;
 
-  @Column({ name: "lo_b", type: "float" })
+  @Column({ name: "lo_b", type: "float", default: 0 })
   loB: number;
 
-  @Column({ name: "lo_c", type: "float" })
+  @Column({ name: "lo_c", type: "float", default: 0 })
   loC: number;
 
-  @Column({ name: "lo_d", type: "float" })
+  @Column({ name: "lo_d", type: "float", default: 0 })
   loD: number;
 
-  @Column({ name: "lo_e", type: "float" })
+  @Column({ name: "lo_e", type: "float", default: 0 })
   loE: number;
 
-  @Column({ name: "lo_f", type: "float" })
+  @Column({ name: "lo_f", type: "float", default: 0 })
   loF: number;
 
-  @Column({ name: "lo_g", type: "float" })
+  @Column({ name: "lo_g", type: "float", default: 0 })
   loG: number;
 
-  @Column({ name: "mid_test", type: "float" })
+  @Column({ name: "mid_test", type: "float", default: 0, nullable: true })
   midTest: number;
 
-  @Column({ name: "quiz", type: "float" })
+  @Column({ name: "quiz", type: "float", default: 0, nullable: true })
   quiz: number;
 
-  @Column({ name: "final_test", type: "float" })
+  @Column({ name: "final_test", type: "float", default: 0, nullable: true })
   finalTest: number;
 
-  @Column({ name: "practicum", type: "float" })
+  @Column({ name: "practicum", type: "float", default: 0, nullable: true })
   practicum: number;
 
-  @Column({ name: "homework", type: "float" })
+  @Column({ name: "homework", type: "float", default: 0, nullable: true })
   homework: number;
 
   @ManyToOne(() => Student, (student) => student.studentGrades)
@@ -90,18 +94,31 @@ export default class StudentGrade extends BaseEntity {
   @Exclude()
   updatedAt: Date;
 
+  // @AfterUpdate()
+  // @AfterRemove()
   @AfterInsert()
-  async updateIpk() {
-    console.log(this);
-    const nim = this.student.nim;
-    const grades = await Container.get(StudentGradeService).getByNim(nim);
+  public async updateIpk() {
+    console.log("hoho", this);
+    const student = await Container.get(StudentService).getOne(this.studentId);
+    console.log(student);
+    const grades = await Container.get(StudentGradeService).getByNim(
+      student.nim
+    );
+    console.log(grades);
     let totalScore = 0;
     let totalCredits = 0;
     for (const grade of grades) {
-      totalCredits += grade.lecture.course.credits;
-      totalScore += IndexValueEnum[grade.index];
+      const lecture = await Container.get(LectureService).getOne(
+        grade.lectureId
+      );
+      const course = await Container.get(CourseService).getOne(
+        lecture.courseId
+      );
+      totalCredits += course.credits;
+      totalScore += IndexValueEnum[grade.index] * course.credits;
     }
+    console.log(totalScore, totalCredits);
     const ipk = totalScore / totalCredits;
-    await Container.get(StudentService).updateByNim(nim, { ipk });
+    await Container.get(StudentService).update(this.studentId, { ipk });
   }
 }
