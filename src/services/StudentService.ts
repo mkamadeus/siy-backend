@@ -92,68 +92,6 @@ export class StudentService {
   }
 
   /**
-   * Get the IPK of student by NIM
-   * @param nim NIM of the student
-   */
-  public async getIpkByNim(nim: number): Promise<number> {
-    const stud = await this.studentRepository
-      .createQueryBuilder("student")
-      .leftJoinAndSelect("student.studentGrades", "studentGrade")
-      .leftJoinAndSelect(
-        "studentGrade.lecture",
-        "studentGrades.lectureId = lectures.id"
-      )
-      .where("student.nim = :nim", { nim: nim })
-      .getRawMany();
-
-    var total = 0;
-    var totalsks = 0;
-    for (let iter of stud) {
-      var indeks = parseFloat(IndexValueEnum[iter["studentGrade_indeks"]]);
-      var sks = iter["studentGrades.lectureId = lectures.id_sks"];
-      total += indeks * sks;
-      totalsks += sks;
-    }
-    var ip = total / totalsks;
-    return ip;
-  }
-
-  /**
-   * Get the IP of the student by NIM
-   * @param nim NIM of the student
-   * @param year The academic year queried
-   * @param semester The semester queried
-   */
-  public async getIpByNim(
-    nim: number,
-    year: number,
-    semester: number
-  ): Promise<number> {
-    const stud = await this.studentRepository
-      .createQueryBuilder("student")
-      .leftJoinAndSelect("student.studentGrades", "studentGrade")
-      .leftJoinAndSelect(
-        "studentGrade.lecture",
-        "studentGrades.lectureId = lectures.id"
-      )
-      .where("student.nim = :nim", { nim: nim })
-      .andWhere("studentGrade.year = :year", { year: year })
-      .andWhere("studentGrade.semester = :sem", { sem: semester })
-      .getRawMany();
-
-    var total = 0;
-    var totalsks = 0;
-    for (let iter of stud) {
-      var indeks = parseFloat(IndexValueEnum[iter["studentGrade_indeks"]]);
-      var sks = iter["studentGrades.lectureId = lectures.id_sks"];
-      total += indeks * sks;
-      totalsks += sks;
-    }
-    var nr = total / totalsks;
-    return nr;
-  }
-
-  /**
    * Create new student
    * @param student Student object that is going to be created
    */

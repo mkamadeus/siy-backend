@@ -123,54 +123,10 @@ export default class StudentGrade extends BaseEntity {
   @AfterRemove()
   @AfterInsert()
   public async updateLo() {
-    const { midTest, quiz, finalTest, practicum, homework } = this;
-    const lecture = await Container.get(LectureService).getOne(this.lectureId);
-
-    // Sum product of all LO
-    this.loA =
-      midTest * lecture.loAMidWeight +
-      quiz * lecture.loAQuizWeight +
-      finalTest * lecture.loAFinalWeight +
-      practicum * lecture.loAPracticumWeight +
-      homework * lecture.loAHomeworkWeight;
-    this.loB =
-      midTest * lecture.loBMidWeight +
-      quiz * lecture.loBQuizWeight +
-      finalTest * lecture.loBFinalWeight +
-      practicum * lecture.loBPracticumWeight +
-      homework * lecture.loBHomeworkWeight;
-    this.loC =
-      midTest * lecture.loCMidWeight +
-      quiz * lecture.loCQuizWeight +
-      finalTest * lecture.loCFinalWeight +
-      practicum * lecture.loCPracticumWeight +
-      homework * lecture.loCHomeworkWeight;
-    this.loD =
-      midTest * lecture.loDMidWeight +
-      quiz * lecture.loDQuizWeight +
-      finalTest * lecture.loDFinalWeight +
-      practicum * lecture.loDPracticumWeight +
-      homework * lecture.loDHomeworkWeight;
-    this.loE =
-      midTest * lecture.loEMidWeight +
-      quiz * lecture.loEQuizWeight +
-      finalTest * lecture.loEFinalWeight +
-      practicum * lecture.loEPracticumWeight +
-      homework * lecture.loEHomeworkWeight;
-    this.loF =
-      midTest * lecture.loFMidWeight +
-      quiz * lecture.loFQuizWeight +
-      finalTest * lecture.loFFinalWeight +
-      practicum * lecture.loFPracticumWeight +
-      homework * lecture.loFHomeworkWeight;
-    this.loG =
-      midTest * lecture.loGMidWeight +
-      quiz * lecture.loGQuizWeight +
-      finalTest * lecture.loGFinalWeight +
-      practicum * lecture.loGPracticumWeight +
-      homework * lecture.loGHomeworkWeight;
-
-    console.log(this);
-    // getRepository(StudentGrade).save(this);
+    console.log("asd");
+    const lo = await Container.get(StudentGradeService).getLoById(this.id);
+    await Container.get(StudentGradeService).update(this.id, {
+      ...lo,
+    } as StudentGrade);
   }
 }

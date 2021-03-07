@@ -95,37 +95,37 @@ export class StudentController {
     return this.studentService.getByNim(nim);
   }
 
-  @Get("/ipk/:nim")
-  @ResponseSchema(StudentResponse)
-  @OpenAPI({
-    description: "Get IPK by NIM",
-    responses: {
-      "200": {
-        description: "OK",
-      },
-    },
-  })
-  public getStudentIpk(@Param("nim") nim: number) {
-    return this.studentService.getIpkByNim(nim);
-  }
+  // @Get("/ipk/:nim")
+  // @ResponseSchema(StudentResponse)
+  // @OpenAPI({
+  //   description: "Get IPK by NIM",
+  //   responses: {
+  //     "200": {
+  //       description: "OK",
+  //     },
+  //   },
+  // })
+  // public getStudentIpk(@Param("nim") nim: number) {
+  //   return this.studentService.getIpkByNim(nim);
+  // }
 
-  @Get("/ipk/:nim/:year/:semester")
-  @ResponseSchema(StudentResponse)
-  @OpenAPI({
-    description: "Get IP by NIM",
-    responses: {
-      "200": {
-        description: "OK",
-      },
-    },
-  })
-  public getStudentIp(
-    @Param("nim") nim: number,
-    @Param("year") year: number,
-    @Param("semester") semester: number
-  ) {
-    return this.studentService.getIpByNim(nim, year, semester);
-  }
+  // @Get("/ipk/:nim/:year/:semester")
+  // @ResponseSchema(StudentResponse)
+  // @OpenAPI({
+  //   description: "Get IP by NIM",
+  //   responses: {
+  //     "200": {
+  //       description: "OK",
+  //     },
+  //   },
+  // })
+  // public getStudentIp(
+  //   @Param("nim") nim: number,
+  //   @Param("year") year: number,
+  //   @Param("semester") semester: number
+  // ) {
+  //   return this.studentService.getIpByNim(nim, year, semester);
+  // }
 
   @Post("/")
   @ResponseSchema(StudentResponse)
