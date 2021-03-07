@@ -12,6 +12,7 @@ import {
   AfterInsert,
   AfterUpdate,
   AfterRemove,
+  getRepository,
 } from "typeorm";
 import Student from "./Student";
 import { IndexEnum, IndexValueEnum } from "@/enum/IndexEnum";
@@ -94,17 +95,14 @@ export default class StudentGrade extends BaseEntity {
   @Exclude()
   updatedAt: Date;
 
-  // @AfterUpdate()
-  // @AfterRemove()
+  @AfterUpdate()
+  @AfterRemove()
   @AfterInsert()
   public async updateIpk() {
-    console.log("hoho", this);
     const student = await Container.get(StudentService).getOne(this.studentId);
-    console.log(student);
     const grades = await Container.get(StudentGradeService).getByNim(
       student.nim
     );
-    console.log(grades);
     let totalScore = 0;
     let totalCredits = 0;
     for (const grade of grades) {
@@ -117,8 +115,62 @@ export default class StudentGrade extends BaseEntity {
       totalCredits += course.credits;
       totalScore += IndexValueEnum[grade.index] * course.credits;
     }
-    console.log(totalScore, totalCredits);
     const ipk = totalScore / totalCredits;
     await Container.get(StudentService).update(this.studentId, { ipk });
+  }
+
+  @AfterUpdate()
+  @AfterRemove()
+  @AfterInsert()
+  public async updateLo() {
+    const { midTest, quiz, finalTest, practicum, homework } = this;
+    const lecture = await Container.get(LectureService).getOne(this.lectureId);
+
+    // Sum product of all LO
+    this.loA =
+      midTest * lecture.loAMidWeight +
+      quiz * lecture.loAQuizWeight +
+      finalTest * lecture.loAFinalWeight +
+      practicum * lecture.loAPracticumWeight +
+      homework * lecture.loAHomeworkWeight;
+    this.loB =
+      midTest * lecture.loBMidWeight +
+      quiz * lecture.loBQuizWeight +
+      finalTest * lecture.loBFinalWeight +
+      practicum * lecture.loBPracticumWeight +
+      homework * lecture.loBHomeworkWeight;
+    this.loC =
+      midTest * lecture.loCMidWeight +
+      quiz * lecture.loCQuizWeight +
+      finalTest * lecture.loCFinalWeight +
+      practicum * lecture.loCPracticumWeight +
+      homework * lecture.loCHomeworkWeight;
+    this.loD =
+      midTest * lecture.loDMidWeight +
+      quiz * lecture.loDQuizWeight +
+      finalTest * lecture.loDFinalWeight +
+      practicum * lecture.loDPracticumWeight +
+      homework * lecture.loDHomeworkWeight;
+    this.loE =
+      midTest * lecture.loEMidWeight +
+      quiz * lecture.loEQuizWeight +
+      finalTest * lecture.loEFinalWeight +
+      practicum * lecture.loEPracticumWeight +
+      homework * lecture.loEHomeworkWeight;
+    this.loF =
+      midTest * lecture.loFMidWeight +
+      quiz * lecture.loFQuizWeight +
+      finalTest * lecture.loFFinalWeight +
+      practicum * lecture.loFPracticumWeight +
+      homework * lecture.loFHomeworkWeight;
+    this.loG =
+      midTest * lecture.loGMidWeight +
+      quiz * lecture.loGQuizWeight +
+      finalTest * lecture.loGFinalWeight +
+      practicum * lecture.loGPracticumWeight +
+      homework * lecture.loGHomeworkWeight;
+
+    console.log(this);
+    // getRepository(StudentGrade).save(this);
   }
 }

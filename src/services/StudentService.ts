@@ -45,7 +45,6 @@ export class StudentService {
   public async getByNim(nim: string): Promise<Student> {
     const student = await this.studentRepository.findOne({
       where: { nim },
-      relations: ["studentGrades", "studentGrades.lecture"],
     });
     return student;
   }

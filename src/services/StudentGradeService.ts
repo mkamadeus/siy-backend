@@ -1,5 +1,5 @@
 import StudentGrade from "@/entity/StudentGrade";
-import { deserialize, plainToClass } from "class-transformer";
+import { plainToClass } from "class-transformer";
 import Container, { Service } from "typedi";
 import { getRepository, Repository } from "typeorm";
 import { StudentService } from "./StudentService";
@@ -50,10 +50,22 @@ export class StudentGradeService {
 
   public async update(
     id: number,
-    student: StudentGrade
+    studentGrade: StudentGrade
   ): Promise<StudentGrade> {
-    student.id = id;
-    return await this.gradeRepository.save(plainToClass(StudentGrade, student));
+    studentGrade.id = id;
+    return await this.gradeRepository.save(
+      plainToClass(StudentGrade, studentGrade)
+    );
+  }
+
+  public async updateByNim(
+    nim: string,
+    studentGrade: StudentGrade
+  ): Promise<StudentGrade> {
+    const student = await Container.get(StudentService).getByNim(nim);
+    return await this.gradeRepository.save(
+      plainToClass(StudentGrade, { studentId: student.id, ...studentGrade })
+    );
   }
 
   public async delete(id: number): Promise<void> {
