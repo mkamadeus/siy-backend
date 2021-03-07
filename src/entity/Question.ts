@@ -1,34 +1,35 @@
 import { Exclude } from "class-transformer";
 import {
-    BaseEntity,
-    Column,
-    Entity,
-    PrimaryGeneratedColumn,
-    CreateDateColumn,
-    UpdateDateColumn,
-    OneToMany
+  BaseEntity,
+  Column,
+  Entity,
+  PrimaryColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
 } from "typeorm";
-import Answer from './Answer';
+import Answer from "./Answer";
 
+// FIXME: Waiting for client confirmation
 @Entity()
 export default class Question extends BaseEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryColumn()
+  id: number;
 
-    @Column()
-    question: string;
+  @Column()
+  question: string;
 
-    @Column()
-    answerType: string;
+  @Column()
+  answerType: string;
 
-    @CreateDateColumn()
-    @Exclude()
-    createdAt: Date;
+  @OneToMany(() => Answer, (answer) => answer.question)
+  answer: Answer[];
 
-    @UpdateDateColumn()
-    @Exclude()
-    updatedAt: Date;
+  @CreateDateColumn()
+  @Exclude()
+  createdAt: Date;
 
-    @OneToMany(() => Answer, answer => answer.question)
-    public answer!: Answer[];
+  @UpdateDateColumn()
+  @Exclude()
+  updatedAt: Date;
 }

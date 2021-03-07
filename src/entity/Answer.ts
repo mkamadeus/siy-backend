@@ -1,63 +1,68 @@
 import { Exclude } from "class-transformer";
 import {
-    BaseEntity,
-    Column,
-    Entity,
-    PrimaryGeneratedColumn,
-    CreateDateColumn,
-    UpdateDateColumn,
-    ManyToOne
+  BaseEntity,
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from "typeorm";
-import Question from './Question';
-import Student from './Student';
-import Course from  './Course';
+import Question from "./Question";
+import Student from "./Student";
+import Lecture from "./Lecture";
 
+// FIXME: Recheck
 @Entity()
 export default class Answer extends BaseEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    questionId: number;
+  @Column({ nullable: true })
+  questionId: number;
 
-    @Column()
-    studentId: number;
+  @Column({ nullable: true })
+  studentId: number;
 
-    @Column()
-    courseId: number;
+  @Column({ nullable: true })
+  courseId: number;
 
-    @Column({
-        "default": ""
-    })
-    strAnswer: string;
+  @ManyToOne(() => Question, (question) => question.answer)
+  @JoinColumn({ name: "question_id", referencedColumnName: "id" })
+  public question: Question;
 
-    @Column({
-        "default": "0"
-    })
-    intAnswer: number;
+  @ManyToOne(() => Student, (student) => student.answer)
+  @JoinColumn({ name: "student_id", referencedColumnName: "id" })
+  public student: Student;
 
-    @Column({
-        "default": ""
-    })
-    fileAnswer: string;
+  @ManyToOne(() => Lecture, (lecture) => lecture.answers)
+  @JoinColumn({ name: "lecture_id", referencedColumnName: "id" })
+  public lecture: Lecture;
 
-    @Column()
-    formId: number;
+  @Column({
+    default: "",
+  })
+  strAnswer: string;
 
-    @CreateDateColumn()
-    @Exclude()
-    createdAt: Date;
+  @Column({
+    default: "0",
+  })
+  intAnswer: number;
 
-    @UpdateDateColumn()
-    @Exclude()
-    updatedAt: Date;
+  @Column({
+    default: "",
+  })
+  fileAnswer: string;
 
-    @ManyToOne(() => Question, question => question.answer)
-    public question!: Question;
+  @Column()
+  formId: number;
 
-    @ManyToOne(() => Student, student => student.answer)
-    public student!: Student;
+  @CreateDateColumn()
+  @Exclude()
+  createdAt: Date;
 
-    @ManyToOne(() => Course, course => course.answer)
-    public course!: Course;
+  @UpdateDateColumn()
+  @Exclude()
+  updatedAt: Date;
 }

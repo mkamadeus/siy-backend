@@ -2,13 +2,6 @@ import "reflect-metadata";
 import Student from "@/entity/Student";
 import { StudentService } from "@/services/StudentService";
 import {
-  IsArray,
-  IsNumber,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from "class-validator";
-import {
   Body,
   Delete,
   Get,
@@ -18,56 +11,8 @@ import {
   Put,
 } from "routing-controllers";
 import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
-import StudentGrade from "@/entity/StudentGrade";
-import { Type } from "class-transformer";
-import { GradeResponse } from "./GradeController";
-
-export class StudentBase {
-  @IsNumber()
-  public nim: number;
-
-  @IsString()
-  public name: string;
-}
-
-export class CreateStudentBody extends StudentBase {
-  @IsNumber()
-  public nim: number;
-
-  @IsString()
-  public name: string;
-}
-
-export class UpdateStudentBody extends StudentBase {
-  @IsOptional()
-  @IsNumber()
-  public nim: number;
-
-  @IsOptional()
-  @IsString()
-  public name: string;
-}
-
-export class StudentResponse {
-  @IsNumber()
-  public id: number;
-
-  @IsNumber()
-  public nim: number;
-
-  @IsString()
-  public name: string;
-
-  @IsString()
-  public imgPath: string;
-
-  @IsNumber()
-  public ipk: number;
-
-  @ValidateNested()
-  @Type(() => GradeResponse)
-  public studentGrades: GradeResponse[];
-}
+import { StudentResponse } from "./response/StudentResponse";
+import { CreateStudentBody, UpdateStudentBody } from "./request/StudentRequest";
 
 @JsonController("/students")
 export class StudentController {
@@ -97,8 +42,8 @@ export class StudentController {
       },
     },
   })
-  public getStudentByNIM(@Param("nim") nim: number) {
-    return this.studentService.getGradesByNim(nim);
+  public getStudentByNIM(@Param("nim") nim: string) {
+    return this.studentService.getByNim(nim);
   }
 
   @Get("/grades/:nim/:year")
@@ -146,41 +91,41 @@ export class StudentController {
       },
     },
   })
-  public getGradeThisSemester(@Param("nim") nim: number) {
-    return this.studentService.getGradesByNim(nim);
+  public getGradeThisSemester(@Param("nim") nim: string) {
+    return this.studentService.getByNim(nim);
   }
 
-  @Get("/ipk/:nim")
-  @ResponseSchema(StudentResponse)
-  @OpenAPI({
-    description: "Get IPK by NIM",
-    responses: {
-      "200": {
-        description: "OK",
-      },
-    },
-  })
-  public getStudentIpk(@Param("nim") nim: number) {
-    return this.studentService.getIpkByNim(nim);
-  }
+  // @Get("/ipk/:nim")
+  // @ResponseSchema(StudentResponse)
+  // @OpenAPI({
+  //   description: "Get IPK by NIM",
+  //   responses: {
+  //     "200": {
+  //       description: "OK",
+  //     },
+  //   },
+  // })
+  // public getStudentIpk(@Param("nim") nim: number) {
+  //   return this.studentService.getIpkByNim(nim);
+  // }
 
-  @Get("/ipk/:nim/:year/:semester")
-  @ResponseSchema(StudentResponse)
-  @OpenAPI({
-    description: "Get IP by NIM",
-    responses: {
-      "200": {
-        description: "OK",
-      },
-    },
-  })
-  public getStudentIp(
-    @Param("nim") nim: number,
-    @Param("year") year: number,
-    @Param("semester") semester: number
-  ) {
-    return this.studentService.GetIpByNim(nim, year, semester);
-  }
+  // @Get("/ipk/:nim/:year/:semester")
+  // @ResponseSchema(StudentResponse)
+  // @OpenAPI({
+  //   description: "Get IP by NIM",
+  //   responses: {
+  //     "200": {
+  //       description: "OK",
+  //     },
+  //   },
+  // })
+  // public getStudentIp(
+  //   @Param("nim") nim: number,
+  //   @Param("year") year: number,
+  //   @Param("semester") semester: number
+  // ) {
+  //   return this.studentService.getIpByNim(nim, year, semester);
+  // }
 
   @Post("/")
   @ResponseSchema(StudentResponse)

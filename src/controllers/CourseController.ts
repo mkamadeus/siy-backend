@@ -1,7 +1,6 @@
 import "reflect-metadata";
 import Course from "@/entity/Course";
 import { CourseService } from "@/services/CourseService";
-import { IsNumber, IsOptional, IsString } from "class-validator";
 import {
   Body,
   Delete,
@@ -12,74 +11,8 @@ import {
   Put,
 } from "routing-controllers";
 import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
-
-export class CreateCourseBody {
-  @IsString()
-  public code: string;
-
-  @IsNumber()
-  public sks: number;
-
-  @IsString()
-  public name: string;
-
-  @IsString()
-  public silabusRingkas: string;
-
-  @IsString()
-  public silabusLengkap: string;
-
-  @IsString()
-  public outcome: string;
-}
-export class UpdateCourseBody {
-  @IsString()
-  @IsOptional()
-  public code?: string;
-
-  @IsNumber()
-  @IsOptional()
-  public sks?: number;
-
-  @IsString()
-  @IsOptional()
-  public name?: string;
-
-  @IsString()
-  @IsOptional()
-  public silabusRingkas?: string;
-
-  @IsString()
-  @IsOptional()
-  public silabusLengkap?: string;
-
-  @IsString()
-  @IsOptional()
-  public outcome?: string;
-}
-
-export class CourseResponse {
-  @IsNumber()
-  public id: number;
-
-  @IsString()
-  public code: string;
-
-  @IsNumber()
-  public sks: number;
-
-  @IsString()
-  public name: string;
-
-  @IsString()
-  public silabusRingkas: string;
-
-  @IsString()
-  public silabusLengkap: string;
-
-  @IsString()
-  public outcome: string;
-}
+import { CourseResponse } from "./response/CourseResponse";
+import { CreateCourseBody, UpdateCourseBody } from "./request/CourseRequest";
 
 @JsonController("/courses")
 export class CourseController {
