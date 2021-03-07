@@ -43,15 +43,11 @@ export class StudentService {
    * @param nim NIM of the student
    */
   public async getByNim(nim: string): Promise<Student> {
-    return await this.studentRepository
-      .createQueryBuilder("student")
-      .leftJoinAndSelect("student.studentGrades", "studentGrade")
-      // .leftJoinAndSelect(
-      //   "studentGrade.lecture",
-      //   "studentGrades.lectureId = lectures.id"
-      // )
-      .where("student.nim = :nim", { nim })
-      .getOne();
+    const student = await this.studentRepository.findOne({
+      where: { nim },
+      relations: ["studentGrades", "studentGrades.lecture"],
+    });
+    return student;
   }
 
   /**

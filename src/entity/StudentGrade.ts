@@ -79,11 +79,11 @@ export default class StudentGrade extends BaseEntity {
   homework: number;
 
   @ManyToOne(() => Student, (student) => student.studentGrades)
-  @JoinColumn({ name: "studentId" })
+  @JoinColumn({ name: "student_id", referencedColumnName: "id" })
   student: Student;
 
   @ManyToOne(() => Lecture, (lecture) => lecture.teaches)
-  @JoinColumn({ name: "lectureId" })
+  @JoinColumn({ name: "lecture_id", referencedColumnName: "id" })
   lecture: Lecture;
 
   @CreateDateColumn()

@@ -21,10 +21,10 @@ export default class Teaches extends BaseEntity {
   lectureId: number;
 
   @ManyToOne(() => Teacher, (teacher) => teacher.teaches)
-  @JoinColumn({ name: "teacherId" })
+  @JoinColumn({ name: "teacher_id", referencedColumnName: "id" })
   teacher: Teacher;
 
   @ManyToOne(() => Lecture, (lecture) => lecture)
-  @JoinColumn({ name: "lectureId" })
+  @JoinColumn({ name: "lecture_id", referencedColumnName: "id" })
   lecture: Lecture;
 }

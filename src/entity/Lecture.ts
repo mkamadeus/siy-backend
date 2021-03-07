@@ -157,6 +157,6 @@ export default class Lecture extends BaseEntity {
   teaches: Teaches[];
 
   @ManyToOne(() => Course, (course) => course.lectures)
-  @JoinColumn({ name: "courseId" })
+  @JoinColumn({ name: "course_id", referencedColumnName: "id" })
   course: Course;
 }

@@ -7,6 +7,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   PrimaryGeneratedColumn,
+  JoinColumn,
 } from "typeorm";
 import StudentGrade from "./StudentGrade";
 import Answer from "./Answer";

@@ -30,7 +30,9 @@ export class StudentGradeService {
   }
 
   public async create(studentGrade: StudentGrade): Promise<StudentGrade> {
-    return await this.gradeRepository.save(studentGrade);
+    return await this.gradeRepository.save(
+      plainToClass(StudentGrade, studentGrade)
+    );
   }
 
   public async createByNim(
@@ -51,7 +53,7 @@ export class StudentGradeService {
     student: StudentGrade
   ): Promise<StudentGrade> {
     student.id = id;
-    return await this.gradeRepository.save(student);
+    return await this.gradeRepository.save(plainToClass(StudentGrade, student));
   }
 
   public async delete(id: number): Promise<void> {
