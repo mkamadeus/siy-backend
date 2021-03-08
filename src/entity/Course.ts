@@ -8,31 +8,34 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import Lecture from "./Lecture";
 
-import StudentGrade from "./StudentGrade";
-
+// FIXME: Recheck
 @Entity()
 export default class Course extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ name: "code" })
   code: string;
 
-  @Column()
-  sks: number;
-
-  @Column()
+  @Column({ name: "name" })
   name: string;
 
-  @Column()
-  silabusRingkas: string;
+  @Column({ name: "credits" })
+  credits: number;
 
-  @Column()
-  silabusLengkap: string;
+  @Column({ name: "brief_syllabus" })
+  briefSyllabus: string;
 
-  @Column()
+  @Column({ name: "complete_syllabus" })
+  completeSyllabus: string;
+
+  @Column({ name: "outcome" })
   outcome: string;
+
+  @OneToMany(() => Lecture, (lecture) => lecture.course)
+  lectures: Lecture[];
 
   @CreateDateColumn()
   @Exclude()
@@ -41,8 +44,4 @@ export default class Course extends BaseEntity {
   @UpdateDateColumn()
   @Exclude()
   updatedAt: Date;
-
-  @OneToMany(() => StudentGrade, studentGrade => studentGrade.course)
-  public studentGrades!: StudentGrade[];
-  
 }

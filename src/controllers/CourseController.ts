@@ -1,7 +1,6 @@
 import "reflect-metadata";
 import Course from "@/entity/Course";
 import { CourseService } from "@/services/CourseService";
-import { IsNumber, IsString } from "class-validator";
 import {
   Body,
   Delete,
@@ -12,36 +11,8 @@ import {
   Put,
 } from "routing-controllers";
 import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
-
-export class CourseBase {
-  @IsNumber()
-  public id: number;
-}
-
-export class CreateCourseBody extends CourseBase {
-  @IsString()
-  public code: string;
-
-  @IsNumber()
-  public sks: number;
-
-  @IsString()
-  public name: string;
-
-  @IsString()
-  public silabusRingkas: string;
-
-  @IsString()
-  public silabusLengkap: string;
-
-  @IsString()
-  public outcome: string;
-}
-
-export class CourseResponse extends CourseBase {
-  @IsNumber()
-  public id: number;
-}
+import { CourseResponse } from "./response/CourseResponse";
+import { CreateCourseBody, UpdateCourseBody } from "./request/CourseRequest";
 
 @JsonController("/courses")
 export class CourseController {
@@ -97,23 +68,23 @@ export class CourseController {
   @Put("/:id")
   @ResponseSchema(CourseResponse)
   @OpenAPI({
-    description: "Update course",
+    description: "Update course, allows partial update",
     responses: {
       "200": {
         description: "OK",
       },
     },
   })
-  public updateCourse(
+  public async updateCourse(
     @Param("id") id: number,
-    @Body() course: CreateCourseBody
+    @Body() course: UpdateCourseBody
   ) {
-    return this.courseService.update(id, course as Course);
+    return await this.courseService.update(id, course as Course);
   }
 
   @Delete("/:id")
   @OpenAPI({
-    description: "Delete course",
+    description: "Delete course by ID",
     responses: {
       "200": {
         description: "OK",

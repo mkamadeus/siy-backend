@@ -7,8 +7,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   PrimaryGeneratedColumn,
+  JoinColumn,
 } from "typeorm";
 import StudentGrade from "./StudentGrade";
+import Answer from "./Answer";
+import Faker from "faker";
 
 @Entity()
 export default class Student extends BaseEntity {
@@ -16,16 +19,22 @@ export default class Student extends BaseEntity {
   id: number;
 
   @Column()
-  nim: number;
+  nim: string;
 
   @Column()
   name: string;
 
-  @Column()
+  @Column({ default: Faker.internet.avatar() })
   imgPath: string;
 
-  @Column("float")
+  @Column({ type: "float", default: 0 })
   ipk: number;
+
+  @OneToMany(() => StudentGrade, (studentGrade) => studentGrade.student)
+  studentGrades: StudentGrade[];
+
+  @OneToMany(() => Answer, (answer) => answer.student)
+  answer: Answer[];
 
   @CreateDateColumn()
   @Exclude()
@@ -34,8 +43,4 @@ export default class Student extends BaseEntity {
   @UpdateDateColumn()
   @Exclude()
   updatedAt: Date;
-
-  @OneToMany(() => StudentGrade, studentGrade => studentGrade.student)
-  public studentGrades!: StudentGrade[];
-
 }

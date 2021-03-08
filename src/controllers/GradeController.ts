@@ -1,7 +1,6 @@
 import "reflect-metadata";
 import StudentGrade from "@/entity/StudentGrade";
-import { GradeService } from "@/services/GradeService";
-import { IsNumber } from "class-validator";
+import { StudentGradeService } from "@/services/StudentGradeService";
 import {
   Body,
   Delete,
@@ -15,33 +14,11 @@ import {
 import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
 import { fileUploadOptions, UploadService } from "@/services/UploadService";
 
-export class GradeBase {
-  @IsNumber()
-  public studentId: number;
-
-  @IsNumber()
-  public courseId: number;
-}
-
-export class CreateGradeBody extends GradeBase {
-  @IsNumber()
-  public studentId: number;
-
-  @IsNumber()
-  public courseId: number;
-}
-
-export class GradeResponse extends GradeBase {
-  @IsNumber()
-  public id: number;
-}
-
 @JsonController("/grades")
 export class GradeController {
-  constructor(
-    private gradeService: GradeService,
-    private uploadService: UploadService
-  ) {}
+  constructor(private gradeService: StudentGradeService) {
+    this.gradeService = gradeService;
+  }
 
   @Get("/")
   @ResponseSchema(GradeResponse, { isArray: true })
@@ -53,36 +30,36 @@ export class GradeController {
       },
     },
   })
-  public getAllGrades() {
-    return this.gradeService.getAll();
+  public async getAllGrades() {
+    return await this.gradeService.getAll();
   }
 
-  @Get("/std/:id")
+  @Get("/student/:nim")
   @ResponseSchema(GradeResponse)
   @OpenAPI({
-    description: "Get grade data by studentID",
+    description: "Get grade data by NIM",
     responses: {
       "200": {
         description: "OK",
       },
     },
   })
-  public getGradeByNIM(@Param("id") id: number) {
-    return this.gradeService.getByStdID(id);
+  public async getGradeByNim(@Param("nim") nim: string) {
+    return await this.gradeService.getByNim(nim);
   }
 
   @Get("/:id")
   @ResponseSchema(GradeResponse)
   @OpenAPI({
-    description: "Get grade data by ID",
+    description: "Get grade data by grade ID",
     responses: {
       "200": {
         description: "OK",
       },
     },
   })
-  public getGradeById(@Param("id") id: number) {
-    return this.gradeService.getOne(id);
+  public async getGradeById(@Param("id") id: number) {
+    return await this.gradeService.getOne(id);
   }
 
   @Post("/")
@@ -98,8 +75,45 @@ export class GradeController {
       },
     },
   })
-  public createGrade(@Body() grade: CreateGradeBody) {
-    return this.gradeService.create(grade as StudentGrade);
+  public async createGrade(@Body() grade: CreateGradeBody) {
+    return await this.gradeService.create(grade as StudentGrade);
+  }
+
+  @Post("/student/:nim")
+  @ResponseSchema(GradeResponse)
+  @OpenAPI({
+    description: "Create new grade by NIM",
+    responses: {
+      "200": {
+        description: "OK",
+      },
+      "400": {
+        description: "Bad request",
+      },
+    },
+  })
+  public async createGradeByNim(
+    @Param("nim") nim: string,
+    @Body() grade: CreateGradeByNimBody
+  ) {
+    return this.gradeService.createByNim(nim, grade as StudentGrade);
+  }
+
+  @Put("/student/:nim")
+  @ResponseSchema(GradeResponse)
+  @OpenAPI({
+    description: "Update grade, allows partial update.",
+    responses: {
+      "200": {
+        description: "OK",
+      },
+    },
+  })
+  public updateGradeByNim(
+    @Param("nim") nim: string,
+    @Body() grade: UpdateGradeBody
+  ) {
+    return this.gradeService.updateByNim(nim, grade as StudentGrade);
   }
 
   @Post("/upload")
@@ -116,14 +130,14 @@ export class GradeController {
   @Put("/:id")
   @ResponseSchema(GradeResponse)
   @OpenAPI({
-    description: "Update grade",
+    description: "Update grade, allows partial update.",
     responses: {
       "200": {
         description: "OK",
       },
     },
   })
-  public updateGrade(@Param("id") id: number, @Body() grade: CreateGradeBody) {
+  public updateGrade(@Param("id") id: number, @Body() grade: UpdateGradeBody) {
     return this.gradeService.update(id, grade as StudentGrade);
   }
 
