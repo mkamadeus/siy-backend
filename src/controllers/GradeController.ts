@@ -41,6 +41,20 @@ export class GradeController {
     return await this.gradeService.getAll();
   }
 
+  @Get("/lo/:id")
+  @ResponseSchema(GradeResponse)
+  @OpenAPI({
+    description: "Get LO by grade ID",
+    responses: {
+      "200": {
+        description: "OK",
+      },
+    },
+  })
+  public async getLoById(@Param("id") id: number) {
+    return await this.gradeService.getLoById(id);
+  }
+
   @Get("/student/:nim")
   @ResponseSchema(GradeResponse)
   @OpenAPI({

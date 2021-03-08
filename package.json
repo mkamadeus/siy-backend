@@ -7,7 +7,8 @@
     "seed.config": "nps seed.config",
     "seed.run": "nps seed.run",
     "schema.drop": "nps schema.drop",
-    "schema.sync": "nps schema.sync"
+    "schema.sync": "nps schema.sync",
+    "test": "nps test"
   },
   "dependencies": {
     "chalk": "^4.1.0",
@@ -33,14 +34,20 @@
   },
   "devDependencies": {
     "@types/body-parser": "^1.19.0",
+    "@types/chai": "^4.2.15",
+    "@types/expect": "^24.3.0",
     "@types/express": "^4.17.9",
     "@types/faker": "^5.1.7",
+    "@types/mocha": "^8.2.1",
     "@types/multer": "^1.4.4",
     "@types/node": "^14.14.10",
     "@types/reflect-metadata": "^0.1.0",
+    "chai": "^4.3.3",
     "cross-env": "^7.0.2",
+    "mocha": "^8.3.1",
     "nodemon": "^2.0.6",
     "nps": "^5.10.0",
+    "ts-mocha": "^8.0.0",
     "ts-node": "^9.0.0",
     "tsconfig-paths": "^3.9.0"
   },

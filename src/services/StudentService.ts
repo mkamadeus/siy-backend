@@ -1,8 +1,6 @@
 import Student from "@/entity/Student";
 import Container, { Service } from "typedi";
 import { getRepository, Repository } from "typeorm";
-import { IndexValueEnum } from "@/enum/IndexEnum";
-import StudentGrade from "@/entity/StudentGrade";
 
 @Service()
 export class StudentService {

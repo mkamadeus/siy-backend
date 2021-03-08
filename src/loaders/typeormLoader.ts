@@ -1,8 +1,12 @@
 import "reflect-metadata";
-import { createConnection } from "typeorm";
+import { createConnection, getConnectionOptions } from "typeorm";
 
 export const typeormLoader = async () => {
-  await createConnection().then(async (connection) => {
-    return await connection.synchronize();
+  const config = await getConnectionOptions(
+    process.env.NODE_ENV === "test" ? "test" : "default"
+  );
+  return await createConnection(config).then(async (connection) => {
+    await connection.synchronize();
+    return connection;
   });
 };
