@@ -1,10 +1,13 @@
 import Teacher from "@/entity/Teacher";
 import { Service } from "typedi";
-import { getRepository, Repository } from "typeorm";
+import { getConnection, getRepository, Repository } from "typeorm";
 
 @Service()
 export class TeacherService {
-  private teacherRepository: Repository<Teacher> = getRepository(Teacher);
+  private teacherRepository: Repository<Teacher> = getRepository(
+    Teacher,
+    "test"
+  );
 
   /**
    * Get all teachers from database.

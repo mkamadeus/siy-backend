@@ -33,5 +33,10 @@ module.exports = {
         description: "Synchronize schema to database.",
       },
     },
+    test: {
+      script:
+        "cross-env NODE_ENV=test ts-mocha -r tsconfig-paths/register --paths tests/*.test.ts",
+      description: "Runs an automated testing on a set of prepared test.",
+    },
   },
 };
