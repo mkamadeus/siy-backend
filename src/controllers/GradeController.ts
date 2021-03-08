@@ -9,17 +9,10 @@ import {
   Param,
   Post,
   Put,
+  UploadedFile,
 } from "routing-controllers";
 import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
-import { GradeResponse } from "./response/StudentGradeResponse";
-import {
-  CreateGradeBody,
-  CreateGradeByNimBody,
-  UpdateGradeBody,
-} from "./request/StudentGradeRequest";
-import Container from "typedi";
-import { StudentService } from "@/services/StudentService";
-import { reset } from "chalk";
+import { fileUploadOptions, UploadService } from "@/services/UploadService";
 
 @JsonController("/grades")
 export class GradeController {
@@ -121,6 +114,17 @@ export class GradeController {
     @Body() grade: UpdateGradeBody
   ) {
     return this.gradeService.updateByNim(nim, grade as StudentGrade);
+  }
+
+  @Post("/upload")
+  public uploadGrade(
+    @UploadedFile("file", { required: true, options: fileUploadOptions() })
+    file: Express.Multer.File
+  ) {
+    // TODO: Fix upload grade using the excel function
+    const fileContent = this.uploadService.parseExcel(file.filename);
+
+    return;
   }
 
   @Put("/:id")
