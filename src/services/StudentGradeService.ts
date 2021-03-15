@@ -6,6 +6,7 @@ import { getRepository, Repository } from "typeorm";
 import { CourseService } from "./CourseService";
 import { LectureService } from "./LectureService";
 import { StudentService } from "./StudentService";
+import { UploadService } from "./UploadService";
 
 @Service()
 export class StudentGradeService {
@@ -207,57 +208,6 @@ export class StudentGradeService {
     return totalLo;
   }
 
-  // public getLoByNimPerSemester(nim: string, year: number, semester: number) {
-  //   const grades = await this.getByNimPerSemester(nim, year, semester);
-  //   const totalLo = Array(7).fill(0);
-  //   for (let grade of grades) {
-  //     // Sum product of all LO
-
-  //     grade.loA =
-  //       midTest * lecture.loAMidWeight +
-  //       quiz * lecture.loAQuizWeight +
-  //       finalTest * lecture.loAFinalWeight +
-  //       practicum * lecture.loAPracticumWeight +
-  //       homework * lecture.loAHomeworkWeight;
-  //     grade.loB =
-  //       midTest * lecture.loBMidWeight +
-  //       quiz * lecture.loBQuizWeight +
-  //       finalTest * lecture.loBFinalWeight +
-  //       practicum * lecture.loBPracticumWeight +
-  //       homework * lecture.loBHomeworkWeight;
-  //     grade.loC =
-  //       midTest * lecture.loCMidWeight +
-  //       quiz * lecture.loCQuizWeight +
-  //       finalTest * lecture.loCFinalWeight +
-  //       practicum * lecture.loCPracticumWeight +
-  //       homework * lecture.loCHomeworkWeight;
-  //     grade.loD =
-  //       midTest * lecture.loDMidWeight +
-  //       quiz * lecture.loDQuizWeight +
-  //       finalTest * lecture.loDFinalWeight +
-  //       practicum * lecture.loDPracticumWeight +
-  //       homework * lecture.loDHomeworkWeight;
-  //     grade.loE =
-  //       midTest * lecture.loEMidWeight +
-  //       quiz * lecture.loEQuizWeight +
-  //       finalTest * lecture.loEFinalWeight +
-  //       practicum * lecture.loEPracticumWeight +
-  //       homework * lecture.loEHomeworkWeight;
-  //     grade.loF =
-  //       midTest * lecture.loFMidWeight +
-  //       quiz * lecture.loFQuizWeight +
-  //       finalTest * lecture.loFFinalWeight +
-  //       practicum * lecture.loFPracticumWeight +
-  //       homework * lecture.loFHomeworkWeight;
-  //     grade.loG =
-  //       midTest * lecture.loGMidWeight +
-  //       quiz * lecture.loGQuizWeight +
-  //       finalTest * lecture.loGFinalWeight +
-  //       practicum * lecture.loGPracticumWeight +
-  //       homework * lecture.loGHomeworkWeight;
-  //   }
-  // }
-
   public async create(studentGrade: StudentGrade): Promise<StudentGrade> {
     return await this.gradeRepository.save(
       plainToClass(StudentGrade, studentGrade)
@@ -268,13 +218,63 @@ export class StudentGradeService {
     nim: string,
     studentGrade: StudentGrade
   ): Promise<StudentGrade> {
-    const student = await Container.get(StudentService).getByNim(nim);
-    return await this.gradeRepository.save(
-      plainToClass(StudentGrade, {
-        studentId: student.id,
-        ...studentGrade,
-      })
-    );
+    try {
+      const student = await Container.get(StudentService).getByNim(nim);
+      const result = await this.gradeRepository.save(
+        plainToClass(StudentGrade, {
+          studentId: student.id,
+          ...studentGrade,
+        })
+      );
+      return result;
+    } catch (err) {
+      throw new EvalError(`Error on ${nim}: ${err.message}`);
+    }
+  }
+
+  public async createBulk(
+    lectureId: number,
+    year: number,
+    semester: number,
+    file: Express.Multer.File
+  ) {
+    const fileContent = (
+      await Container.get(UploadService).parseExcel(file.filename, 3)
+    ).slice(1);
+
+    const nimArray = fileContent.map((row) => row[0].toString());
+    const gradeArray = fileContent.map((row) => {
+      const grades = row.slice(2);
+      return {
+        finalTest: parseFloat(grades[0].toString()),
+        midTest: parseFloat(grades[1].toString()),
+        practicum: parseFloat(grades[2].toString()),
+        homework: parseFloat(grades[3].toString()),
+        quiz: parseFloat(grades[4].toString()),
+        index: grades[6].toString(),
+      };
+    });
+
+    if (nimArray.length !== gradeArray.length)
+      throw new Error("Array length must be the same!");
+
+    const errorArray = [];
+    for (let i = 0; i < nimArray.length; i++) {
+      try {
+        const body = {
+          lectureId,
+          year,
+          semester,
+          ...gradeArray[i],
+        };
+        // console.log(body);
+        await this.createByNim(nimArray[i], body as StudentGrade);
+      } catch (err) {
+        errorArray.push((err as Error).message);
+      }
+    }
+
+    return { errors: errorArray };
   }
 
   public async update(

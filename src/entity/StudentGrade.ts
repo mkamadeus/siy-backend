@@ -12,7 +12,6 @@ import {
   AfterInsert,
   AfterUpdate,
   AfterRemove,
-  getRepository,
 } from "typeorm";
 import Student from "./Student";
 import { IndexEnum, IndexValueEnum } from "@/enum/IndexEnum";
@@ -123,10 +122,9 @@ export default class StudentGrade extends BaseEntity {
   @AfterRemove()
   @AfterInsert()
   public async updateLo() {
-    console.log("asd");
-    const lo = await Container.get(StudentGradeService).getLoById(this.id);
-    await Container.get(StudentGradeService).update(this.id, {
-      ...lo,
-    } as StudentGrade);
+    // const lo = await Container.get(StudentGradeService).getLoById(this.id);
+    // await Container.get(StudentGradeService).update(this.id, {
+    //   ...lo,
+    // } as StudentGrade);
   }
 }
