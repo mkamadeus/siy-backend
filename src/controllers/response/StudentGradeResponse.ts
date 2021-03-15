@@ -1,5 +1,5 @@
 import { IndexEnum } from "@/enum/IndexEnum";
-import { IsEnum, IsNumber } from "class-validator";
+import { IsArray, IsEnum, IsNumber, IsString } from "class-validator";
 
 export class GradeResponse {
   @IsNumber()
@@ -19,4 +19,9 @@ export class GradeResponse {
 
   @IsNumber()
   public year: number;
+}
+
+export class GradeBulkResponse {
+  @IsString({ each: true })
+  errors: string[];
 }

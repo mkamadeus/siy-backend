@@ -3,6 +3,8 @@ import StudentGrade from "@/entity/StudentGrade";
 import { StudentGradeService } from "@/services/StudentGradeService";
 import {
   Body,
+  BodyParam,
+  ContentType,
   Delete,
   Get,
   JsonController,
@@ -10,9 +12,20 @@ import {
   Post,
   Put,
   UploadedFile,
+  UseBefore,
 } from "routing-controllers";
 import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
-import { fileUploadOptions, UploadService } from "@/services/UploadService";
+import { fileUploadOptions } from "@/services/UploadService";
+import {
+  GradeBulkResponse,
+  GradeResponse,
+} from "./response/StudentGradeResponse";
+import {
+  CreateGradeBody,
+  CreateGradeByNimBody,
+  UpdateGradeBody,
+} from "./request/StudentGradeRequest";
+import express from "express";
 
 @JsonController("/grades")
 export class GradeController {
@@ -117,14 +130,32 @@ export class GradeController {
   }
 
   @Post("/upload")
-  public uploadGrade(
+  @UseBefore(express.urlencoded({ extended: true }))
+  @OpenAPI({
+    description:
+      "Upload grade using Excel file. Use form data and insert the file using file field.",
+    responses: {
+      "200": {
+        description: "OK",
+      },
+    },
+  })
+  public async uploadGrade(
     @UploadedFile("file", { required: true, options: fileUploadOptions() })
-    file: Express.Multer.File
+    file: Express.Multer.File,
+    @BodyParam("lectureId") lectureId: number,
+    @BodyParam("year") year: number,
+    @BodyParam("semester") semester: number
   ) {
-    // TODO: Fix upload grade using the excel function
-    const fileContent = this.uploadService.parseExcel(file.filename);
-
-    return;
+    if (!lectureId || !year || !semester)
+      throw new Error("Provide necessary info.");
+    const result = await this.gradeService.createBulk(
+      lectureId,
+      year,
+      semester,
+      file
+    );
+    return result;
   }
 
   @Put("/:id")

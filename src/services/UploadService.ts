@@ -32,16 +32,20 @@ export class UploadService {
    * Parse Excel file from path in the `uploads` folder
    * @param filePath Path relative to the `uploads` folder
    */
-  public async parseExcel(filePath: string): Promise<CellValue[][]> {
+  public async parseExcel(
+    filePath: string,
+    sheetIndex: number = 1
+  ): Promise<CellValue[][]> {
     const workbook = new Workbook();
     const absolutePath = path.join(__dirname, "../../uploads", filePath);
     await workbook.xlsx.readFile(absolutePath);
-    const worksheet = workbook.getWorksheet(1);
+    const worksheet = workbook.getWorksheet(sheetIndex);
     const result: CellValue[][] = [];
     for (let i = 0; i < worksheet.rowCount; i++) {
       const row: CellValue[] = [];
       for (let j = 0; j < worksheet.columnCount; j++) {
-        row.push(worksheet.getRow(i + 1).getCell(j + 1).value);
+        const cell = worksheet.getRow(i + 1).getCell(j + 1);
+        row.push(cell.result || cell.value);
       }
       result.push(row);
     }
