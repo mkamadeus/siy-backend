@@ -1,5 +1,5 @@
 before_script:
-  - echo "$DOCKER_PASSWORD" | docker login $DOCKER_REGISTRY --username $DOCKER_USERNAME --password-stdin
+  - docker login $DOCKER_REGISTRY -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 
 build-staging:
   stage: build
