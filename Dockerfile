@@ -4,6 +4,7 @@ WORKDIR /app
 COPY package.json yarn.lock ./
 
 RUN yarn install
+RUN touch ormconfig.json
 
 COPY . .
 
