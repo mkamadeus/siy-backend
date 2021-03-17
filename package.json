@@ -49,12 +49,6 @@
     "cross-env": "^7.0.2",
     "mocha": "^8.3.1",
     "nodemon": "^2.0.6",
-<<<<<<< HEAD
-=======
-    "nps": "^5.10.0",
-    "ts-mocha": "^8.0.0",
-    "ts-node": "^9.0.0",
->>>>>>> 6566398 (basic testing structure added)
     "tsconfig-paths": "^3.9.0"
   },
   "engines": {
