@@ -99,32 +99,22 @@ export default class StudentGrade extends BaseEntity {
   @AfterInsert()
   public async updateIpk() {
     const student = await Container.get(StudentService).getOne(this.studentId);
-    const grades = await Container.get(StudentGradeService).getByNim(
+    const ipk = await Container.get(StudentGradeService).getIpkByNim(
       student.nim
     );
-    let totalScore = 0;
-    let totalCredits = 0;
-    for (const grade of grades) {
-      const lecture = await Container.get(LectureService).getOne(
-        grade.lectureId
-      );
-      const course = await Container.get(CourseService).getOne(
-        lecture.courseId
-      );
-      totalCredits += course.credits;
-      totalScore += IndexValueEnum[grade.index] * course.credits;
-    }
-    const ipk = totalScore / totalCredits;
+
     await Container.get(StudentService).update(this.studentId, { ipk });
   }
 
   @AfterUpdate()
   @AfterRemove()
   @AfterInsert()
-  public async updateLo() {
-    // const lo = await Container.get(StudentGradeService).getLoById(this.id);
-    // await Container.get(StudentGradeService).update(this.id, {
-    //   ...lo,
-    // } as StudentGrade);
+  public async updateCumulativeLo() {
+    const student = await Container.get(StudentService).getOne(this.studentId);
+    const lo = await Container.get(StudentGradeService).getCumulativeLoByNim(
+      student.nim
+    );
+    console.log(student);
+    await Container.get(StudentService).update(student.id, { ...lo });
   }
 }

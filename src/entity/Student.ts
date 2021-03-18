@@ -18,7 +18,7 @@ export default class Student extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   nim: string;
 
   @Column()
@@ -26,6 +26,27 @@ export default class Student extends BaseEntity {
 
   @Column({ default: Faker.internet.avatar() })
   imgPath: string;
+
+  @Column({ type: "float", default: 0 })
+  loA: number;
+
+  @Column({ type: "float", default: 0 })
+  loB: number;
+
+  @Column({ type: "float", default: 0 })
+  loC: number;
+
+  @Column({ type: "float", default: 0 })
+  loD: number;
+
+  @Column({ type: "float", default: 0 })
+  loE: number;
+
+  @Column({ type: "float", default: 0 })
+  loF: number;
+
+  @Column({ type: "float", default: 0 })
+  loG: number;
 
   @Column({ type: "float", default: 0 })
   ipk: number;
