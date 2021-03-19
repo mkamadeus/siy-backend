@@ -19,8 +19,6 @@ import Lecture from "./Lecture";
 import Container from "typedi";
 import { StudentGradeService } from "@/services/StudentGradeService";
 import { StudentService } from "@/services/StudentService";
-import { LectureService } from "@/services/LectureService";
-import { CourseService } from "@/services/CourseService";
 
 @Entity()
 export default class StudentGrade extends BaseEntity {
@@ -116,5 +114,11 @@ export default class StudentGrade extends BaseEntity {
     );
     console.log(student);
     await Container.get(StudentService).update(student.id, { ...lo });
+  }
+
+  @AfterInsert()
+  public async updateLo() {
+    const lo = await Container.get(StudentGradeService).getLoById(this.id);
+    await Container.get(StudentGradeService).update(this.id, { ...lo });
   }
 }

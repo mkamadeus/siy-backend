@@ -1,5 +1,10 @@
+import { StudentGradeService } from "@/services/StudentGradeService";
 import { Exclude } from "class-transformer";
+import Container from "typedi";
 import {
+  AfterInsert,
+  AfterRemove,
+  AfterUpdate,
   BaseEntity,
   Column,
   CreateDateColumn,
@@ -334,4 +339,17 @@ export default class Lecture extends BaseEntity {
   @ManyToOne(() => Course, (course) => course.lectures)
   @JoinColumn({ name: "course_id", referencedColumnName: "id" })
   course: Course;
+
+  @AfterUpdate()
+  @AfterRemove()
+  @AfterInsert()
+  public async updateLo() {
+    const losWithOwner = await Container.get(
+      StudentGradeService
+    ).getLoByLectureId(this.id);
+    for (const loWithOwner of losWithOwner)
+      Container.get(StudentGradeService).update(loWithOwner.gradeId, {
+        ...loWithOwner.los,
+      });
+  }
 }

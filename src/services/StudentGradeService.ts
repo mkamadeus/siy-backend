@@ -1,6 +1,6 @@
 import StudentGrade from "@/entity/StudentGrade";
 import { IndexValueEnum } from "@/enum/IndexEnum";
-import { LoEntry } from "@/enum/LoEnum";
+import { LoEntry, LoOwner } from "@/enum/LoEnum";
 import { plainToClass } from "class-transformer";
 import Container, { Service } from "typedi";
 import { getRepository, Repository } from "typeorm";
@@ -32,6 +32,12 @@ export class StudentGradeService {
     return await this.gradeRepository
       .find({ where: { studentId: student.id } })
       .then((studentGrade) => studentGrade);
+  }
+
+  public async getByLectureId(lectureId: number) {
+    return await this.gradeRepository
+      .find({ where: { lectureId } })
+      .then((studentGrades) => studentGrades);
   }
 
   public async getByNimPerSemester(
@@ -218,6 +224,20 @@ export class StudentGradeService {
     return await this.getLo(grade);
   }
 
+  public async getLoByLectureId(lectureId: number) {
+    const grades = await this.getByLectureId(lectureId);
+    const loWithOwners: LoOwner[] = await Promise.all(
+      grades.map(async (grade) => {
+        const los = await this.getLoById(grade.id);
+        return {
+          gradeId: grade.id,
+          los,
+        };
+      })
+    );
+    return loWithOwners;
+  }
+
   /**
    *
    * @param nim Student's NIM
@@ -319,7 +339,7 @@ export class StudentGradeService {
 
   public async update(
     id: number,
-    studentGrade: StudentGrade
+    studentGrade: Partial<StudentGrade>
   ): Promise<StudentGrade> {
     studentGrade.id = id;
     await this.gradeRepository.update(

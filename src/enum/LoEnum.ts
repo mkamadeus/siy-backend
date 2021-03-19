@@ -7,3 +7,8 @@ export interface LoEntry {
   loF: number;
   loG: number;
 }
+
+export interface LoOwner {
+  gradeId: number;
+  los: LoEntry;
+}
