@@ -28,6 +28,7 @@ unit-testing:
   before_script:
     - yarn config set cache-folder .yarn
     - yarn install --frozen-lockfile
+    - cp ormconfig.example.json ormconfig.json
   script:
     - yarn test
   only:

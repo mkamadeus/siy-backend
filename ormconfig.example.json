@@ -1,14 +1,32 @@
-{
-  "type": "postgres",
-  "host": "localhost",
-  "port": 5432,
-  "username": "postgres",
-  "password": "postgres",
-  "database": "siy",
-  "synchronize": true,
-  "entities": ["src/entity/**/*.ts"],
-  "migrations": ["src/migration/**/*.ts"],
-  "subscribers": ["src/subscriber/**/*.ts"],
-  "seeds": ["src/seeds/**/*.ts"],
-  "factories": ["src/factories/**/*.ts"]
-}
+[
+  {
+    "name": "default",
+    "type": "postgres",
+    "host": "localhost",
+    "port": 5432,
+    "username": "postgres",
+    "password": "password",
+    "database": "siy",
+    "synchronize": true,
+    "entities": ["src/entity/**/*.ts"],
+    "migrations": ["src/migration/**/*.ts"],
+    "subscribers": ["src/subscriber/**/*.ts"],
+    "seeds": ["src/seeds/**/*.ts"],
+    "factories": ["src/factories/**/*.ts"]
+  },
+  {
+    "name": "test",
+    "type": "postgres",
+    "host": "localhost",
+    "port": 5432,
+    "username": "postgres",
+    "password": "password",
+    "database": "siy_test",
+    "synchronize": true,
+    "entities": ["src/entity/**/*.ts"],
+    "migrations": ["src/migration/**/*.ts"],
+    "subscribers": ["src/subscriber/**/*.ts"],
+    "seeds": ["src/seeds/**/*.ts"],
+    "factories": ["src/factories/**/*.ts"]
+  }
+]
