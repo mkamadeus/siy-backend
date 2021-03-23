@@ -7,45 +7,62 @@ import { Container } from "typedi";
 import { Connection } from "typeorm";
 
 let connection: Connection;
-before (async() => {
-    connection = await typeormLoader();
+before(async () => {
+  connection = await typeormLoader();
 });
 
-describe("QuestionService Test", () => {
-    
-
-    describe("#1 Question creation", () => {
-        let questionId: number;
-
-        it("should have 0 question", (done) => {
-            const questionService = Container.get(QuestionService);
-
-            questionService.getAll().then((questionArray) => {
-                expect(questionArray.length).to.be.equal(0);
-
-                done();
-            });
-        });
-
-        it("should have created 1 question", (done) => {
-            const questionService = Container.get(QuestionService);
-
-            questionService
-            .create(
-            {
-                question: "Testing",
-                answerType: "str"
-            } as Question)
-            .then(() => {
-                questionService.getAll().then((questionArray) => {
-                    expect(questionArray.length).to.be.equal(1);
-                    done();
-                });
-            })
+describe("QuestionService test", () => {
+  describe("#1 Question creation", () => {
+    let questionId: number;
+    it("should have 0 question", (done) => {
+      const questionService = Container.get(QuestionService);
+      questionService.getAll().then((questionArray) => {
+        expect(questionArray.length).to.be.equal(0);
+        done();
+      });
+    });
+    it("should have created 1 question", (done) => {
+      const questionService = Container.get(QuestionService);
+      questionService
+        .create({
+          question: "Yudistira Dwi Wardhana Asnar, ST., Ph.D.",
+          answerType: "str"
+        } as Question)
+        .then((question) => {
+          questionId = question.id;
+          expect(question.question).to.be.equal(
+            "Yudistira Dwi Wardhana Asnar, ST., Ph.D."
+          );
+          return questionService.getAll();
+        })
+        .then((questionArray) => {
+          expect(questionArray.length).to.be.equal(1);
+          done();
         });
     });
+    it("should deleted the entry", (done) => {
+      const questionService = Container.get(QuestionService);
+      questionService
+        .delete(questionId)
+        .then(() => {
+          return questionService.getAll();
+        })
+        .then((questionArray) => {
+          expect(questionArray.length).to.be.equal(0);
+          done();
+        });
+    });
+  });
 });
 
 after(() => {
-    connection.close();
+  connection.close();
 });
+
+// after(async () => {
+//   const entities = getConnection().entityMetadatas;
+//   for (const entity of entities) {
+//     const repository = getConnection().getRepository(entity.name);
+//     await repository.clear();
+//   }
+// });
