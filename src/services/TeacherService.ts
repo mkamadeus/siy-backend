@@ -6,7 +6,7 @@ import { getConnection, getRepository, Repository } from "typeorm";
 export class TeacherService {
   private teacherRepository: Repository<Teacher> = getRepository(
     Teacher,
-    "test"
+    process.env.NODE_ENV === "test" ? "test" : "default"
   );
 
   /**

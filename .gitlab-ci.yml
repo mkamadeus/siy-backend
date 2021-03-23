@@ -1,6 +1,15 @@
 # Uses NodeJS V 9.4.0
 image: node:15
 
+services:
+  - postgres:12.2-alpine
+
+variables:
+  POSTGRES_DB: siy_test
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: password
+  POSTGRES_HOST_AUTH_METHOD: trust
+
 # And to cache them as well.
 cache:
   paths:
