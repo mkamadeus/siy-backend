@@ -25,13 +25,13 @@ describe("QuestionService test", () => {
       const questionService = Container.get(QuestionService);
       questionService
         .create({
-          question: "Yudistira Dwi Wardhana Asnar, ST., Ph.D.",
-          answerType: "str"
+          question: "Seberapa sering Anda berkomunikasi dengan kelompok Anda?",
+          answerType: "int"
         } as Question)
         .then((question) => {
           questionId = question.id;
           expect(question.question).to.be.equal(
-            "Yudistira Dwi Wardhana Asnar, ST., Ph.D."
+            "Seberapa sering Anda berkomunikasi dengan kelompok Anda?"
           );
           return questionService.getAll();
         })
