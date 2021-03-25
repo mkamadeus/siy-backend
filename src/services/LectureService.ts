@@ -14,6 +14,8 @@ export class LectureService {
     return await this.lectureRepository.findOne({ where: { id } });
   }
 
+  // public async getFromCourseId(id: number)
+
   public async create(lecture: Lecture): Promise<Lecture> {
     return await this.lectureRepository.save(lecture);
   }
