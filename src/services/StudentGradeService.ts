@@ -1,5 +1,6 @@
 import StudentGrade from "@/entity/StudentGrade";
 import { IndexValueEnum } from "@/enum/IndexEnum";
+import { LoEntry, LoOwner } from "@/enum/LoEnum";
 import { plainToClass } from "class-transformer";
 import Container, { Service } from "typedi";
 import { getRepository, Repository } from "typeorm";
@@ -31,6 +32,12 @@ export class StudentGradeService {
     return await this.gradeRepository
       .find({ where: { studentId: student.id } })
       .then((studentGrade) => studentGrade);
+  }
+
+  public async getByLectureId(lectureId: number) {
+    return await this.gradeRepository
+      .find({ where: { lectureId } })
+      .then((studentGrades) => studentGrades);
   }
 
   public async getByNimPerSemester(
@@ -94,9 +101,8 @@ export class StudentGradeService {
     return ip;
   }
 
-  public async getLoById(id: number) {
-    const grade = await this.getOne(id);
-    const totalLo = {
+  public async getLo(grade: StudentGrade) {
+    const totalLo: LoEntry = {
       loA: 0,
       loB: 0,
       loC: 0,
@@ -208,6 +214,60 @@ export class StudentGradeService {
     return totalLo;
   }
 
+  /**
+   * Get LO by grade entry
+   * @param id Grade ID
+   * @returns LO after being calculated
+   */
+  public async getLoById(id: number) {
+    const grade = await this.getOne(id);
+    return await this.getLo(grade);
+  }
+
+  public async getLoByLectureId(lectureId: number) {
+    const grades = await this.getByLectureId(lectureId);
+    const loWithOwners: LoOwner[] = await Promise.all(
+      grades.map(async (grade) => {
+        const los = await this.getLoById(grade.id);
+        return {
+          gradeId: grade.id,
+          los,
+        };
+      })
+    );
+    return loWithOwners;
+  }
+
+  /**
+   *
+   * @param nim Student's NIM
+   * @returns Cumulative LO for the student
+   */
+  public async getCumulativeLoByNim(nim: string) {
+    const grades = await this.getByNim(nim);
+
+    let cumulativeSum: LoEntry | null = null;
+    for (const grade of grades) {
+      const loList = await this.getLo(grade);
+      console.log(loList);
+      if (cumulativeSum) {
+        for (let key in cumulativeSum) {
+          cumulativeSum[key] += loList[key];
+        }
+      } else {
+        cumulativeSum = loList;
+      }
+    }
+
+    for (let key in cumulativeSum) {
+      cumulativeSum[key] /= grades.length;
+    }
+
+    console.log(cumulativeSum);
+
+    return cumulativeSum;
+  }
+
   public async create(studentGrade: StudentGrade): Promise<StudentGrade> {
     return await this.gradeRepository.save(
       plainToClass(StudentGrade, studentGrade)
@@ -279,7 +339,7 @@ export class StudentGradeService {
 
   public async update(
     id: number,
-    studentGrade: StudentGrade
+    studentGrade: Partial<StudentGrade>
   ): Promise<StudentGrade> {
     studentGrade.id = id;
     await this.gradeRepository.update(

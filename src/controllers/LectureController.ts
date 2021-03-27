@@ -20,20 +20,6 @@ export class LectureController {
     this.lectureService = lectureService;
   }
 
-  @Get("/id")
-  @ResponseSchema(LectureResponse)
-  @OpenAPI({
-    description: "Get one Lectures",
-    responses: {
-      "200" : {
-        description:"OK",
-      },
-    },
-  })
-  public getOneLectures(@Param("id") id: number) {
-    return this.lectureService.getOne(id);
-  }
-
   @Get("/")
   @ResponseSchema(LectureResponse, {isArray:true})
   @OpenAPI({
@@ -48,7 +34,61 @@ export class LectureController {
     return this.lectureService.getAll();
   }
 
+  @Get("/:id")
+  @ResponseSchema(LectureResponse)
+  @OpenAPI({
+    description: "Get one Lecture",
+    responses: {
+      "200" : {
+        description:"OK",
+      },
+    },
+  })
+  public getOneLecture(@Param("id") id: number) {
+    return this.lectureService.getOne(id);
+  }
 
+  @Get("/course/:id")
+  @ResponseSchema(LectureResponse)
+  @OpenAPI({
+    description: "Get Lecture by course",
+    responses: {
+      "200" : {
+        description:"OK",
+      },
+    },
+  })
+  public getLectureByCourse(@Param("id") id: number) {
+    return this.lectureService.getByCourse(id);
+  }
+
+  @Get("/year/:year")
+  @ResponseSchema(LectureResponse)
+  @OpenAPI({
+    description: "Get Lecture by year",
+    responses: {
+      "200" : {
+        description:"OK",
+      },
+    },
+  })
+  public getLectureByYear(@Param("year") year: number) {
+    return this.lectureService.getByYear(year);
+  }
+
+  @Get("/year/:year/:semester")
+  @ResponseSchema(LectureResponse)
+  @OpenAPI({
+    description: "Get Lecture by year and semester",
+    responses: {
+      "200" : {
+        description:"OK",
+      },
+    },
+  })
+  public getLectureByYearSemester(@Param("year") year: number, @Param("semester") semester: number) {
+    return this.lectureService.getByYearSemester(year, semester);
+  }
 
 
   @Post("/")
