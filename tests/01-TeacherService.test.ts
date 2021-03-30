@@ -7,11 +7,12 @@ import { Container } from "typedi";
 import { Connection } from "typeorm";
 
 let connection: Connection;
-before(async () => {
-  connection = await typeormLoader();
-});
 
 describe("TeacherService test", () => {
+  before(async () => {
+    connection = await typeormLoader();
+  });
+
   describe("#1 Teacher creation", () => {
     let teacherId: number;
     it("should have 0 teacher", (done) => {
@@ -52,16 +53,8 @@ describe("TeacherService test", () => {
         });
     });
   });
-});
 
-after(() => {
-  connection.close();
+  after(() => {
+    connection.close();
+  });
 });
-
-// after(async () => {
-//   const entities = getConnection().entityMetadatas;
-//   for (const entity of entities) {
-//     const repository = getConnection().getRepository(entity.name);
-//     await repository.clear();
-//   }
-// });
