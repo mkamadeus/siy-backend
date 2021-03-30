@@ -34,6 +34,63 @@ export default class Lecture extends BaseEntity {
   @Column()
   year: number;
 
+  // KMT Weight
+  @Column({
+    name: "lo_a_kmt_weight",
+    default: 0,
+    type: "float",
+    nullable: true,
+  })
+  loAKMTWeight?: number;
+
+  @Column({
+    name: "lo_b_kmt_weight",
+    default: 0,
+    type: "float",
+    nullable: true,
+  })
+  loBKMTWeight?: number;
+
+  @Column({
+    name: "lo_c_kmt_weight",
+    default: 0,
+    type: "float",
+    nullable: true,
+  })
+  loCKMTWeight?: number;
+
+  @Column({
+    name: "lo_d_kmt_weight",
+    default: 0,
+    type: "float",
+    nullable: true,
+  })
+  loDKMTWeight?: number;
+
+  @Column({
+    name: "lo_e_kmt_weight",
+    default: 0,
+    type: "float",
+    nullable: true,
+  })
+  loEKMTWeight?: number;
+
+  @Column({
+    name: "lo_f_kmt_weight",
+    default: 0,
+    type: "float",
+    nullable: true,
+  })
+  loFKMTWeight?: number;
+
+  @Column({
+    name: "lo_g_kmt_weight",
+    default: 0,
+    type: "float",
+    nullable: true,
+  })
+  loGKMTWeight?: number;
+
   // UAS weight
   @Column({
     name: "lo_a_final_weight",
