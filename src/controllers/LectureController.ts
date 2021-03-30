@@ -16,17 +16,17 @@ import { CreateLectureBody, UpdateLectureBody } from "./request/LectureRequest";
 
 @JsonController("/lectures")
 export class LectureController {
-  constructor(private lectureService:LectureService) {
+  constructor(private lectureService: LectureService) {
     this.lectureService = lectureService;
   }
 
   @Get("/")
-  @ResponseSchema(LectureResponse, {isArray:true})
+  @ResponseSchema(LectureResponse, { isArray: true })
   @OpenAPI({
     description: "Get all Lectures",
     responses: {
-      "200" : {
-        description:"OK",
+      "200": {
+        description: "OK",
       },
     },
   })
@@ -39,8 +39,8 @@ export class LectureController {
   @OpenAPI({
     description: "Get one Lecture",
     responses: {
-      "200" : {
-        description:"OK",
+      "200": {
+        description: "OK",
       },
     },
   })
@@ -53,8 +53,8 @@ export class LectureController {
   @OpenAPI({
     description: "Get Lecture by course",
     responses: {
-      "200" : {
-        description:"OK",
+      "200": {
+        description: "OK",
       },
     },
   })
@@ -67,8 +67,8 @@ export class LectureController {
   @OpenAPI({
     description: "Get Lecture by year",
     responses: {
-      "200" : {
-        description:"OK",
+      "200": {
+        description: "OK",
       },
     },
   })
@@ -81,15 +81,45 @@ export class LectureController {
   @OpenAPI({
     description: "Get Lecture by year and semester",
     responses: {
-      "200" : {
-        description:"OK",
+      "200": {
+        description: "OK",
       },
     },
   })
-  public getLectureByYearSemester(@Param("year") year: number, @Param("semester") semester: number) {
+  public getLectureByYearSemester(
+    @Param("year") year: number,
+    @Param("semester") semester: number
+  ) {
     return this.lectureService.getByYearSemester(year, semester);
   }
 
+  @Get("/co/:id/:lo")
+  @ResponseSchema(LectureResponse)
+  @OpenAPI({
+    description: "Get course outcome per LO by lecture id",
+    responses: {
+      "200": {
+        description: "OK",
+      },
+    },
+  })
+  public getCOperLO(@Param("id") id: number, @Param("lo") lo: string) {
+    return this.lectureService.getCourseOutcomeLO(id, lo);
+  }
+
+  @Get("/co/:id")
+  @ResponseSchema(LectureResponse)
+  @OpenAPI({
+    description: "Get course outcome by lecture id",
+    responses: {
+      "200": {
+        description: "OK",
+      },
+    },
+  })
+  public getCO(@Param("id") id: number) {
+    return this.lectureService.getCourseOutcome(id);
+  }
 
   @Post("/")
   @ResponseSchema(LectureResponse)
