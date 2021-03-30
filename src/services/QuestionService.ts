@@ -4,7 +4,10 @@ import { getRepository, Repository } from "typeorm";
 
 @Service()
 export class QuestionService {
-    private questionRepository: Repository<Question> = getRepository(Question);
+    private questionRepository: Repository<Question> = getRepository(
+        Question,
+        process.env.NODE_ENV === "test" ? "test" : "default"
+    );
 
     /**
      * Get all questions from database

@@ -3,7 +3,7 @@ import {
   BaseEntity,
   Column,
   Entity,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
@@ -13,7 +13,7 @@ import Answer from "./Answer";
 // FIXME: Waiting for client confirmation
 @Entity()
 export default class Question extends BaseEntity {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
