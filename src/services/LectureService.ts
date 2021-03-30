@@ -22,6 +22,18 @@ export class LectureService {
     return await this.lectureRepository.findOne({ where: { id } });
   }
 
+  public async getByCourse(id: number): Promise<Lecture[]> {
+    return await this.lectureRepository.find({ where: { courseId:id } });
+  }
+
+  public async getByYear(year: number): Promise<Lecture[]> {
+    return await this.lectureRepository.find({ where: { year:year } });
+  }
+
+  public async getByYearSemester(year: number, semester: number): Promise<Lecture[]> {
+    return await this.lectureRepository.find({ where: { year:year, semester:semester } });
+  }
+
   /**
    * Get Course Outcome per LO by lecture ID
    * @param id ID of the lecture
@@ -55,6 +67,8 @@ export class LectureService {
     });
     return totalLO / grades.length
   }
+
+  // public async getFromCourseId(id: number)
 
   public async create(lecture: Lecture): Promise<Lecture> {
     return await this.lectureRepository.save(lecture);

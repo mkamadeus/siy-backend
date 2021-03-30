@@ -1,19 +1,56 @@
+# Uses NodeJS V 9.4.0
+image: node:15
+
+services:
+  - postgres:12.2-alpine
+
+variables:
+  POSTGRES_DB: siy_test
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: password
+  POSTGRES_HOST_AUTH_METHOD: trust
+
+# And to cache them as well.
+cache:
+  paths:
+    - node_modules/
+    - .yarn
+
 before_script:
-  - docker login $DOCKER_REGISTRY -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+  - apt-get update -qq && apt-get install
+
+stages:
+  - test
+  - build
+
+unit-testing:
+  stage: test
+  before_script:
+    - yarn config set cache-folder .yarn
+    - yarn install --frozen-lockfile
+    - cp ormconfig.example.json ormconfig.json
+  script:
+    - yarn test
+  only:
+    - main
+    - f/deployment-2
+    - develop
 
 build-staging:
   stage: build
   script:
+    - docker login $DOCKER_REGISTRY -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     - docker build -t $DOCKER_USERNAME/siy-backend:latest .
     - docker push $DOCKER_USERNAME/siy-backend:latest
   only:
     - main
-    - f/deployment
+    - f/deployment-2
     - develop
 
 build-production:
   stage: build
   script:
+    - docker login $DOCKER_REGISTRY -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     - docker build -t $DOCKER_USERNAME/siy-backend:production .
     - docker push $DOCKER_USERNAME/siy-backend:production
   only:
