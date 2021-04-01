@@ -6,12 +6,13 @@ import { expect } from "chai";
 import { Container } from "typedi";
 import { Connection } from "typeorm";
 
-let connection: Connection;
-before(async () => {
-  connection = await typeormLoader();
-});
 
 describe("QuestionService test", () => {
+  let connection: Connection;
+  before(async () => {
+    connection = await typeormLoader();
+  });
+
   describe("#1 Question creation", () => {
     let questionId: number;
     it("should have 0 question", (done) => {
@@ -26,7 +27,7 @@ describe("QuestionService test", () => {
       questionService
         .create({
           question: "Seberapa sering Anda berkomunikasi dengan kelompok Anda?",
-          answerType: "int"
+          answerType: "int",
         } as Question)
         .then((question) => {
           questionId = question.id;
@@ -53,10 +54,10 @@ describe("QuestionService test", () => {
         });
     });
   });
-});
 
-after(() => {
-  connection.close();
+  after(() => {
+    connection.close();
+  });
 });
 
 // after(async () => {

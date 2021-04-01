@@ -6,12 +6,12 @@ import { expect } from "chai";
 import { Container } from "typedi";
 import { Connection } from "typeorm";
 
-let connection: Connection;
-before(async () => {
-  connection = await typeormLoader();
-});
-
 describe("CourseService test", () => {
+  let connection: Connection;
+  before(async () => {
+    connection = await typeormLoader();
+  });
+
   describe("#1 Course creation", () => {
     let courseId: number;
     it("should have 0 course", (done) => {
@@ -25,15 +25,13 @@ describe("CourseService test", () => {
       const courseService = Container.get(CourseService);
       courseService
         .create({
-        //   code: "IF3250",
+          //   code: "IF3250",
           name: "Proyek Perangkat Lunak",
-        //   sks: 4,
+          //   sks: 4,
         } as Course)
         .then((course) => {
           courseId = course.id;
-          expect(course.name).to.be.equal(
-            "Proyek Perangkat Lunak"
-          );
+          expect(course.name).to.be.equal("Proyek Perangkat Lunak");
           return courseService.getAll();
         })
         .then((courseArray) => {
@@ -54,8 +52,8 @@ describe("CourseService test", () => {
         });
     });
   });
-});
 
-after(() => {
-  connection.close();
+  after(() => {
+    connection.close();
+  });
 });

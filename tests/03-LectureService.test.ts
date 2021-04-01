@@ -6,12 +6,14 @@ import { expect } from "chai";
 import { Container } from "typedi";
 import { Connection } from "typeorm";
 
-let connection: Connection;
-before(async () => {
-  connection = await typeormLoader();
-});
+
 
 describe("LectureService test", () => {
+  let connection: Connection;
+  before(async () => {
+    connection = await typeormLoader();
+  });
+  
   describe("#1 Lecture creation", () => {
     let lecId: number;
     it("should have 0 lecture", (done) =>{
@@ -74,8 +76,9 @@ describe("LectureService test", () => {
         });
     });
   });
+  after(() => {
+    connection.close();
+  });
 });
 
-after(() => {
-  connection.close();
-});
+

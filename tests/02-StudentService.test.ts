@@ -6,12 +6,14 @@ import { expect } from "chai";
 import { Container } from "typedi";
 import { Connection } from "typeorm";
 
-let connection: Connection;
-before(async () => {
-  connection = await typeormLoader();
-});
+
 
 describe("StudentService test", () => {
+  let connection: Connection;
+  before(async () => {
+    connection = await typeormLoader();
+  });
+
   describe("#1 Student creation", () => {
     let studentId: number;
     it("should have 0 student", (done) => {
@@ -56,11 +58,13 @@ describe("StudentService test", () => {
         });
     });
   });
+
+  after(() => {
+    connection.close();
+  });
 });
 
-after(() => {
-  connection.close();
-});
+
 
 // after(async () => {
 //   const entities = getConnection().entityMetadatas;
