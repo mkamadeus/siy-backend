@@ -4,7 +4,10 @@ import { getRepository, Repository } from "typeorm";
 
 @Service()
 export class CourseService {
-  private courseRepository: Repository<Course> = getRepository(Course);
+  private courseRepository: Repository<Course> = getRepository(
+    Course,
+    process.env.NODE_ENV === "test" ? "test" : "default"
+  );
 
   public async getAll(): Promise<Course[]> {
     return await this.courseRepository.find().then((course) => course);

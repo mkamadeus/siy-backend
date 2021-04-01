@@ -6,9 +6,9 @@ import { expect } from "chai";
 import { Container } from "typedi";
 import { Connection } from "typeorm";
 
+let connection: Connection;
 
 describe("QuestionService test", () => {
-  let connection: Connection;
   before(async () => {
     connection = await typeormLoader();
   });

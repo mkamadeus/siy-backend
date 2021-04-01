@@ -4,7 +4,10 @@ import { getRepository, Repository } from "typeorm";
 
 @Service()
 export class StudentService {
-  private studentRepository: Repository<Student> = getRepository(Student);
+  private studentRepository: Repository<Student> = getRepository(
+    Student,
+    process.env.NODE_ENV === "test" ? "test" : "default"
+    );
 
   /**
    * Get all students from database.

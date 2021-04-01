@@ -6,7 +6,10 @@ import { StudentGradeService } from "./StudentGradeService";
 
 @Service()
 export class LectureService {
-  private lectureRepository: Repository<Lecture> = getRepository(Lecture);
+  private lectureRepository: Repository<Lecture> = getRepository(
+    Lecture,
+    process.env.NODE_ENV === "test" ? "test" : "default"
+  );
 
   /**
    * Get all Lectures
