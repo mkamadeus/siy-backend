@@ -89,7 +89,6 @@ export class GradeController {
     return await this.gradeService.getOne(id);
   }
 
-  
 
   @Post("/")
   @ResponseSchema(GradeResponse)
