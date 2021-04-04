@@ -26,9 +26,12 @@ describe("CourseService test", () => {
       const courseService = Container.get(CourseService);
       courseService
         .create({
-          //   code: "IF3250",
+          code: "IF3250",
           name: "Proyek Perangkat Lunak",
-          //   sks: 4,
+          credits: 4,
+          briefSyllabus: "Kuliah ini memberikan gambaran kompleksitas dan pengalaman mengenai pengembangan perangkat lunak skala besar.",
+          completeSyllabus: "Definisi perangkat lunak skala besar; berbagai ... Performance Engineering.",
+          outcome:"1.Memahami definisi P/L skala besar serta berbagai persoalan pengembangan P/L skala besar ... and Performance Engineering."
         } as Course)
         .then((course) => {
           courseId = course.id;
@@ -38,7 +41,8 @@ describe("CourseService test", () => {
         .then((courseArray) => {
           expect(courseArray.length).to.be.equal(1);
           done();
-        });
+        })
+        .catch(e => console.log("Here: ", e));
     });
     it("should deleted the entry", (done) => {
       const courseService = Container.get(CourseService);
