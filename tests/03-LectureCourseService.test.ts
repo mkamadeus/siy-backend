@@ -25,43 +25,56 @@ describe("LectureService test", () => {
         done();
       });
     });
-    it("should create 1 lecture", (done) => {
+    it("should create 1 course", (done) => {
       const courseService = Container.get(CourseService);
-      const lectureService = Container.get(LectureService);
       courseService
         .create({
-          code: "MS0001",
-          credits: 2,
-          name: "Mata Kuliah 1",
-          briefSyllabus: "string",
-          completeSyllabus: "string",
-          outcome: "string",
+          code: "IF3250",
+          name: "Proyek Perangkat Lunak",
+          credits: 4,
+          briefSyllabus:
+            "Kuliah ini memberikan gambaran kompleksitas dan pengalaman mengenai pengembangan perangkat lunak skala besar.",
+          completeSyllabus:
+            "Definisi perangkat lunak skala besar; berbagai ... Performance Engineering.",
+          outcome:
+            "1.Memahami definisi P/L skala besar serta berbagai persoalan pengembangan P/L skala besar ... and Performance Engineering.",
         } as Course)
         .then((course) => {
           courseId = course.id;
-          lectureService
-            .create({
-              courseId: courseId,
-              semester: 3,
-              year: 2021,
-            } as Lecture)
-            .then((lecture) => {
-              lecId = lecture.id;
-              expect(lecture.courseId).to.be.equal(courseId);
-              expect(lecture.semester).to.be.equal(3);
-              expect(lecture.year).to.be.equal(2021);
-              expect(lecture.loAPracticumWeight).to.be.equal(0);
-              return lectureService.getAll();
-            })
-            .then((lectureArray) => {
-              expect(lectureArray.length).to.be.equal(1);
-              done();
-            });
+          expect(course.name).to.be.equal("Proyek Perangkat Lunak");
+          return courseService.getAll();
+        })
+        .then((courseArray) => {
+          expect(courseArray.length).to.be.equal(1);
+          done();
+        })
+
+        .catch((e) => console.log("Here: ", e));
+    });
+    it("should create 1 lecture", (done) => {
+      const lectureService = Container.get(LectureService);
+      lectureService
+        .create({
+          courseId: courseId,
+          semester: 3,
+          year: 2021,
+        } as Lecture)
+        .then((lecture) => {
+          lecId = lecture.id;
+          expect(lecture.courseId).to.be.equal(courseId);
+          expect(lecture.semester).to.be.equal(3);
+          expect(lecture.year).to.be.equal(2021);
+          expect(lecture.loAPracticumWeight).to.be.equal(0);
+          return lectureService.getAll();
+        })
+        .then((lectureArray) => {
+          expect(lectureArray.length).to.be.equal(1);
+          done();
         });
     });
+
     it("should update lecture loAPracticum Weight to 3, semester to 4", (done) => {
       const lectureService = Container.get(LectureService);
-      console.log(courseId);
       lectureService
         .update(lecId, {
           courseId: courseId,
@@ -74,13 +87,14 @@ describe("LectureService test", () => {
           expect(lecture.semester).to.be.equal(4);
           expect(lecture.year).to.be.equal(2021);
           expect(lecture.loAPracticumWeight).to.be.equal(3);
+          expect(1).to.be.equal(1);
+
           done();
         });
     });
-    it("should delete the lecture entry", (done) => {
+    it("should delete the lecture and course entry", (done) => {
       const lectureService = Container.get(LectureService);
       const courseService = Container.get(CourseService);
-
       lectureService
         .delete(lecId)
         .then(() => {
@@ -90,8 +104,6 @@ describe("LectureService test", () => {
               return courseService.getAll();
             })
             .then((courseArray) => {
-              console.log("halo");
-              console.log(courseArray.length);
               expect(courseArray.length).to.be.equal(0);
             });
           return lectureService.getAll();
