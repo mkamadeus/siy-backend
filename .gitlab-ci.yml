@@ -33,7 +33,7 @@ unit-testing:
     - yarn test
   only:
     - main
-    - f/deployment-2
+    - f/deployment-3
     - develop
 
 build-staging:
@@ -44,7 +44,7 @@ build-staging:
     - docker push $DOCKER_USERNAME/siy-backend:latest
   only:
     - main
-    - f/deployment-2
+    - f/deployment-3
     - develop
 
 build-production:
