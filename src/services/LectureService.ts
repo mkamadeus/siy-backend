@@ -1,5 +1,6 @@
 import { GradeResponse } from "@/controllers/response/StudentGradeResponse";
 import Lecture from "@/entity/Lecture";
+import { IndexValueEnum } from "@/enum/IndexEnum";
 import Container, { Service } from "typedi";
 import { getRepository, Repository } from "typeorm";
 import { StudentGradeService } from "./StudentGradeService";
@@ -75,56 +76,67 @@ export class LectureService {
   }
 
   public async getCourseOutcome(id: number): Promise<number> {
-    const lect = this.getOne(id);
-    var kmtA = (await lect).loAKMTWeight;
-    if (kmtA == null) {
-      kmtA = 0;
-    }
-    var kmtB = (await lect).loBKMTWeight;
-    if (kmtB == null) {
-      kmtB = 0;
-    }
-    var kmtC = (await lect).loCKMTWeight;
-    if (kmtC == null) {
-      kmtC = 0;
-    }
-    var kmtD = (await lect).loDKMTWeight;
-    if (kmtD == null) {
-      kmtD = 0;
-    }
-    var kmtE = (await lect).loEKMTWeight;
-    if (kmtE == null) {
-      kmtE = 0;
-    }
-    var kmtF = (await lect).loFKMTWeight;
-    if (kmtF == null) {
-      kmtF = 0;
-    }
-    var kmtG = (await lect).loGKMTWeight;
-    if (kmtG == null) {
-      kmtG = 0;
-    }
+    const grades = await Container.get(StudentGradeService).getByLectureId(id);
+    var totalIdx = 0;
 
-    const coA = await this.getCourseOutcomeLO(id, "A");
-    const coB = await this.getCourseOutcomeLO(id, "B");
-    const coC = await this.getCourseOutcomeLO(id, "C");
-    const coD = await this.getCourseOutcomeLO(id, "D");
-    const coE = await this.getCourseOutcomeLO(id, "E");
-    const coF = await this.getCourseOutcomeLO(id, "F");
-    const coG = await this.getCourseOutcomeLO(id, "G");
+    grades.forEach((grade) => {
+      var index = IndexValueEnum[grade.index];
+      totalIdx += index;
+    });
 
-    var totalKMT = kmtA + kmtB + kmtC + kmtD + kmtE + kmtF + kmtG;
+    var totalStudent = grades.length;
+    return totalIdx / totalStudent;
 
-    return (
-      (kmtA * coA +
-        kmtB * coB +
-        kmtC * coC +
-        kmtD * coD +
-        kmtE * coE +
-        kmtF * coF +
-        kmtG * coG) /
-      totalKMT
-    );
+    // const lect = this.getOne(id);
+    // var kmtA = (await lect).loAKMTWeight;
+    // if (kmtA == null) {
+    //   kmtA = 0;
+    // }
+    // var kmtB = (await lect).loBKMTWeight;
+    // if (kmtB == null) {
+    //   kmtB = 0;
+    // }
+    // var kmtC = (await lect).loCKMTWeight;
+    // if (kmtC == null) {
+    //   kmtC = 0;
+    // }
+    // var kmtD = (await lect).loDKMTWeight;
+    // if (kmtD == null) {
+    //   kmtD = 0;
+    // }
+    // var kmtE = (await lect).loEKMTWeight;
+    // if (kmtE == null) {
+    //   kmtE = 0;
+    // }
+    // var kmtF = (await lect).loFKMTWeight;
+    // if (kmtF == null) {
+    //   kmtF = 0;
+    // }
+    // var kmtG = (await lect).loGKMTWeight;
+    // if (kmtG == null) {
+    //   kmtG = 0;
+    // }
+
+    // const coA = await this.getCourseOutcomeLO(id, "A");
+    // const coB = await this.getCourseOutcomeLO(id, "B");
+    // const coC = await this.getCourseOutcomeLO(id, "C");
+    // const coD = await this.getCourseOutcomeLO(id, "D");
+    // const coE = await this.getCourseOutcomeLO(id, "E");
+    // const coF = await this.getCourseOutcomeLO(id, "F");
+    // const coG = await this.getCourseOutcomeLO(id, "G");
+
+    // var totalKMT = kmtA + kmtB + kmtC + kmtD + kmtE + kmtF + kmtG;
+
+    // return (
+    //   (kmtA * coA +
+    //     kmtB * coB +
+    //     kmtC * coC +
+    //     kmtD * coD +
+    //     kmtE * coE +
+    //     kmtF * coF +
+    //     kmtG * coG) /
+    //   totalKMT
+    // );
   }
 
   public async create(lecture: Lecture): Promise<Lecture> {
