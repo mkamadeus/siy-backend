@@ -1,6 +1,3 @@
-# Uses NodeJS V 9.4.0
-image: node:15
-
 services:
   - postgres:12.2-alpine
 
@@ -25,6 +22,7 @@ stages:
 
 unit-testing:
   stage: test
+  image: docker:20
   before_script:
     - yarn config set cache-folder .yarn
     - yarn install --frozen-lockfile
@@ -38,6 +36,7 @@ unit-testing:
 
 build-staging:
   stage: build
+  image: node:14
   script:
     - docker login $DOCKER_REGISTRY -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     - docker build -t $DOCKER_USERNAME/siy-backend:latest .
@@ -49,6 +48,7 @@ build-staging:
 
 build-production:
   stage: build
+  image: node:14
   script:
     - docker login $DOCKER_REGISTRY -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     - docker build -t $DOCKER_USERNAME/siy-backend:production .
