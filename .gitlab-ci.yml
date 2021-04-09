@@ -1,5 +1,6 @@
 services:
   - postgres:12.2-alpine
+  - docker:dind
 
 variables:
   POSTGRES_DB: siy_test
@@ -7,14 +8,10 @@ variables:
   POSTGRES_PASSWORD: password
   POSTGRES_HOST_AUTH_METHOD: trust
 
-# And to cache them as well.
 cache:
   paths:
     - node_modules/
     - .yarn
-
-before_script:
-  - apt-get update -qq && apt-get install
 
 stages:
   - test
@@ -36,7 +33,6 @@ unit-testing:
 
 build-staging:
   stage: build
-  image: docker:20
   script:
     - docker login $DOCKER_REGISTRY -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     - docker build -t $DOCKER_USERNAME/siy-backend:latest .
@@ -48,7 +44,6 @@ build-staging:
 
 build-production:
   stage: build
-  image: docker:20
   script:
     - docker login $DOCKER_REGISTRY -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     - docker build -t $DOCKER_USERNAME/siy-backend:production .
