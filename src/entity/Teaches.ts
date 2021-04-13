@@ -14,10 +14,10 @@ export default class Teaches extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ name: "teacher_id" })
   teacherId: number;
 
-  @Column()
+  @Column({ name: "lecture_id"})
   lectureId: number;
 
   @ManyToOne(() => Teacher, (teacher) => teacher.teaches)
