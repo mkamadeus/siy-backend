@@ -46,7 +46,7 @@ build-staging:
 deploy-staging:
   stage: deploy
   script:
-    - echo $PRIVATE_KEY | sudo ssh -i /dev/stdin mkamadeus@34.101.128.166 "cd ~/siy-server && docker-compose pull && docker-compose up -d --remove-orphans"
+    - sudo echo $PRIVATE_KEY | ssh -i /dev/stdin mkamadeus@34.101.128.166 "cd ~/siy-server && docker-compose pull && docker-compose up -d --remove-orphans"
 
 
 build-production:
