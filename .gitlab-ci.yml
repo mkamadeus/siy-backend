@@ -16,6 +16,7 @@ cache:
 stages:
   - test
   - build
+  - deploy
 
 unit-testing:
   stage: test
@@ -41,6 +42,12 @@ build-staging:
     - main
     - f/deployment-3
     - develop
+
+deploy-staging:
+  stage: deploy
+  script:
+    - echo $PRIVATE_KEY | sudo ssh -i /dev/stdin mkamadeus@34.101.128.166 "cd ~/siy-server && docker-compose pull && docker-compose up -d --remove-orphans"
+
 
 build-production:
   stage: build
