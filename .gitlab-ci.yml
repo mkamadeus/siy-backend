@@ -45,8 +45,14 @@ build-staging:
 
 deploy-staging:
   stage: deploy
+  before_script:
+    - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
   script:
-    - echo $PRIVATE_KEY | ssh -i /dev/stdin mkamadeus@34.101.128.166 "cd ~/siy-server && docker-compose pull && docker-compose up -d --remove-orphans"
+    - ssh -i /dev/stdin mkamadeus@34.101.128.166 "cd ~/siy-server && docker-compose pull && docker-compose up -d --remove-orphans"
 
 
 build-production:
