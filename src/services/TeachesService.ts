@@ -47,6 +47,16 @@ export class TeachesService {
       .getMany();
   }
 
+  public async getLecturePortofolioByID(lid: number): Promise<number> {
+    const teachers = await this.getByLectureId(lid);
+    var total = 0;
+    teachers.forEach((teacher) => {
+      total += teacher.portofolio;
+    });
+
+    return total / teachers.length;
+  }
+
   public async create(teaches: Teaches): Promise<Teaches> {
     return await this.teachesRepository.save(teaches);
   }
