@@ -51,6 +51,8 @@ deploy-staging:
     - echo "$PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
+    - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
   script:
     - ssh mkamadeus@34.101.128.166 "cd ~/siy-server && docker-compose pull && docker-compose up -d --remove-orphans"
 
