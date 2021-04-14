@@ -1,22 +1,27 @@
 import "reflect-metadata";
 import Teaches from "@/entity/Teaches";
-import { 
-  Get, 
-  JsonController, 
-  Param, 
+import {
+  Get,
+  JsonController,
+  Param,
   Post,
   Body,
   Put,
-  Delete
+  Delete,
 } from "routing-controllers";
 import { TeachesService } from "@/services/TeachesService";
 import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
 import { TeachesResponse } from "./response/TeachesResponse";
-import { CreateTeachesBody, UpdateTeachesBody } from "./request/TeachesRequest";
+import {
+  CreateTeachesBody,
+  UpdatePortoBody,
+  UpdateTeachesBody,
+} from "./request/TeachesRequest";
+import { prototype } from "node:events";
 
 @JsonController("/teaches")
 export class TeachesController {
-  constructor(private teachesService: TeachesService){
+  constructor(private teachesService: TeachesService) {
     this.teachesService = teachesService;
   }
 
@@ -30,7 +35,7 @@ export class TeachesController {
       },
     },
   })
-  public getAllTeaches(){
+  public getAllTeaches() {
     return this.teachesService.getAll();
   }
 
@@ -44,7 +49,7 @@ export class TeachesController {
       },
     },
   })
-  public getTeachesById(@Param("id") id: number){
+  public getTeachesById(@Param("id") id: number) {
     return this.teachesService.getOne(id);
   }
 
@@ -58,7 +63,7 @@ export class TeachesController {
       },
     },
   })
-  public getTeachesByTeacher(@Param("id") id: number){
+  public getTeachesByTeacher(@Param("id") id: number) {
     return this.teachesService.getByTeacherId(id);
   }
 
@@ -72,7 +77,7 @@ export class TeachesController {
       },
     },
   })
-  public getTeachesByLecture(@Param("id") id: number){
+  public getTeachesByLecture(@Param("id") id: number) {
     return this.teachesService.getByLectureId(id);
   }
 
@@ -89,8 +94,31 @@ export class TeachesController {
       },
     },
   })
-  public createTeaches(@Body() teaches: CreateTeachesBody){
+  public createTeaches(@Body() teaches: CreateTeachesBody) {
     return this.teachesService.create(teaches as Teaches);
+  }
+
+  @Put("/portofolio/:lid/:tid")
+  @ResponseSchema(TeachesResponse)
+  @OpenAPI({
+    description: "Update teaching information",
+    responses: {
+      "200": {
+        description: "OK",
+      },
+    },
+  })
+  public async updatePorto(
+    @Param("lid") lid: number,
+    @Param("tid") tid: number,
+    @Body() teaches: UpdateTeachesBody
+    // @Body() prototype: UpdatePortoBody
+  ) {
+    return await this.teachesService.updatePortofolio(
+      lid,
+      tid,
+      teaches as Teaches
+    );
   }
 
   //TODO: Is this necessary?
@@ -100,14 +128,14 @@ export class TeachesController {
     description: "Update teaching information",
     responses: {
       "200": {
-          description: "OK",
+        description: "OK",
       },
     },
   })
   public async updateTeaches(
     @Param("id") id: number,
     @Body() teaches: UpdateTeachesBody
-  ){
+  ) {
     return await this.teachesService.update(id, teaches as Teaches);
   }
 
@@ -115,12 +143,12 @@ export class TeachesController {
   @OpenAPI({
     description: "Delete teaching information by ID",
     responses: {
-        "200": {
-            description: "OK",
-        },
+      "200": {
+        description: "OK",
+      },
     },
   })
-  public removeTeaches(@Param("id") id: number){
+  public removeTeaches(@Param("id") id: number) {
     return this.teachesService.delete(id);
   }
 }
