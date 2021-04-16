@@ -40,14 +40,5 @@ export default class Teaches extends BaseEntity {
   @ManyToOne(() => RatingQuestionnaire, (rq) => rq.teaches)
   @JoinColumn({ name: "ratingquestionnaire_id", referencedColumnName: "id" })
   ratingQuestionnaire: RatingQuestionnaire;
-
-  @Column({ name: "rating_m_2" })
-  ratingM_2: number;
-
-  @Column({ name: "rating_m_6" })
-  ratingM_6: number;
-
-  @Column({ name: "rating_m_9" })
-  ratingM_9: number;
   
 }

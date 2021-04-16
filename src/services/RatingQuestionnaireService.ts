@@ -19,9 +19,14 @@ export class RatingQuestionnaireService{
           .then((rq) => rq);
     }
 
-    /*TODO: get Teaches?
-            get ratings
-            get m_x rating */
+    public async getByLectureId(lectureId: number): Promise<RatingQuestionnaire[]>{
+        return await this.ratingQuestionnaireRepository
+            .createQueryBuilder("rating_questionnaire")
+            .leftJoinAndSelect("rating_questionnaire.teaches", "teaches")
+            .leftJoinAndSelect("teaches.lecture", "lecture")
+            .where("lecture.id = :lectureId", { lectureId })
+            .getMany()
+    }
 
     public async create(rq: RatingQuestionnaire): Promise<RatingQuestionnaire>{
         return await this.ratingQuestionnaireRepository.save(rq);
