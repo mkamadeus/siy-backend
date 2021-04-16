@@ -1,3 +1,5 @@
+import { Exclude } from "class-transformer";
+
 import {
     BaseEntity,
     Entity,
@@ -6,6 +8,7 @@ import {
     OneToMany,
     JoinColumn,
     Column,
+    CreateDateColumn,
 } from "typeorm";
 import Student from "./Student";
 import Teaches from "./Teaches";
@@ -16,9 +19,11 @@ export default class RatingQuestionnaire extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => Student, (student) => student)
-    @JoinColumn({ name: "student_id", referencedColumnName: "id" })
-    student: Student;
+    @Column({ name: "student_id" })
+    studentId: number;
+
+    @Column({ name: "teaches_id" })
+    teachesId: number;
 
     @Column({ name: "rating_m_1" })
     ratingM_1: number;
@@ -47,7 +52,25 @@ export default class RatingQuestionnaire extends BaseEntity {
     @Column({ name: "rating_m_12" })
     ratingM_12: number;
 
+    //TEACHER AVERAGE SCORES COLUMN
+    @Column({ name: "rating_m_2" })
+    ratingM_2: number;
+  
+    @Column({ name: "rating_m_6" })
+    ratingM_6: number;
+  
+    @Column({ name: "rating_m_9" })
+    ratingM_9: number;
+
+    @ManyToOne(() => Student, (student) => student)
+    @JoinColumn({ name: "student_id", referencedColumnName: "id" })
+    student: Student;
+
     @OneToMany(() => Teaches, (teaches) => teaches.id)
     @JoinColumn({ name: "teaches_id", referencedColumnName: "id" })
     teaches: Teaches[];
+
+    @CreateDateColumn()
+    @Exclude()
+    createdAt: Date;
 }
