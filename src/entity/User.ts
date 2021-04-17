@@ -1,3 +1,4 @@
+import { UserRole } from "@/enum/UserRoleEnum";
 import { Exclude } from "class-transformer";
 import {
   BaseEntity,
@@ -19,6 +20,12 @@ export default class User extends BaseEntity {
   @Column()
   @Exclude()
   password: string;
+
+  @Column({ type: "enum", enum: UserRole })
+  role: UserRole;
+
+  @Column({ nullable: true })
+  refreshToken: string;
 
   @CreateDateColumn()
   @Exclude()

@@ -14,7 +14,7 @@ import {
   AfterRemove,
 } from "typeorm";
 import Student from "./Student";
-import { IndexEnum, IndexValueEnum } from "@/enum/IndexEnum";
+import { IndexEnum } from "@/enum/IndexEnum";
 import Lecture from "./Lecture";
 import Container from "typedi";
 import { StudentGradeService } from "@/services/StudentGradeService";

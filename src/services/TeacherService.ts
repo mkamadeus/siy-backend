@@ -1,6 +1,6 @@
 import Teacher from "@/entity/Teacher";
 import { Service } from "typedi";
-import { getConnection, getRepository, Repository } from "typeorm";
+import { getRepository, Repository } from "typeorm";
 
 @Service()
 export class TeacherService {
