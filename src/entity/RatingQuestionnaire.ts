@@ -10,8 +10,8 @@ import {
     Column,
     CreateDateColumn,
 } from "typeorm";
+import Lecture from "./Lecture";
 import Student from "./Student";
-import Teaches from "./Teaches";
 
 @Entity()
 export default class RatingQuestionnaire extends BaseEntity {
@@ -22,8 +22,8 @@ export default class RatingQuestionnaire extends BaseEntity {
     @Column({ name: "student_id" })
     studentId: number;
 
-    @Column({ name: "teaches_id" })
-    teachesId: number;
+    @Column({ name: "lecture_id" })
+    lectureId: number;
 
     @Column({ name: "rating_m_1" })
     ratingM_1: number;
@@ -53,22 +53,31 @@ export default class RatingQuestionnaire extends BaseEntity {
     ratingM_12: number;
 
     //TEACHER AVERAGE SCORES COLUMN
-    @Column({ name: "rating_m_2" })
+    @Column({
+        name: "rating_m_2",
+        type: "float"
+    })
     ratingM_2: number;
   
-    @Column({ name: "rating_m_6" })
+    @Column({
+        name: "rating_m_6",
+        type: "float"
+    })
     ratingM_6: number;
   
-    @Column({ name: "rating_m_9" })
+    @Column({
+        name: "rating_m_9",
+        type: "float"
+    })
     ratingM_9: number;
 
     @ManyToOne(() => Student, (student) => student)
     @JoinColumn({ name: "student_id", referencedColumnName: "id" })
     student: Student;
 
-    @OneToMany(() => Teaches, (teaches) => teaches.id)
-    @JoinColumn({ name: "teaches_id", referencedColumnName: "id" })
-    teaches: Teaches[];
+    @OneToMany(() => Lecture, (lecture) => lecture.id)
+    @JoinColumn({ name: "lecture_id", referencedColumnName: "id" })
+    lectures: Lecture[];
 
     @CreateDateColumn()
     @Exclude()

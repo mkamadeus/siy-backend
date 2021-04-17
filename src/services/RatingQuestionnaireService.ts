@@ -1,6 +1,8 @@
 import RatingQuestionnaire from "@/entity/RatingQuestionnaire";
-import { Service } from "typedi";
+import { plainToClass } from "class-transformer";
+import Container, { Service } from "typedi";
 import { getRepository, Repository } from "typeorm";
+import { StudentService } from "./StudentService";
 
 @Service()
 export class RatingQuestionnaireService{
@@ -22,14 +24,33 @@ export class RatingQuestionnaireService{
     public async getByLectureId(lectureId: number): Promise<RatingQuestionnaire[]>{
         return await this.ratingQuestionnaireRepository
             .createQueryBuilder("rating_questionnaire")
-            .leftJoinAndSelect("rating_questionnaire.teaches", "teaches")
-            .leftJoinAndSelect("teaches.lecture", "lecture")
+            .leftJoinAndSelect("rating_questionnaire.lectures", "lecture")
+            //.leftJoinAndSelect("teaches.lecture", "lecture")
             .where("lecture.id = :lectureId", { lectureId })
             .getMany()
     }
 
     public async create(rq: RatingQuestionnaire): Promise<RatingQuestionnaire>{
         return await this.ratingQuestionnaireRepository.save(rq);
+    }
+
+    //TODO: Create by student after confirming that they have StudentGrade of a Lecture
+    public async createByStudent(
+        nim: string,
+        rq: RatingQuestionnaire
+    ): Promise<RatingQuestionnaire> {
+        try {
+            const student = await Container.get(StudentService).getByNim(nim);
+            const result = await this.ratingQuestionnaireRepository.save(
+                plainToClass(RatingQuestionnaire, {
+                    studentId: student.id,
+                    ...rq,
+                })
+            );
+            return result;
+        } catch (err) {
+            throw new EvalError(`Error on questionnaire ${nim}: ${err.message}`);
+        }
     }
 
     public async update(id: number, rq: RatingQuestionnaire): Promise<RatingQuestionnaire>{
