@@ -75,9 +75,9 @@ export default class RatingQuestionnaire extends BaseEntity {
     @JoinColumn({ name: "student_id", referencedColumnName: "id" })
     student: Student;
 
-    @OneToMany(() => Lecture, (lecture) => lecture.id)
+    @ManyToOne(() => Lecture, (lecture) => lecture.id)
     @JoinColumn({ name: "lecture_id", referencedColumnName: "id" })
-    lectures: Lecture[];
+    lectures: Lecture;
 
     @CreateDateColumn()
     @Exclude()
