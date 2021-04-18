@@ -35,8 +35,9 @@ export class RatingQuestionnaireService{
     }
 
     //TODO: Create by student after confirming that they have StudentGrade of a Lecture
-    public async createByStudent(
+    public async createByStudentNimLecture(
         nim: string,
+        lectureId: number,
         rq: RatingQuestionnaire
     ): Promise<RatingQuestionnaire> {
         try {
@@ -44,6 +45,7 @@ export class RatingQuestionnaireService{
             const result = await this.ratingQuestionnaireRepository.save(
                 plainToClass(RatingQuestionnaire, {
                     studentId: student.id,
+                    lectureId: lectureId,
                     ...rq,
                 })
             );
