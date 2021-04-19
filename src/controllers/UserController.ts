@@ -2,7 +2,7 @@ import User from "@/entity/User";
 import { UserService } from "@/services/UserService";
 import { Body, Get, JsonController, Param, Post } from "routing-controllers";
 
-@JsonController("/user")
+@JsonController("/users")
 export class UserController {
   constructor(private userService: UserService) {
     this.userService = userService;

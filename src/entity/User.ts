@@ -18,7 +18,6 @@ export default class User extends BaseEntity {
   username: string;
 
   @Column()
-  @Exclude()
   password: string;
 
   @Column({ type: "enum", enum: UserRole })

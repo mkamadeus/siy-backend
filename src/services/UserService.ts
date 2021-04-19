@@ -26,13 +26,16 @@ export class UserService {
   }
 
   public async createUser(user: User) {
+    console.log(user);
     user.password = await argon2.hash(user.password);
     const createdUser = await this.userRepository.save(user);
     return createdUser;
   }
 
   public async updateUser(id: number, user: Partial<User>) {
-    user.password = await argon2.hash(user.password);
+    if (user.password) {
+      user.password = await argon2.hash(user.password);
+    }
     const updatedUser = await this.userRepository.update(id, user);
     return updatedUser;
   }

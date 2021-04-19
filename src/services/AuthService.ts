@@ -9,7 +9,13 @@ export class AuthService {
   public async login(username: string, password: string) {
     const user = await Container.get(UserService).getUserByUsername(username);
 
-    if (user || (await argon2.verify(user.password, password))) {
+    if (!user) {
+      throw new Error("Credentials invalid");
+    }
+
+    console.log(user, password);
+
+    if (await argon2.verify(user.password, password)) {
       const accessToken = jwt.sign({ id: user.id }, env.accessTokenSecret, {
         expiresIn: 60 * 60,
       });
@@ -26,6 +32,10 @@ export class AuthService {
 
   public async invalidateUser(username: string) {
     const user = await Container.get(UserService).getUserByUsername(username);
+    if (!user.username) {
+      throw new Error("No user with that username");
+    }
+
     await Container.get(UserService).updateUser(user.id, {
       refreshToken: null,
     });
