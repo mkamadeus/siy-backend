@@ -1,9 +1,12 @@
-import { IsNumber } from "class-validator";
+import { IsNumber, IsString } from "class-validator";
 
 export class CreateUserBody {
-  @IsNumber()
-  public id: number;
+  @IsString()
+  public username: string;
+
+  @IsString()
+  public password: string;
 
   @IsNumber()
-  public lectureId: number;
+  public role: number;
 }

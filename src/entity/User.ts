@@ -1,4 +1,4 @@
-import { UserRole } from "@/enum/UserRoleEnum";
+import { UserRole as UserRoleEnum } from "@/enum/UserRoleEnum";
 import { Exclude } from "class-transformer";
 import {
   BaseEntity,
@@ -20,8 +20,8 @@ export default class User extends BaseEntity {
   @Column()
   password: string;
 
-  @Column({ type: "enum", enum: UserRole })
-  role: UserRole;
+  @Column({ type: "enum", enum: UserRoleEnum })
+  role: UserRoleEnum;
 
   @Column({ nullable: true })
   refreshToken: string;
