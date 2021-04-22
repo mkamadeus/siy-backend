@@ -53,6 +53,7 @@
     "cross-env": "^7.0.2",
     "mocha": "^8.3.2",
     "nodemon": "^2.0.6",
+    "sonarqube-scanner": "^2.8.0",
     "ts-mocha": "^8.0.0",
     "tsconfig-paths": "^3.9.0"
   },

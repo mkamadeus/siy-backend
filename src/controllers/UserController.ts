@@ -1,6 +1,14 @@
 import User from "@/entity/User";
+import { UserRoleEnum } from "@/enum/UserRoleEnum";
 import { UserService } from "@/services/UserService";
-import { Body, Get, JsonController, Param, Post } from "routing-controllers";
+import {
+  Authorized,
+  Body,
+  Get,
+  JsonController,
+  Param,
+  Post,
+} from "routing-controllers";
 import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
 import { CreateUserBody } from "./request/UserRequest";
 import { UserResponse } from "./response/UserResponse";
@@ -11,6 +19,7 @@ export class UserController {
     this.userService = userService;
   }
 
+  @Authorized(UserRoleEnum.ADMIN)
   @Get("/")
   @ResponseSchema(UserResponse, { isArray: true })
   @OpenAPI({
@@ -25,6 +34,7 @@ export class UserController {
     return await this.userService.getUsers();
   }
 
+  @Authorized(UserRoleEnum.ADMIN)
   @Get("/:id")
   @ResponseSchema(UserResponse)
   @OpenAPI({
@@ -39,6 +49,7 @@ export class UserController {
     return await this.userService.getUserById(id);
   }
 
+  @Authorized(UserRoleEnum.ADMIN)
   @Post("/")
   @ResponseSchema(UserResponse)
   @OpenAPI({

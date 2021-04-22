@@ -13,7 +13,7 @@ export class AuthService {
       throw new Error("Credentials invalid");
     }
 
-    console.log(user, password);
+    // console.log(user, password);
 
     if (await argon2.verify(user.password, password)) {
       const accessToken = jwt.sign({ id: user.id }, env.accessTokenSecret, {
@@ -39,5 +39,15 @@ export class AuthService {
     await Container.get(UserService).updateUser(user.id, {
       refreshToken: null,
     });
+  }
+
+  public async getUserByToken(accessToken: string) {
+    const decoded: { id: number; iat: number; exp: number } = jwt.verify(
+      accessToken,
+      env.accessTokenSecret
+    ) as { id: number; iat: number; exp: number };
+
+    const user = await Container.get(UserService).getUserById(decoded.id);
+    return user;
   }
 }

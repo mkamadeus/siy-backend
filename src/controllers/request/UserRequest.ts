@@ -1,4 +1,4 @@
-import { IsNumber, IsString } from "class-validator";
+import { IsString } from "class-validator";
 
 export class CreateUserBody {
   @IsString()
@@ -6,7 +6,4 @@ export class CreateUserBody {
 
   @IsString()
   public password: string;
-
-  @IsNumber()
-  public role: number;
 }
