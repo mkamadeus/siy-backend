@@ -7,20 +7,22 @@ export class StudentService {
   private studentRepository: Repository<Student> = getRepository(
     Student,
     process.env.NODE_ENV === "test" ? "test" : "default"
-    );
+  );
 
   /**
    * Get all students from database.
    */
   public async getAll(): Promise<Student[]> {
-    return await this.studentRepository
-      .createQueryBuilder("student")
-      .leftJoinAndSelect("student.studentGrades", "studentGrade")
-      .leftJoinAndSelect(
-        "studentGrade.lecture",
-        "studentGrades.lectureId = lectures.id"
-      )
-      .getMany();
+    return await this.studentRepository.find().then((cls) => cls);
+
+    // return await this.studentRepository
+    //   .createQueryBuilder("student")
+    //   // .leftJoinAndSelect("student.studentGrades", "studentGrade")
+    //   // .leftJoinAndSelect(
+    //   //   "studentGrade.lecture",
+    //   //   "studentGrades.lectureId = lectures.id"
+    //   // )
+    //   .getMany();
   }
 
   /**
@@ -108,7 +110,9 @@ export class StudentService {
   public async update(id: number, student: Partial<Student>): Promise<Student> {
     student.id = id;
     await this.studentRepository.update(id, student);
-    return await Container.get(StudentService).getOne(id);
+    var tes = await Container.get(StudentService).getOne(id);
+    // console.log(tes);
+    return tes;
   }
 
   /**
