@@ -1,5 +1,5 @@
 import { IndexEnum } from "@/enum/IndexEnum";
-import { IsEnum, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsEnum, IsNumber, IsOptional } from "class-validator";
 
 export class CreateGradeBody {
   @IsNumber()
@@ -17,6 +17,7 @@ export class CreateGradeBody {
   @IsNumber()
   public year: number;
 }
+
 export class CreateGradeByNimBody {
   @IsNumber()
   public lectureId: number;
@@ -30,6 +31,7 @@ export class CreateGradeByNimBody {
   @IsNumber()
   public year: number;
 }
+
 export class UpdateGradeBody {
   @IsNumber()
   @IsOptional()

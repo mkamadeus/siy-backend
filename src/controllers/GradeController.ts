@@ -4,7 +4,6 @@ import { StudentGradeService } from "@/services/StudentGradeService";
 import {
   Body,
   BodyParam,
-  ContentType,
   Delete,
   Get,
   JsonController,
@@ -16,10 +15,7 @@ import {
 } from "routing-controllers";
 import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
 import { fileUploadOptions } from "@/services/UploadService";
-import {
-  GradeBulkResponse,
-  GradeResponse,
-} from "./response/StudentGradeResponse";
+import { GradeResponse } from "./response/StudentGradeResponse";
 import {
   CreateGradeBody,
   CreateGradeByNimBody,
@@ -88,7 +84,6 @@ export class GradeController {
   public async getGradeById(@Param("id") id: number) {
     return await this.gradeService.getOne(id);
   }
-
 
   @Post("/")
   @ResponseSchema(GradeResponse)

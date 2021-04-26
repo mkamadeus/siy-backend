@@ -4,11 +4,14 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import Teaches from "./Teaches";
+import User from "./User";
 
 @Entity()
 export default class Teacher extends BaseEntity {
@@ -20,6 +23,10 @@ export default class Teacher extends BaseEntity {
 
   @OneToMany(() => Teaches, (teaches) => teaches.teacher)
   teaches: Teaches[];
+
+  @OneToOne(() => User)
+  @JoinColumn()
+  user: User;
 
   @CreateDateColumn()
   @Exclude()

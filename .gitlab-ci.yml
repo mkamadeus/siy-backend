@@ -29,7 +29,6 @@ unit-testing:
     - yarn test
   only:
     - main
-    - f/deployment-3
     - develop
 
 build-staging:
@@ -40,13 +39,12 @@ build-staging:
     - docker push $DOCKER_USERNAME/siy-backend:latest
   only:
     - main
-    - f/deployment-3
     - develop
 
 deploy-staging:
   stage: deploy
   before_script:
-    - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
+    - "command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )"
     - eval $(ssh-agent -s)
     - echo "$PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
@@ -55,7 +53,6 @@ deploy-staging:
     - chmod 644 ~/.ssh/known_hosts
   script:
     - ssh mkamadeus@34.101.128.166 "cd ~/siy-server && docker-compose pull && docker-compose up -d --remove-orphans"
-
 
 build-production:
   stage: build
