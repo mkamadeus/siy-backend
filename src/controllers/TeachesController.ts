@@ -13,8 +13,14 @@ import {
 import { TeachesService } from "@/services/TeachesService";
 import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
 import { TeachesResponse } from "./response/TeachesResponse";
-import { CreateTeachesBody, UpdateTeachesBody } from "./request/TeachesRequest";
 import { UserRoleEnum } from "@/enum/UserRoleEnum";
+
+import {
+  CreateTeachesBody,
+  UpdatePortoBody,
+  UpdateTeachesBody,
+} from "./request/TeachesRequest";
+
 
 @JsonController("/teaches")
 export class TeachesController {
@@ -98,6 +104,29 @@ export class TeachesController {
   })
   public createTeaches(@Body() teaches: CreateTeachesBody) {
     return this.teachesService.create(teaches as Teaches);
+  }
+
+  @Put("/portofolio/:lid/:tid")
+  @ResponseSchema(TeachesResponse)
+  @OpenAPI({
+    description: "Update teaching information",
+    responses: {
+      "200": {
+        description: "OK",
+      },
+    },
+  })
+  public async updatePorto(
+    @Param("lid") lid: number,
+    @Param("tid") tid: number,
+    @Body() teaches: UpdateTeachesBody
+    // @Body() prototype: UpdatePortoBody
+  ) {
+    return await this.teachesService.updatePortofolio(
+      lid,
+      tid,
+      teaches as Teaches
+    );
   }
 
   //TODO: Is this necessary?

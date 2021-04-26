@@ -16,4 +16,13 @@ export class UpdateTeachesBody {
   @IsNumber()
   @IsOptional()
   public lectureId: number;
+
+  @IsNumber()
+  @IsOptional()
+  public portofolio: number;
+}
+
+export class UpdatePortoBody {
+  @IsNumber()
+  public porto: number;
 }

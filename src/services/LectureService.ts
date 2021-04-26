@@ -1,8 +1,10 @@
 import { GradeResponse } from "@/controllers/response/StudentGradeResponse";
 import Lecture from "@/entity/Lecture";
 import { IndexValueEnum } from "@/enum/IndexEnum";
+import { LectureRating } from "@/enum/LectureRatingEnum";
 import Container, { Service } from "typedi";
 import { getRepository, Repository } from "typeorm";
+import { RatingQuestionnaireService } from "./RatingQuestionnaireService";
 import { StudentGradeService } from "./StudentGradeService";
 
 @Service()
@@ -137,6 +139,56 @@ export class LectureService {
     //     kmtG * coG) /
     //   totalKMT
     // );
+  }
+
+  public async getLectureRating(lecture: Lecture) {
+    const questionnaires = await Container.get(RatingQuestionnaireService).getByLectureId(lecture.id);
+    const totalRating: LectureRating = {
+      m1: 0,
+      m2: 0,
+      m3: 0,
+      m4: 0,
+      m5: 0,
+      m6: 0,
+      m7: 0,
+      m8: 0,
+      m9: 0,
+      m10: 0,
+      m11: 0,
+      m12: 0,
+    };
+    const countQuestionnaire = questionnaires.length;
+    questionnaires.forEach((rate) => {
+      totalRating.m1 += rate.ratingM_1;
+      totalRating.m2 += rate.ratingM_2;
+      totalRating.m3 += rate.ratingM_3;
+      totalRating.m4 += rate.ratingM_4;
+      totalRating.m5 += rate.ratingM_5;
+      totalRating.m6 += rate.ratingM_6;
+      totalRating.m7 += rate.ratingM_7;
+      totalRating.m8 += rate.ratingM_8;
+      totalRating.m9 += rate.ratingM_9;
+      totalRating.m10 += rate.ratingM_10;
+      totalRating.m11 += rate.ratingM_11;
+      totalRating.m12 += rate.ratingM_12;
+    });
+
+    const averageRating: LectureRating = {
+      m1: totalRating.m1/countQuestionnaire,
+      m2: totalRating.m1/countQuestionnaire,
+      m3: totalRating.m1/countQuestionnaire,
+      m4: totalRating.m1/countQuestionnaire,
+      m5: totalRating.m1/countQuestionnaire,
+      m6: totalRating.m1/countQuestionnaire,
+      m7: totalRating.m1/countQuestionnaire,
+      m8: totalRating.m1/countQuestionnaire,
+      m9: totalRating.m1/countQuestionnaire,
+      m10: totalRating.m1/countQuestionnaire,
+      m11: totalRating.m1/countQuestionnaire,
+      m12: totalRating.m1/countQuestionnaire,
+    };
+
+    return averageRating;
   }
 
   public async create(lecture: Lecture): Promise<Lecture> {
