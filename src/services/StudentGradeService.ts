@@ -40,6 +40,14 @@ export class StudentGradeService {
       .then((studentGrades) => studentGrades);
   }
 
+  public async getByNimPerYear(nim: string, year: number) {
+    const student = await Container.get(StudentService).getByNim(nim);
+    const grades = await this.gradeRepository.find({
+      where: { studentId: student.id, year },
+    });
+    return grades;
+  }
+
   public async getByNimPerSemester(
     nim: string,
     year: number,
