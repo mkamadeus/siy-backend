@@ -16,10 +16,7 @@ import {
 } from "routing-controllers";
 import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
 import { fileUploadOptions } from "@/services/UploadService";
-import {
-  GradeBulkResponse,
-  GradeResponse,
-} from "./response/StudentGradeResponse";
+import { GradeResponse } from "./response/StudentGradeResponse";
 import {
   CreateGradeBody,
   CreateGradeByNimBody,
@@ -47,6 +44,20 @@ export class GradeController {
     return await this.gradeService.getAll();
   }
 
+  @Get("/student/:nim")
+  @ResponseSchema(GradeResponse)
+  @OpenAPI({
+    description: "Get grade data by NIM",
+    responses: {
+      "200": {
+        description: "OK",
+      },
+    },
+  })
+  public async getGradeByNim(@Param("nim") nim: string) {
+    return await this.gradeService.getByNim(nim);
+  }
+
   @Get("/lo/:id")
   @ResponseSchema(GradeResponse)
   @OpenAPI({
@@ -61,18 +72,36 @@ export class GradeController {
     return await this.gradeService.getLoById(id);
   }
 
-  @Get("/student/:nim")
+  @Get("/lo/nim/:nim")
   @ResponseSchema(GradeResponse)
   @OpenAPI({
-    description: "Get grade data by NIM",
+    description: "Get Cumulative LO by NIM",
     responses: {
       "200": {
         description: "OK",
       },
     },
   })
-  public async getGradeByNim(@Param("nim") nim: string) {
-    return await this.gradeService.getByNim(nim);
+  public async getLOCumulative(@Param("nim") nim: string) {
+    return await this.gradeService.getCumulativeLoByNim(nim);
+  }
+
+  @Get("/lo/:nim/:year/:semester")
+  @ResponseSchema(GradeResponse)
+  @OpenAPI({
+    description: "Get cumulative LO per semester by NIM",
+    responses: {
+      "200": {
+        description: "OK",
+      },
+    },
+  })
+  public async getLOSemester(
+    @Param("nim") nim: string,
+    @Param("year") year: number,
+    @Param("semester") semester: number
+  ) {
+    return await this.gradeService.getLOPerSemester(nim, year, semester);
   }
 
   @Get("/:id")
@@ -88,7 +117,6 @@ export class GradeController {
   public async getGradeById(@Param("id") id: number) {
     return await this.gradeService.getOne(id);
   }
-
 
   @Post("/")
   @ResponseSchema(GradeResponse)

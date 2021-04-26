@@ -273,9 +273,18 @@ export class StudentGradeService {
    * @returns Cumulative LO for the student
    */
   public async getCumulativeLoByNim(nim: string) {
-    // const student = await Container.get(StudentService).getByNim(nim);
     const grades = await this.getByNim(nim);
 
+    return await this.getCumulativeSum(grades);
+  }
+
+  public async getLOPerSemester(nim: string, year: number, semester: number) {
+    const grades = await this.getByNimPerSemester(nim, year, semester);
+
+    return await this.getCumulativeSum(grades);
+  }
+
+  public async getCumulativeSum(grades: StudentGrade[]) {
     let cumulativeSum: LoEntry = {
       loA: 0,
       loB: 0,
