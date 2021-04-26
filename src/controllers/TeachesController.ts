@@ -15,12 +15,7 @@ import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
 import { TeachesResponse } from "./response/TeachesResponse";
 import { UserRoleEnum } from "@/enum/UserRoleEnum";
 
-import {
-  CreateTeachesBody,
-  UpdatePortoBody,
-  UpdateTeachesBody,
-} from "./request/TeachesRequest";
-
+import { CreateTeachesBody, UpdateTeachesBody } from "./request/TeachesRequest";
 
 @JsonController("/teaches")
 export class TeachesController {
