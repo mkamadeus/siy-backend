@@ -23,7 +23,7 @@ import { UserRoleEnum } from "@/enum/UserRoleEnum";
 export class StudentController {
   constructor(private studentService: StudentService) {}
 
-  @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  //@Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
   @Get("/")
   @ResponseSchema(StudentResponse, { isArray: true })
   @OpenAPI({
@@ -38,7 +38,7 @@ export class StudentController {
     return this.studentService.getAll();
   }
 
-  @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  //@Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
   @Get("/nim/:nim")
   @ResponseSchema(StudentResponse)
   @OpenAPI({
@@ -53,7 +53,7 @@ export class StudentController {
     return this.studentService.getByNim(nim);
   }
 
-  @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  //@Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
   @Get("/grades/:nim/:year")
   @ResponseSchema(StudentResponse)
   @OpenAPI({
@@ -89,7 +89,7 @@ export class StudentController {
     return this.studentService.getGradesBySemester(nim, year, semester);
   }
 
-  @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  //@Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
   @Get("/grades/:nim")
   @ResponseSchema(StudentResponse)
   @OpenAPI({
@@ -136,7 +136,7 @@ export class StudentController {
   //   return this.studentService.getIpByNim(nim, year, semester);
   // }
 
-  @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  //@Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
   @Post("/")
   @ResponseSchema(StudentResponse)
   @OpenAPI({
@@ -154,7 +154,7 @@ export class StudentController {
     return this.studentService.create(student as Student);
   }
 
-  @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  //@Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
   @Put("/:id")
   @ResponseSchema(StudentResponse)
   @OpenAPI({
@@ -172,7 +172,7 @@ export class StudentController {
     return this.studentService.update(id, student as Student);
   }
 
-  @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  //@Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
   @Delete("/:id")
   @OpenAPI({
     description: "Delete student",
