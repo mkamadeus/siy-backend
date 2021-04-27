@@ -134,7 +134,7 @@ export class GradeController {
     return await this.gradeService.create(grade as StudentGrade);
   }
 
-  @Post("/student/:nim")
+  @Post("/student/nim/:nim")
   @ResponseSchema(GradeResponse)
   @OpenAPI({
     description: "Create new grade by NIM",
@@ -154,7 +154,7 @@ export class GradeController {
     return this.gradeService.createByNim(nim, grade as StudentGrade);
   }
 
-  @Put("/student/:nim")
+  @Put("/student/nim/:nim")
   @ResponseSchema(GradeResponse)
   @OpenAPI({
     description: "Update grade, allows partial update.",

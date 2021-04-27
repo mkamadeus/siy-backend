@@ -7,3 +7,8 @@ export class LoginResponse {
   @IsString()
   public refreshToken: string;
 }
+
+export class RefreshResponse {
+  @IsString()
+  public accessToken: string;
+}
