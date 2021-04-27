@@ -34,6 +34,46 @@ export default class Lecture extends BaseEntity {
   @Column()
   year: number;
 
+  // @Column({
+  //   name: "index_final_weight",
+  //   default: 0,
+  //   type: "float",
+  //   nullable: true,
+  // })
+  // indexFinalWeight?: number;
+
+  // @Column({
+  //   name: "index_mid_weight",
+  //   default: 0,
+  //   type: "float",
+  //   nullable: true,
+  // })
+  // indexMidWeight?: number;
+
+  // @Column({
+  //   name: "index_homework_weight",
+  //   default: 0,
+  //   type: "float",
+  //   nullable: true,
+  // })
+  // indexHomeworkWeight?: number;
+
+  // @Column({
+  //   name: "index_kuis_weight",
+  //   default: 0,
+  //   type: "float",
+  //   nullable: true,
+  // })
+  // indexQuisWeight?: number;
+
+  // @Column({
+  //   name: "index_practicum_weight",
+  //   default: 0,
+  //   type: "float",
+  //   nullable: true,
+  // })
+  // indexPracticumWeight?: number;
+
   // KMT Weight
   @Column({
     name: "lo_a_kmt_weight",

@@ -126,7 +126,11 @@ export class StudentGradeService {
       loF: 0,
       loG: 0,
     };
+    console.log("getLo");
+    console.log(grade);
+
     const lecture = await Container.get(LectureService).getOne(grade.lectureId);
+    console.log(lecture);
     const loATotalWeight =
       lecture.loAMidWeight +
       lecture.loAQuizWeight +
@@ -170,62 +174,87 @@ export class StudentGradeService {
       lecture.loGPracticumWeight +
       lecture.loGHomeworkWeight;
     totalLo.loA =
-      ((grade.midTest * lecture.loAMidWeight +
-        grade.quiz * lecture.loAQuizWeight +
-        grade.finalTest * lecture.loAFinalWeight +
-        grade.practicum * lecture.loAPracticumWeight +
-        grade.homework * lecture.loAHomeworkWeight) *
-        4) /
-      (loATotalWeight * 100);
+      loATotalWeight > 0
+        ? ((grade.midTest * lecture.loAMidWeight +
+            grade.quiz * lecture.loAQuizWeight +
+            grade.finalTest * lecture.loAFinalWeight +
+            grade.practicum * lecture.loAPracticumWeight +
+            grade.homework * lecture.loAHomeworkWeight) *
+            4) /
+          (loATotalWeight * 100)
+        : 0;
     totalLo.loB =
-      ((grade.midTest * lecture.loBMidWeight +
-        grade.quiz * lecture.loBQuizWeight +
-        grade.finalTest * lecture.loBFinalWeight +
-        grade.practicum * lecture.loBPracticumWeight +
-        grade.homework * lecture.loBHomeworkWeight) *
-        4) /
-      (loBTotalWeight * 100);
+      loBTotalWeight > 0
+        ? ((grade.midTest * lecture.loBMidWeight +
+            grade.quiz * lecture.loBQuizWeight +
+            grade.finalTest * lecture.loBFinalWeight +
+            grade.practicum * lecture.loBPracticumWeight +
+            grade.homework * lecture.loBHomeworkWeight) *
+            4) /
+          (loBTotalWeight * 100)
+        : 0;
     totalLo.loC =
-      ((grade.midTest * lecture.loCMidWeight +
-        grade.quiz * lecture.loCQuizWeight +
-        grade.finalTest * lecture.loCFinalWeight +
-        grade.practicum * lecture.loCPracticumWeight +
-        grade.homework * lecture.loCHomeworkWeight) *
-        4) /
-      (loCTotalWeight * 100);
+      loCTotalWeight > 0
+        ? ((grade.midTest * lecture.loCMidWeight +
+            grade.quiz * lecture.loCQuizWeight +
+            grade.finalTest * lecture.loCFinalWeight +
+            grade.practicum * lecture.loCPracticumWeight +
+            grade.homework * lecture.loCHomeworkWeight) *
+            4) /
+          (loCTotalWeight * 100)
+        : 0;
     totalLo.loD =
-      ((grade.midTest * lecture.loDMidWeight +
-        grade.quiz * lecture.loDQuizWeight +
-        grade.finalTest * lecture.loDFinalWeight +
-        grade.practicum * lecture.loDPracticumWeight +
-        grade.homework * lecture.loDHomeworkWeight) *
-        4) /
-      (loDTotalWeight * 100);
+      loDTotalWeight > 0
+        ? ((grade.midTest * lecture.loDMidWeight +
+            grade.quiz * lecture.loDQuizWeight +
+            grade.finalTest * lecture.loDFinalWeight +
+            grade.practicum * lecture.loDPracticumWeight +
+            grade.homework * lecture.loDHomeworkWeight) *
+            4) /
+          (loDTotalWeight * 100)
+        : 0;
     totalLo.loE =
-      ((grade.midTest * lecture.loEMidWeight +
-        grade.quiz * lecture.loEQuizWeight +
-        grade.finalTest * lecture.loEFinalWeight +
-        grade.practicum * lecture.loEPracticumWeight +
-        grade.homework * lecture.loEHomeworkWeight) *
-        4) /
-      (loETotalWeight * 100);
+      loETotalWeight > 0
+        ? ((grade.midTest * lecture.loEMidWeight +
+            grade.quiz * lecture.loEQuizWeight +
+            grade.finalTest * lecture.loEFinalWeight +
+            grade.practicum * lecture.loEPracticumWeight +
+            grade.homework * lecture.loEHomeworkWeight) *
+            4) /
+          (loETotalWeight * 100)
+        : 0;
     totalLo.loF =
-      ((grade.midTest * lecture.loFMidWeight +
-        grade.quiz * lecture.loFQuizWeight +
-        grade.finalTest * lecture.loFFinalWeight +
-        grade.practicum * lecture.loFPracticumWeight +
-        grade.homework * lecture.loFHomeworkWeight) *
-        4) /
-      (loFTotalWeight * 100);
+      loFTotalWeight > 0
+        ? ((grade.midTest * lecture.loFMidWeight +
+            grade.quiz * lecture.loFQuizWeight +
+            grade.finalTest * lecture.loFFinalWeight +
+            grade.practicum * lecture.loFPracticumWeight +
+            grade.homework * lecture.loFHomeworkWeight) *
+            4) /
+          (loFTotalWeight * 100)
+        : 0;
     totalLo.loG =
-      ((grade.midTest * lecture.loGMidWeight +
-        grade.quiz * lecture.loGQuizWeight +
-        grade.finalTest * lecture.loGFinalWeight +
-        grade.practicum * lecture.loGPracticumWeight +
-        grade.homework * lecture.loGHomeworkWeight) *
-        4) /
-      (loGTotalWeight * 100);
+      loGTotalWeight > 0
+        ? ((grade.midTest * lecture.loGMidWeight +
+            grade.quiz * lecture.loGQuizWeight +
+            grade.finalTest * lecture.loGFinalWeight +
+            grade.practicum * lecture.loGPracticumWeight +
+            grade.homework * lecture.loGHomeworkWeight) *
+            4) /
+          (loGTotalWeight * 100)
+        : 0;
+    console.log(totalLo);
 
+    grade.loA = totalLo.loA;
+    grade.loB = totalLo.loB;
+    grade.loC = totalLo.loC;
+    grade.loD = totalLo.loD;
+    grade.loE = totalLo.loE;
+    grade.loF = totalLo.loF;
+    grade.loG = totalLo.loG;
+
+    await this.gradeRepository.update(grade.id, grade);
+    console.log(grade);
     return totalLo;
   }
 
@@ -261,32 +290,75 @@ export class StudentGradeService {
   public async getCumulativeLoByNim(nim: string) {
     const grades = await this.getByNim(nim);
 
-    let cumulativeSum: LoEntry | null = null;
+    return await this.getCumulativeSum(grades);
+  }
+
+  public async getLOPerSemester(nim: string, year: number, semester: number) {
+    const grades = await this.getByNimPerSemester(nim, year, semester);
+
+    return await this.getCumulativeSum(grades);
+  }
+
+  public async getCumulativeSum(grades: StudentGrade[]) {
+    let cumulativeSum: LoEntry = {
+      loA: 0,
+      loB: 0,
+      loC: 0,
+      loD: 0,
+      loE: 0,
+      loF: 0,
+      loG: 0,
+    };
+
+    let totalWeight: LoEntry = {
+      loA: 0,
+      loB: 0,
+      loC: 0,
+      loD: 0,
+      loE: 0,
+      loF: 0,
+      loG: 0,
+    };
+
     for (const grade of grades) {
       const loList = await this.getLo(grade);
+      const kmtList = await Container.get(LectureService).getKMT(
+        grade.lectureId
+      );
+      console.log("loList");
       console.log(loList);
+      console.log("kmtList");
+      console.log(kmtList);
       if (cumulativeSum) {
         for (let key in cumulativeSum) {
-          cumulativeSum[key] += loList[key];
+          cumulativeSum[key] += loList[key] * kmtList[key];
+          totalWeight[key] += kmtList[key];
         }
       } else {
         cumulativeSum = loList;
       }
     }
+    console.log("cumulativeSum");
+    console.log(cumulativeSum);
+    console.log("totalWeight");
+    console.log(totalWeight);
 
     for (let key in cumulativeSum) {
-      cumulativeSum[key] /= grades.length;
+      if (totalWeight[key] == 0) {
+        cumulativeSum[key] = 0;
+      } else {
+        cumulativeSum[key] /= totalWeight[key];
+      }
     }
-
+    console.log("Cumulative Sum");
     console.log(cumulativeSum);
 
     return cumulativeSum;
   }
 
   public async create(studentGrade: StudentGrade): Promise<StudentGrade> {
-    return await this.gradeRepository.save(
-      plainToClass(StudentGrade, studentGrade)
-    );
+    var result = await this.gradeRepository.save(studentGrade);
+    return this.updateLO(result);
   }
 
   public async createByNim(
@@ -357,18 +429,40 @@ export class StudentGradeService {
     studentGrade: Partial<StudentGrade>
   ): Promise<StudentGrade> {
     studentGrade.id = id;
-    await this.gradeRepository.update(
-      id,
-      plainToClass(StudentGrade, studentGrade)
+    // await this.gradeRepository.update(
+    //   studentGrade.id,
+    //   plainToClass(StudentGrade, { id: studentGrade.id, ...studentGrade })
+    // );
+    await this.gradeRepository.save(plainToClass(StudentGrade, studentGrade));
+    const grade = await this.getOne(id);
+    // console.log(grade);
+    return await this.updateLO(grade);
+  }
+
+  public async updateLO(grade: StudentGrade): Promise<StudentGrade> {
+    // update LO
+    console.log("updateCumulativeLO");
+    // const grade = await Container.get(StudentGradeService).getOne(this.id);
+    const student = await Container.get(StudentService).getOne(grade.studentId);
+    const lo = await Container.get(StudentGradeService).getCumulativeLoByNim(
+      student.nim
     );
-    return this.getOne(id);
+    console.log("lo");
+    console.log(lo);
+    console.log(student.id);
+
+    await Container.get(StudentService).update(student.id, { ...lo });
+
+    return this.getOne(grade.id);
   }
 
   public async updateByNim(
     nim: string,
     studentGrade: StudentGrade
   ): Promise<StudentGrade> {
+    console.log("sebelum get student");
     const student = await Container.get(StudentService).getByNim(nim);
+
     await this.gradeRepository.update(
       student.id,
       plainToClass(StudentGrade, { studentId: student.id, ...studentGrade })
