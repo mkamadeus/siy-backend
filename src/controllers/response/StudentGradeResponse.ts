@@ -8,9 +8,6 @@ export class GradeResponse {
   @IsNumber()
   public studentId: number;
 
-  @IsEnum(IndexEnum)
-  public index: string;
-
   @IsNumber()
   public lectureId: number;
 
@@ -19,6 +16,24 @@ export class GradeResponse {
 
   @IsNumber()
   public year: number;
+
+  @IsEnum(IndexEnum)
+  public index: string;
+
+  @IsNumber()
+  public midTest: number;
+
+  @IsNumber()
+  public quiz: number;
+
+  @IsNumber()
+  public finalTest: number;
+
+  @IsNumber()
+  public practicum: number;
+
+  @IsNumber()
+  public homework: number;
 }
 
 export class GradeBulkResponse {

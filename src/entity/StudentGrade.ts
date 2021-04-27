@@ -37,7 +37,7 @@ export default class StudentGrade extends BaseEntity {
   @Column()
   year: number;
 
-  @Column({ type: "enum", enum: IndexEnum })
+  @Column({ type: "enum", enum: IndexEnum, nullable: true })
   index: IndexEnum;
 
   @Column({ name: "lo_a", type: "float", default: 0 })
@@ -96,29 +96,60 @@ export default class StudentGrade extends BaseEntity {
   @AfterRemove()
   @AfterInsert()
   public async updateIpk() {
-    const student = await Container.get(StudentService).getOne(this.studentId);
+    const grade = await Container.get(StudentGradeService).getOne(this.id);
+    const student = await Container.get(StudentService).getOne(grade.studentId);
     const ipk = await Container.get(StudentGradeService).getIpkByNim(
       student.nim
     );
-
-    await Container.get(StudentService).update(this.studentId, { ipk });
+    console.log("updateIPK");
+    await Container.get(StudentService).update(grade.studentId, { ipk });
   }
+  // @AfterUpdate()
+  // @AfterRemove()
+  // @AfterInsert()
+  // public async updateIpk() {
+  //   const student = await Container.get(StudentService).getOne(this.studentId);
+  //   const ipk = await Container.get(StudentGradeService).getIpkByNim(
+  //     student.nim
+  //   );
 
-  @AfterUpdate()
-  @AfterRemove()
-  @AfterInsert()
-  public async updateCumulativeLo() {
-    const student = await Container.get(StudentService).getOne(this.studentId);
-    const lo = await Container.get(StudentGradeService).getCumulativeLoByNim(
-      student.nim
-    );
-    console.log(student);
-    await Container.get(StudentService).update(student.id, { ...lo });
-  }
+  //   await Container.get(StudentService).update(this.studentId, { ipk });
+  // }
 
-  @AfterInsert()
-  public async updateLo() {
-    const lo = await Container.get(StudentGradeService).getLoById(this.id);
-    await Container.get(StudentGradeService).update(this.id, { ...lo });
-  }
+  // @AfterUpdate()
+  // @AfterRemove()
+  // @AfterInsert()
+  // public async updateCumulativeLo() {
+  //   console.log("updateCumulativeLO");
+  //   const grade = await Container.get(StudentGradeService).getOne(this.id);
+  //   const student = await Container.get(StudentService).getOne(grade.studentId);
+  //   const lo = await Container.get(StudentGradeService).getCumulativeLoByNim(
+  //     student.nim
+  //   );
+
+  //   console.log("lo");
+  //   console.log(lo);
+  //   console.log(student.id);
+
+  //   await Container.get(StudentService).update(student.id, { ...lo });
+  // }
+
+  // @AfterInsert()
+  // public async updateLo() {
+  //   const lo = await Container.get(StudentGradeService).getLoById(this.id);
+  //   await Container.get(StudentGradeService).update(this.id, { ...lo });
+  // }
+  //   const student = await Container.get(StudentService).getOne(this.studentId);
+  //   const lo = await Container.get(StudentGradeService).getCumulativeLoByNim(
+  //     student.nim
+  //   );
+  //   console.log(student);
+  //   await Container.get(StudentService).update(student.id, { ...lo });
+  // }
+
+  // @AfterInsert()
+  // public async updateLo() {
+  //   const lo = await Container.get(StudentGradeService).getLoById(this.id);
+  //   await Container.get(StudentGradeService).update(this.id, { ...lo });
+  // }
 }

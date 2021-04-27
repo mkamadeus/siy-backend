@@ -2,8 +2,13 @@ import { IsString } from "class-validator";
 
 export class LoginBody {
   @IsString()
-  public username : string
+  public username: string;
 
   @IsString()
-  public password : string
+  public password: string;
+}
+
+export class RefreshBody {
+  @IsString()
+  public refreshToken: string;
 }

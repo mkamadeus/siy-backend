@@ -43,6 +43,20 @@ export class GradeController {
     return await this.gradeService.getAll();
   }
 
+  @Get("/student/:nim")
+  @ResponseSchema(GradeResponse)
+  @OpenAPI({
+    description: "Get grade data by NIM",
+    responses: {
+      "200": {
+        description: "OK",
+      },
+    },
+  })
+  public async getGradeByNim(@Param("nim") nim: string) {
+    return await this.gradeService.getByNim(nim);
+  }
+
   @Get("/lo/:id")
   @ResponseSchema(GradeResponse)
   @OpenAPI({
@@ -57,18 +71,36 @@ export class GradeController {
     return await this.gradeService.getLoById(id);
   }
 
-  @Get("/student/:nim")
+  @Get("/lo/nim/:nim")
   @ResponseSchema(GradeResponse)
   @OpenAPI({
-    description: "Get grade data by NIM",
+    description: "Get Cumulative LO by NIM",
     responses: {
       "200": {
         description: "OK",
       },
     },
   })
-  public async getGradeByNim(@Param("nim") nim: string) {
-    return await this.gradeService.getByNim(nim);
+  public async getLOCumulative(@Param("nim") nim: string) {
+    return await this.gradeService.getCumulativeLoByNim(nim);
+  }
+
+  @Get("/lo/:nim/:year/:semester")
+  @ResponseSchema(GradeResponse)
+  @OpenAPI({
+    description: "Get cumulative LO per semester by NIM",
+    responses: {
+      "200": {
+        description: "OK",
+      },
+    },
+  })
+  public async getLOSemester(
+    @Param("nim") nim: string,
+    @Param("year") year: number,
+    @Param("semester") semester: number
+  ) {
+    return await this.gradeService.getLOPerSemester(nim, year, semester);
   }
 
   @Get("/lecture/:id")
@@ -116,7 +148,7 @@ export class GradeController {
     return await this.gradeService.create(grade as StudentGrade);
   }
 
-  @Post("/student/:nim")
+  @Post("/student/nim/:nim")
   @ResponseSchema(GradeResponse)
   @OpenAPI({
     description: "Create new grade by NIM",
@@ -136,7 +168,7 @@ export class GradeController {
     return this.gradeService.createByNim(nim, grade as StudentGrade);
   }
 
-  @Put("/student/:nim")
+  @Put("/student/nim/:nim")
   @ResponseSchema(GradeResponse)
   @OpenAPI({
     description: "Update grade, allows partial update.",

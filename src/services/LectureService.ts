@@ -2,6 +2,7 @@ import { CourseAssessment } from "@/controllers/response/CourseAssessmentRespons
 import { GradeResponse } from "@/controllers/response/StudentGradeResponse";
 import Lecture from "@/entity/Lecture";
 import { IndexValueEnum } from "@/enum/IndexEnum";
+import { LoEntry } from "@/enum/LoEnum";
 import { LectureRating } from "@/enum/LectureRatingEnum";
 import Container, { Service } from "typedi";
 import { getRepository, Repository } from "typeorm";
@@ -152,6 +153,21 @@ export class LectureService {
     //     kmtG * coG) /
     //   totalKMT
     // );
+  }
+
+  public async getKMT(lectureId: number) {
+    const lecture = await this.getOne(lectureId);
+    const listKMT: LoEntry = {
+      loA: lecture.loAKMTWeight,
+      loB: lecture.loBKMTWeight,
+      loC: lecture.loCKMTWeight,
+      loD: lecture.loDKMTWeight,
+      loE: lecture.loEKMTWeight,
+      loF: lecture.loFKMTWeight,
+      loG: lecture.loGKMTWeight,
+    };
+
+    return listKMT;
   }
 
   /**
@@ -358,6 +374,12 @@ export class LectureService {
   public async update(id: number, lecture: Lecture): Promise<Lecture> {
     lecture.id = id;
     await this.lectureRepository.update(id, lecture);
+    var grades = await Container.get(StudentGradeService).getByLectureId(
+      lecture.id
+    );
+    grades.forEach((grade) => {
+      Container.get(StudentGradeService).updateLO(grade);
+    });
     return await this.getOne(id);
   }
 

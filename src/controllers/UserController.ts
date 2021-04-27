@@ -19,7 +19,7 @@ export class UserController {
     this.userService = userService;
   }
 
-  @Authorized(UserRoleEnum.ADMIN)
+  // @Authorized(UserRoleEnum.ADMIN)
   @Get("/")
   @ResponseSchema(UserResponse, { isArray: true })
   @OpenAPI({

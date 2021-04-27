@@ -8,6 +8,7 @@ export class CreateGradeBody {
   @IsNumber()
   public lectureId: number;
 
+  @IsOptional()
   @IsEnum(IndexEnum)
   public index: string;
 
@@ -22,6 +23,7 @@ export class CreateGradeByNimBody {
   @IsNumber()
   public lectureId: number;
 
+  @IsOptional()
   @IsEnum(IndexEnum)
   public index: string;
 
