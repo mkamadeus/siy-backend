@@ -6,6 +6,7 @@ import {
   Body,
   Delete,
   Get,
+  HeaderParam,
   JsonController,
   Param,
   Post,
@@ -17,6 +18,7 @@ import { CreateStudentBody, UpdateStudentBody } from "./request/StudentRequest";
 import { UserRoleEnum } from "@/enum/UserRoleEnum";
 import Container from "typedi";
 import { StudentGradeService } from "@/services/StudentGradeService";
+import { AuthService } from "@/services/AuthService";
 
 @OpenAPI({
   security: [{ BasicAuth: [] }],
@@ -46,7 +48,7 @@ export class StudentController {
     return this.studentService.getAll();
   }
 
-  //@Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  // @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
   @Get("/nim/:nim")
   @ResponseSchema(StudentResponse)
   @OpenAPI({
@@ -60,7 +62,6 @@ export class StudentController {
   public getStudentByNIM(@Param("nim") nim: string) {
     return this.studentService.getByNim(nim);
   }
-
 
   //@Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
   @Get("/nim/:nim/grades/:year")
@@ -98,7 +99,7 @@ export class StudentController {
     return this.gradeService.getByNimPerSemester(nim, year, semester);
   }
 
-  //@Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  // @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
   @Get("/nim/:nim/grades/")
   @ResponseSchema(StudentResponse)
   @OpenAPI({

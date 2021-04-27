@@ -25,6 +25,11 @@ export class StudentService {
     return student;
   }
 
+  public async getByUserId(userId: number): Promise<Student> {
+    const student = await this.studentRepository.findOne({ where: { userId } });
+    return student;
+  }
+
   /**
    * Get student by NIM
    * @param nim NIM of the student

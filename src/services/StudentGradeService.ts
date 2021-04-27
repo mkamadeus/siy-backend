@@ -34,6 +34,13 @@ export class StudentGradeService {
       .then((studentGrade) => studentGrade);
   }
 
+  public async getByStudentId(id: number): Promise<StudentGrade[]> {
+    const student = await Container.get(StudentService).getOne(id);
+    return await this.gradeRepository
+      .find({ where: { studentId: student.id } })
+      .then((studentGrade) => studentGrade);
+  }
+
   public async getByLectureId(lectureId: number) {
     return await this.gradeRepository
       .find({ where: { lectureId } })

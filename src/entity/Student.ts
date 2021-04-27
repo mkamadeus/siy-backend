@@ -20,6 +20,9 @@ export default class Student extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ name: "user_id", nullable: true })
+  userId: number;
+
   @Column({ unique: true })
   nim: string;
 
@@ -60,7 +63,7 @@ export default class Student extends BaseEntity {
   answer: Answer[];
 
   @OneToOne(() => User)
-  @JoinColumn()
+  @JoinColumn({ name: "user_id" })
   user: User;
 
   @CreateDateColumn()
