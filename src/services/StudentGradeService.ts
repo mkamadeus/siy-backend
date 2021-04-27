@@ -34,10 +34,25 @@ export class StudentGradeService {
       .then((studentGrade) => studentGrade);
   }
 
+  public async getByStudentId(id: number): Promise<StudentGrade[]> {
+    const student = await Container.get(StudentService).getOne(id);
+    return await this.gradeRepository
+      .find({ where: { studentId: student.id } })
+      .then((studentGrade) => studentGrade);
+  }
+
   public async getByLectureId(lectureId: number) {
     return await this.gradeRepository
       .find({ where: { lectureId } })
       .then((studentGrades) => studentGrades);
+  }
+
+  public async getByNimPerYear(nim: string, year: number) {
+    const student = await Container.get(StudentService).getByNim(nim);
+    const grades = await this.gradeRepository.find({
+      where: { studentId: student.id, year },
+    });
+    return grades;
   }
 
   public async getByNimPerSemester(

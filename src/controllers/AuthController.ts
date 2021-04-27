@@ -1,7 +1,7 @@
 import { AuthService } from "@/services/AuthService";
 import { Body, JsonController, Param, Post, Put } from "routing-controllers";
 import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
-import { LoginBody } from "./request/AuthRequest";
+import { LoginBody, RefreshBody } from "./request/AuthRequest";
 import { LoginResponse } from "./response/AuthResponse";
 
 @JsonController("/auth")
@@ -13,7 +13,7 @@ export class AuthController {
   @Post("/login")
   @ResponseSchema(LoginResponse)
   @OpenAPI({
-    description: "Create new grade",
+    description: "User login",
     responses: {
       "200": {
         description: "OK",
@@ -28,6 +28,23 @@ export class AuthController {
       credentials.username,
       credentials.password
     );
+  }
+
+  @Post("/refresh")
+  @ResponseSchema(LoginResponse)
+  @OpenAPI({
+    description: "Refresh user token",
+    responses: {
+      "200": {
+        description: "OK",
+      },
+      "400": {
+        description: "Invalid credentials",
+      },
+    },
+  })
+  public async refreshToken(@Body() token: RefreshBody) {
+    return await this.authService.refreshToken(token.refreshToken);
   }
 
   @Put("/invalidate/:username")

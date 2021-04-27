@@ -37,7 +37,7 @@ export default class StudentGrade extends BaseEntity {
   @Column()
   year: number;
 
-  @Column({ type: "enum", enum: IndexEnum })
+  @Column({ type: "enum", enum: IndexEnum, nullable: true })
   index: IndexEnum;
 
   @Column({ name: "lo_a", type: "float", default: 0 })
@@ -92,33 +92,33 @@ export default class StudentGrade extends BaseEntity {
   @Exclude()
   updatedAt: Date;
 
-  @AfterUpdate()
-  @AfterRemove()
-  @AfterInsert()
-  public async updateIpk() {
-    const student = await Container.get(StudentService).getOne(this.studentId);
-    const ipk = await Container.get(StudentGradeService).getIpkByNim(
-      student.nim
-    );
+  // @AfterUpdate()
+  // @AfterRemove()
+  // @AfterInsert()
+  // public async updateIpk() {
+  //   const student = await Container.get(StudentService).getOne(this.studentId);
+  //   const ipk = await Container.get(StudentGradeService).getIpkByNim(
+  //     student.nim
+  //   );
 
-    await Container.get(StudentService).update(this.studentId, { ipk });
-  }
+  //   await Container.get(StudentService).update(this.studentId, { ipk });
+  // }
 
-  @AfterUpdate()
-  @AfterRemove()
-  @AfterInsert()
-  public async updateCumulativeLo() {
-    const student = await Container.get(StudentService).getOne(this.studentId);
-    const lo = await Container.get(StudentGradeService).getCumulativeLoByNim(
-      student.nim
-    );
-    console.log(student);
-    await Container.get(StudentService).update(student.id, { ...lo });
-  }
+  // @AfterUpdate()
+  // @AfterRemove()
+  // @AfterInsert()
+  // public async updateCumulativeLo() {
+  //   const student = await Container.get(StudentService).getOne(this.studentId);
+  //   const lo = await Container.get(StudentGradeService).getCumulativeLoByNim(
+  //     student.nim
+  //   );
+  //   console.log(student);
+  //   await Container.get(StudentService).update(student.id, { ...lo });
+  // }
 
-  @AfterInsert()
-  public async updateLo() {
-    const lo = await Container.get(StudentGradeService).getLoById(this.id);
-    await Container.get(StudentGradeService).update(this.id, { ...lo });
-  }
+  // @AfterInsert()
+  // public async updateLo() {
+  //   const lo = await Container.get(StudentGradeService).getLoById(this.id);
+  //   await Container.get(StudentGradeService).update(this.id, { ...lo });
+  // }
 }

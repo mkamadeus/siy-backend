@@ -7,20 +7,13 @@ export class StudentService {
   private studentRepository: Repository<Student> = getRepository(
     Student,
     process.env.NODE_ENV === "test" ? "test" : "default"
-    );
+  );
 
   /**
    * Get all students from database.
    */
   public async getAll(): Promise<Student[]> {
-    return await this.studentRepository
-      .createQueryBuilder("student")
-      .leftJoinAndSelect("student.studentGrades", "studentGrade")
-      .leftJoinAndSelect(
-        "studentGrade.lecture",
-        "studentGrades.lectureId = lectures.id"
-      )
-      .getMany();
+    return await this.studentRepository.find();
   }
 
   /**
@@ -28,15 +21,13 @@ export class StudentService {
    * @param id ID of the student
    */
   public async getOne(id: number): Promise<Student> {
-    return await this.studentRepository
-      .createQueryBuilder("student")
-      .leftJoinAndSelect("student.studentGrades", "studentGrade")
-      .leftJoinAndSelect(
-        "studentGrade.lecture",
-        "studentGrades.lectureId = lectures.id"
-      )
-      .where("student.id = :id", { id })
-      .getOne();
+    const student = await this.studentRepository.findOne({ where: { id } });
+    return student;
+  }
+
+  public async getByUserId(userId: number): Promise<Student> {
+    const student = await this.studentRepository.findOne({ where: { userId } });
+    return student;
   }
 
   /**
@@ -48,48 +39,6 @@ export class StudentService {
       where: { nim },
     });
     return student;
-  }
-
-  /**
-   * Get grade by semester
-   * @param nim NIM of the student
-   * @param year Year queried
-   */
-  public async getGradesByYear(nim: number, year: number): Promise<Student> {
-    return await this.studentRepository
-      .createQueryBuilder("student")
-      .leftJoinAndSelect("student.studentGrades", "studentGrade")
-      .leftJoinAndSelect(
-        "studentGrade.lecture",
-        "studentGrades.lectureId = lectures.id"
-      )
-      .where("student.nim = :nim", { nim })
-      .andWhere("studentGrade.year = :year", { year })
-      .getOne();
-  }
-
-  /**
-   * Get grades by semester
-   * @param nim NIM of the student
-   * @param year Year queried
-   * @param semester Semester queried
-   */
-  public async getGradesBySemester(
-    nim: number,
-    year: number,
-    semester: number
-  ): Promise<Student> {
-    return await this.studentRepository
-      .createQueryBuilder("student")
-      .leftJoinAndSelect("student.studentGrades", "studentGrade")
-      .leftJoinAndSelect(
-        "studentGrade.lecture",
-        "studentGrades.lectureId = lectures.id"
-      )
-      .where("student.nim = :nim", { nim })
-      .andWhere("studentGrade.year = :year", { year })
-      .andWhere("studentGrade.semester = :semester", { semester })
-      .getOne();
   }
 
   /**
