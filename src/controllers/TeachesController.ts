@@ -8,16 +8,14 @@ import {
   Body,
   Put,
   Delete,
+  Authorized,
 } from "routing-controllers";
 import { TeachesService } from "@/services/TeachesService";
 import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
 import { TeachesResponse } from "./response/TeachesResponse";
-import {
-  CreateTeachesBody,
-  UpdatePortoBody,
-  UpdateTeachesBody,
-} from "./request/TeachesRequest";
-import { prototype } from "node:events";
+import { UserRoleEnum } from "@/enum/UserRoleEnum";
+
+import { CreateTeachesBody, UpdateTeachesBody } from "./request/TeachesRequest";
 
 @JsonController("/teaches")
 export class TeachesController {
@@ -25,6 +23,7 @@ export class TeachesController {
     this.teachesService = teachesService;
   }
 
+  @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
   @Get("/")
   @ResponseSchema(TeachesResponse, { isArray: true })
   @OpenAPI({
@@ -39,6 +38,7 @@ export class TeachesController {
     return this.teachesService.getAll();
   }
 
+  @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
   @Get("/:id")
   @ResponseSchema(TeachesResponse)
   @OpenAPI({
@@ -53,6 +53,7 @@ export class TeachesController {
     return this.teachesService.getOne(id);
   }
 
+  @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
   @Get("/teacher/:id")
   @ResponseSchema(TeachesResponse)
   @OpenAPI({
@@ -67,6 +68,7 @@ export class TeachesController {
     return this.teachesService.getByTeacherId(id);
   }
 
+  @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
   @Get("/lecture/:id")
   @ResponseSchema(TeachesResponse)
   @OpenAPI({
@@ -81,6 +83,7 @@ export class TeachesController {
     return this.teachesService.getByLectureId(id);
   }
 
+  @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
   @Post("/")
   @ResponseSchema(TeachesResponse)
   @OpenAPI({
@@ -122,6 +125,7 @@ export class TeachesController {
   }
 
   //TODO: Is this necessary?
+  @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
   @Put("/:id")
   @ResponseSchema(TeachesResponse)
   @OpenAPI({
@@ -139,6 +143,7 @@ export class TeachesController {
     return await this.teachesService.update(id, teaches as Teaches);
   }
 
+  @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
   @Delete("/:id")
   @OpenAPI({
     description: "Delete teaching information by ID",

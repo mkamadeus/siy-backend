@@ -89,7 +89,7 @@ export class TeachesService {
   }
 
   public async delete(id: number): Promise<void> {
-    await this, this.teachesRepository.delete(id);
+    await this.teachesRepository.delete(id);
     return;
   }
 }
