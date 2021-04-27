@@ -47,14 +47,10 @@ export class TeachesService {
       .getMany();
   }
 
-  public async getLecturePortofolioByID(lid: number): Promise<number> {
-    const teachers = await this.getByLectureId(lid);
-    var total = 0;
-    teachers.forEach((teacher) => {
-      total += teacher.portofolio;
-    });
-
-    return total / teachers.length;
+  public async getInstancesByTeacherId(teacherId: number) {
+    return await this.teachesRepository
+      .find({ where: { teacherId: teacherId } })
+      .then((teaches) => teaches);
   }
 
   public async create(teaches: Teaches): Promise<Teaches> {
@@ -71,6 +67,7 @@ export class TeachesService {
     // .set({ firstName: "Timber", lastName: "Saw" })
     // .where("id = :id", { id: 1 })
     // .execute();
+
     const teaches2 = await this.teachesRepository
       .createQueryBuilder("teaches")
       .where("lecture_id = :lectureId", { lectureId })

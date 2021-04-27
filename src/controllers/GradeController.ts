@@ -71,6 +71,20 @@ export class GradeController {
     return await this.gradeService.getByNim(nim);
   }
 
+  @Get("/lecture/:id")
+  @ResponseSchema(GradeResponse)
+  @OpenAPI({
+    description: "Get grade data by grade ID",
+    responses: {
+      "200": {
+        description: "OK",
+      },
+    },
+  })
+  public async getGradeByLecture(@Param("id") id: number) {
+    return await this.gradeService.getByLectureId(id);
+  }
+
   @Get("/:id")
   @ResponseSchema(GradeResponse)
   @OpenAPI({

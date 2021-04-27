@@ -40,6 +40,18 @@ export class StudentGradeService {
       .then((studentGrades) => studentGrades);
   }
 
+  public async getStudentDetailByLectureId(lectureId: number) {
+    return await this.gradeRepository
+      .createQueryBuilder("grades")
+      .leftJoinAndSelect("student.studentGrades", "studentGrade")
+      .leftJoinAndSelect(
+        "studentGrade.lecture",
+        "studentGrades.lectureId = lectures.id"
+      )
+      .where("studentGrade.lectureId = :lectureId", { lectureId })
+      .getOne();
+  }
+
   public async getByNimPerSemester(
     nim: string,
     year: number,
