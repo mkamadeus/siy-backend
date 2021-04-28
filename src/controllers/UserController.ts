@@ -49,7 +49,7 @@ export class UserController {
     return await this.userService.getUserById(id);
   }
 
-  @Authorized(UserRoleEnum.ADMIN)
+  // @Authorized(UserRoleEnum.ADMIN)
   @Post("/")
   @ResponseSchema(UserResponse)
   @OpenAPI({

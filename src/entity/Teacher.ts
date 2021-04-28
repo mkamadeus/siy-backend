@@ -21,11 +21,14 @@ export default class Teacher extends BaseEntity {
   @Column({ name: "teacher_name" })
   name: string;
 
+  @Column({name: 'user_id', nullable: true})
+  userId: number;
+
   @OneToMany(() => Teaches, (teaches) => teaches.teacher)
   teaches: Teaches[];
 
   @OneToOne(() => User)
-  @JoinColumn()
+  @JoinColumn({name: 'user_id'})
   user: User;
 
   @CreateDateColumn()

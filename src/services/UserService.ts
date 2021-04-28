@@ -26,7 +26,6 @@ export class UserService {
   }
 
   public async createUser(user: User) {
-    console.log(user);
     user.password = await argon2.hash(user.password);
     const createdUser = await this.userRepository.save(user);
     return createdUser;

@@ -1,13 +1,19 @@
-import { IsOptional, IsString } from "class-validator";
-
+import { IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateTeacherBody {
-    @IsString()
-    public name: string;
+  @IsString()
+  public name: string;
+
+  @IsNumber()
+  public userId: number;
 }
 
 export class UpdateTeacherBody {
-    @IsString()
-    @IsOptional()
-    public name: string;
+  @IsString()
+  @IsOptional()
+  public name: string;
+
+  @IsNumber()
+  @IsOptional()
+  public userId: number;
 }

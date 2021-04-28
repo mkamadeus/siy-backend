@@ -22,7 +22,7 @@ export class TeacherController {
     this.teacherService = teacherService;
   }
 
-  @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  // @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
   @Get("/")
   @ResponseSchema(TeacherResponse, { isArray: true })
   @OpenAPI({
@@ -37,7 +37,7 @@ export class TeacherController {
     return this.teacherService.getAll();
   }
 
-  @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  // @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
   @Get("/:id")
   @ResponseSchema(TeacherResponse)
   @OpenAPI({
@@ -52,7 +52,7 @@ export class TeacherController {
     return this.teacherService.getOne(id);
   }
 
-  @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  // @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
   @Post("/")
   @ResponseSchema(TeacherResponse)
   @OpenAPI({
@@ -70,7 +70,6 @@ export class TeacherController {
     return this.teacherService.create(teacher as Teacher);
   }
 
-  @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
   @Put("/:id")
   @ResponseSchema(TeacherResponse)
   @OpenAPI({
@@ -88,7 +87,6 @@ export class TeacherController {
     return await this.teacherService.update(id, teacher as Teacher);
   }
 
-  @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
   @Delete("/:id")
   @OpenAPI({
     description: "Delete teacher by ID",
