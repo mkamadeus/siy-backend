@@ -14,6 +14,7 @@ import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
 import { LectureResponse } from "./response/LectureResponse";
 import { CreateLectureBody, UpdateLectureBody } from "./request/LectureRequest";
 import { CourseAssessmentResponse } from "./response/CourseAssessmentResponse";
+import { LOAssessmentResponse } from "./response/LOAssessmentResponse";
 
 @JsonController("/lectures")
 export class LectureController {
@@ -122,6 +123,23 @@ export class LectureController {
     return this.lectureService.getCourseAssessmentByTeacherId(id);
   }
 
+  @Get("/ca/semester/:year/:semester")
+  @ResponseSchema(CourseAssessmentResponse)
+  @OpenAPI({
+    description: "Get course assessment per semester",
+    responses: {
+      "200": {
+        description: "OK",
+      },
+    },
+  })
+  public getCAperSemester(
+    @Param("year") year: number,
+    @Param("semester") semester: number
+  ) {
+    return this.lectureService.getCourseAssessmentPerSemester(year, semester);
+  }
+
   @Get("/ca/:id")
   @ResponseSchema(LectureResponse)
   @OpenAPI({
@@ -148,6 +166,23 @@ export class LectureController {
   })
   public getAllCA() {
     return this.lectureService.getCourseAssessment();
+  }
+
+  @Get("/loAssessment/:year/:semester")
+  @ResponseSchema(LOAssessmentResponse)
+  @OpenAPI({
+    description: "Get all detailed course assessment",
+    responses: {
+      "200": {
+        description: "OK",
+      },
+    },
+  })
+  public getLOAssessment(
+    @Param("year") year: number,
+    @Param("semester") semester: number
+  ) {
+    return this.lectureService.getLOAssessmentDetail(year, semester);
   }
 
   @Get("/:id")
