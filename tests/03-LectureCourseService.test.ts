@@ -73,22 +73,17 @@ describe("LectureService test", () => {
         });
     });
 
-    it("should update lecture loAPracticum Weight to 3, semester to 4", (done) => {
-      const lectureService = Container.get(LectureService);
-      lectureService
-        .update(lecId, {
-          courseId: courseId,
-          semester: 4,
-          year: 2021,
-          loAPracticumWeight: 3,
-        } as Lecture)
-        .then((lecture) => {
-          expect(lecture.courseId).to.be.equal(courseId);
-          expect(lecture.semester).to.be.equal(4);
-          expect(lecture.year).to.be.equal(2021);
-          expect(lecture.loAPracticumWeight).to.be.equal(3);
-          expect(1).to.be.equal(1);
-
+    it("should update couse code to MS3250 and credits to 2", (done) => {
+      const courseService = Container.get(CourseService);
+      courseService
+        .update(courseId, {
+          code: "MS3250",
+          credits: 2,
+        } as Course)
+        .then((course) => {
+          expect(course.id).to.be.equal(courseId);
+          expect(course.code).to.be.equal("MS3250");
+          expect(course.credits).to.be.equal(2);
           done();
         });
     });
