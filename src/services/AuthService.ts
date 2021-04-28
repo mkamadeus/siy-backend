@@ -15,12 +15,20 @@ export class AuthService {
     }
 
     if (await argon2.verify(user.password, password)) {
-      const accessToken = jwt.sign({ id: user.id }, env.accessTokenSecret, {
-        expiresIn: 60 * 60,
-      });
-      const refreshToken = jwt.sign({ id: user.id }, env.refreshTokenSecret, {
-        expiresIn: 60 * 60 * 24 * 7,
-      });
+      const accessToken = jwt.sign(
+        { id: user.id, role: user.role },
+        env.accessTokenSecret,
+        {
+          expiresIn: 60 * 60,
+        }
+      );
+      const refreshToken = jwt.sign(
+        { id: user.id, role: user.role },
+        env.refreshTokenSecret,
+        {
+          expiresIn: 60 * 60 * 24 * 7,
+        }
+      );
 
       await Container.get(UserService).updateUser(user.id, { refreshToken });
       return { accessToken, refreshToken };
@@ -35,9 +43,13 @@ export class AuthService {
       env.refreshTokenSecret
     ) as DecodedToken;
 
-    const accessToken = jwt.sign({ id: decoded.id }, env.accessTokenSecret, {
-      expiresIn: 60 * 60,
-    });
+    const accessToken = jwt.sign(
+      { id: decoded.id, role: decoded.role },
+      env.accessTokenSecret,
+      {
+        expiresIn: 60 * 60,
+      }
+    );
 
     return { accessToken, refreshToken };
   }

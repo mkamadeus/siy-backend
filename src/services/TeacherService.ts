@@ -26,6 +26,11 @@ export class TeacherService {
       .then((teacher) => teacher);
   }
 
+  public async getByUserId(userId: number): Promise<Teacher> {
+    const teacher = await this.teacherRepository.findOne({ where: { userId } });
+    return teacher;
+  }
+
   /**
    * Create new teacher entry in the database.
    * @param {Teacher} teacher The teacher ID queried.
