@@ -13,6 +13,7 @@ import {
 import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
 import { LectureResponse } from "./response/LectureResponse";
 import { CreateLectureBody, UpdateLectureBody } from "./request/LectureRequest";
+import { CourseAssessmentResponse } from "./response/CourseAssessmentResponse";
 
 @JsonController("/lectures")
 export class LectureController {
@@ -32,20 +33,6 @@ export class LectureController {
   })
   public getAllLectures() {
     return this.lectureService.getAll();
-  }
-
-  @Get("/:id")
-  @ResponseSchema(LectureResponse)
-  @OpenAPI({
-    description: "Get one Lecture",
-    responses: {
-      "200": {
-        description: "OK",
-      },
-    },
-  })
-  public getOneLecture(@Param("id") id: number) {
-    return this.lectureService.getOne(id);
   }
 
   @Get("/course/:id")
@@ -119,6 +106,62 @@ export class LectureController {
   })
   public getCO(@Param("id") id: number) {
     return this.lectureService.getCourseOutcome(id);
+  }
+
+  @Get("/ca/teacher/:id")
+  @ResponseSchema(CourseAssessmentResponse)
+  @OpenAPI({
+    description: "Get course assessment by teacher id",
+    responses: {
+      "200": {
+        description: "OK",
+      },
+    },
+  })
+  public getTeacherCA(@Param("id") id: number) {
+    return this.lectureService.getCourseAssessmentByTeacherId(id);
+  }
+
+  @Get("/ca/:id")
+  @ResponseSchema(LectureResponse)
+  @OpenAPI({
+    description: "Get course assessment by lecture id",
+    responses: {
+      "200": {
+        description: "OK",
+      },
+    },
+  })
+  public getCA(@Param("id") id: number) {
+    return this.lectureService.getCourseAssessmentByID(id);
+  }
+
+  @Get("/ca")
+  @ResponseSchema(CourseAssessmentResponse)
+  @OpenAPI({
+    description: "Get all detailed course assessment",
+    responses: {
+      "200": {
+        description: "OK",
+      },
+    },
+  })
+  public getAllCA() {
+    return this.lectureService.getCourseAssessment();
+  }
+
+  @Get("/:id")
+  @ResponseSchema(LectureResponse)
+  @OpenAPI({
+    description: "Get one Lecture",
+    responses: {
+      "200": {
+        description: "OK",
+      },
+    },
+  })
+  public getOneLecture(@Param("id") id: number) {
+    return this.lectureService.getOne(id);
   }
 
   @Post("/")
