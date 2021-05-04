@@ -1,67 +1,58 @@
-import StudentGrade from "@/entity/StudentGrade";
-import { IndexValueEnum } from "@/enum/IndexEnum";
-import { LoEntry, LoOwner } from "@/enum/LoEnum";
-import { plainToClass } from "class-transformer";
-import Container, { Service } from "typedi";
-import { getRepository, Repository } from "typeorm";
-import { CourseService } from "./CourseService";
-import { LectureService } from "./LectureService";
-import { StudentService } from "./StudentService";
-import { UploadService } from "./UploadService";
+import { IndexValueEnum } from '@/enum/IndexEnum';
+import { LoEntry, LoOwner } from '@/enum/LoEnum';
+import { prisma } from '@/repository/prisma';
+import { StudentGrade } from '@prisma/client';
+import { plainToClass } from 'class-transformer';
+import Container, { Service } from 'typedi';
+import { CourseService } from './CourseService';
+import { LectureService } from './LectureService';
+import { StudentService } from './StudentService';
+import { UploadService } from './UploadService';
 
 @Service()
 export class StudentGradeService {
-  private gradeRepository: Repository<StudentGrade> = getRepository(
-    StudentGrade
-  );
-
-  public async getAll(): Promise<StudentGrade[]> {
-    return await this.gradeRepository
-      .find()
-      .then((studentGrade) => studentGrade);
+  /**
+   * Get all grades from database
+   * @returns Grade array
+   */
+  public async getAllGrades(): Promise<StudentGrade[]> {
+    const grades = await prisma.studentGrade.findMany();
+    return grades;
   }
 
-  public async getOne(id: number): Promise<StudentGrade> {
-    return await this.gradeRepository
-      .findOne({ where: { id } })
-      .then((studentGrade) => studentGrade);
+  public async getGradeById(id: number): Promise<StudentGrade> {
+    const grade = await prisma.studentGrade.findUnique({ where: { id } });
+    return grade;
   }
 
-  public async getByNim(nim: string): Promise<StudentGrade[]> {
-    const student = await Container.get(StudentService).getByNim(nim);
-    return await this.gradeRepository
-      .find({ where: { studentId: student.id } })
-      .then((studentGrade) => studentGrade);
+  public async getGradeByNim(nim: string): Promise<StudentGrade[]> {
+    const student = await Container.get(StudentService).getStudentByNim(nim);
+    const grades = await prisma.studentGrade.findMany({
+      where: { studentId: student.id },
+    });
+    return grades;
   }
 
-  public async getByStudentId(id: number): Promise<StudentGrade[]> {
-    const student = await Container.get(StudentService).getOne(id);
-    return await this.gradeRepository
-      .find({ where: { studentId: student.id } })
-      .then((studentGrade) => studentGrade);
+  public async getGradeByStudentId(id: number): Promise<StudentGrade[]> {
+    const grades = await prisma.studentGrade.findMany({
+      where: { studentId: id },
+    });
+    return grades;
   }
 
-  public async getByLectureId(lectureId: number) {
-    return await this.gradeRepository
-      .find({ where: { lectureId } })
-      .then((studentGrades) => studentGrades);
+  public async getGradeByLectureId(lectureId: number): Promise<StudentGrade[]> {
+    const grades = await prisma.studentGrade.findMany({
+      where: { lectureId },
+    });
+    return grades;
   }
 
-  public async getStudentDetailByLectureId(lectureId: number) {
-    return await this.gradeRepository
-      .createQueryBuilder("grades")
-      .leftJoinAndSelect("student.studentGrades", "studentGrade")
-      .leftJoinAndSelect(
-        "studentGrade.lecture",
-        "studentGrades.lectureId = lectures.id"
-      )
-      .where("studentGrade.lectureId = :lectureId", { lectureId })
-      .getOne();
-  }
-
-  public async getByNimPerYear(nim: string, year: number) {
-    const student = await Container.get(StudentService).getByNim(nim);
-    const grades = await this.gradeRepository.find({
+  public async getGradeByNimPerYear(
+    nim: string,
+    year: number
+  ): Promise<StudentGrade[]> {
+    const student = await Container.get(StudentService).getStudentByNim(nim);
+    const grades = await prisma.studentGrade.findMany({
       where: { studentId: student.id, year },
     });
     return grades;
@@ -71,11 +62,12 @@ export class StudentGradeService {
     nim: string,
     year: number,
     semester: number
-  ) {
-    const student = await Container.get(StudentService).getByNim(nim);
-    return await this.gradeRepository
-      .find({ where: { studentId: student.id, semester, year } })
-      .then((studentGrade) => studentGrade);
+  ): Promise<StudentGrade[]> {
+    const student = await Container.get(StudentService).getStudentByNim(nim);
+    const grades = await prisma.studentGrade.findMany({
+      where: { studentId: student.id, semester, year },
+    });
+    return grades;
   }
 
   /**
@@ -83,15 +75,15 @@ export class StudentGradeService {
    * @param nim NIM of the student
    */
   public async getIpkByNim(nim: string): Promise<number> {
-    const grades = await this.getByNim(nim);
+    const grades = await this.getGradeByNim(nim);
 
     let total = 0;
     let totalCredits = 0;
-    for (let grade of grades) {
-      const lecture = await Container.get(LectureService).getOne(
+    for (const grade of grades) {
+      const lecture = await Container.get(LectureService).getLectureById(
         grade.lectureId
       );
-      const course = await Container.get(CourseService).getOne(
+      const course = await Container.get(CourseService).getCourseById(
         lecture.courseId
       );
       total += IndexValueEnum[grade.index] * course.credits;
@@ -114,11 +106,11 @@ export class StudentGradeService {
 
     let total = 0;
     let totalCredits = 0;
-    for (let grade of grades) {
-      const lecture = await Container.get(LectureService).getOne(
+    for (const grade of grades) {
+      const lecture = await Container.get(LectureService).getLectureById(
         grade.lectureId
       );
-      const course = await Container.get(CourseService).getOne(
+      const course = await Container.get(CourseService).getCourseById(
         lecture.courseId
       );
       total += IndexValueEnum[grade.index] * course.credits;
@@ -138,10 +130,12 @@ export class StudentGradeService {
       loF: 0,
       loG: 0,
     };
-    console.log("getLo");
+    console.log('getLo');
     console.log(grade);
 
-    const lecture = await Container.get(LectureService).getOne(grade.lectureId);
+    const lecture = await Container.get(LectureService).getLectureById(
+      grade.lectureId
+    );
     console.log(lecture);
     const loATotalWeight =
       lecture.loAMidWeight +
@@ -265,7 +259,7 @@ export class StudentGradeService {
     grade.loF = totalLo.loF;
     grade.loG = totalLo.loG;
 
-    await this.gradeRepository.update(grade.id, grade);
+    await prisma.studentGrade.update(grade.id, grade);
     console.log(grade);
     return totalLo;
   }
@@ -276,12 +270,12 @@ export class StudentGradeService {
    * @returns LO after being calculated
    */
   public async getLoById(id: number) {
-    const grade = await this.getOne(id);
+    const grade = await this.getGradeById(id);
     return await this.getLo(grade);
   }
 
   public async getLoByLectureId(lectureId: number) {
-    const grades = await this.getByLectureId(lectureId);
+    const grades = await this.getGradeByLectureId(lectureId);
     const loWithOwners: LoOwner[] = await Promise.all(
       grades.map(async (grade) => {
         const los = await this.getLoById(grade.id);
@@ -300,7 +294,7 @@ export class StudentGradeService {
    * @returns Cumulative LO for the student
    */
   public async getCumulativeLoByNim(nim: string) {
-    const grades = await this.getByNim(nim);
+    const grades = await this.getGradeByNim(nim);
 
     return await this.getCumulativeSum(grades);
   }
@@ -322,7 +316,7 @@ export class StudentGradeService {
       loG: 0,
     };
 
-    let totalWeight: LoEntry = {
+    const totalWeight: LoEntry = {
       loA: 0,
       loB: 0,
       loC: 0,
@@ -337,12 +331,12 @@ export class StudentGradeService {
       const kmtList = await Container.get(LectureService).getKMT(
         grade.lectureId
       );
-      console.log("loList");
+      console.log('loList');
       console.log(loList);
-      console.log("kmtList");
+      console.log('kmtList');
       console.log(kmtList);
       if (cumulativeSum) {
-        for (let key in cumulativeSum) {
+        for (const key in cumulativeSum) {
           cumulativeSum[key] += loList[key] * kmtList[key];
           totalWeight[key] += kmtList[key];
         }
@@ -350,26 +344,26 @@ export class StudentGradeService {
         cumulativeSum = loList;
       }
     }
-    console.log("cumulativeSum");
+    console.log('cumulativeSum');
     console.log(cumulativeSum);
-    console.log("totalWeight");
+    console.log('totalWeight');
     console.log(totalWeight);
 
-    for (let key in cumulativeSum) {
+    for (const key in cumulativeSum) {
       if (totalWeight[key] == 0) {
         cumulativeSum[key] = 0;
       } else {
         cumulativeSum[key] /= totalWeight[key];
       }
     }
-    console.log("Cumulative Sum");
+    console.log('Cumulative Sum');
     console.log(cumulativeSum);
 
     return cumulativeSum;
   }
 
   public async create(studentGrade: StudentGrade): Promise<StudentGrade> {
-    var result = await this.gradeRepository.save(studentGrade);
+    const result = await prisma.studentGrade.save(studentGrade);
     return this.updateLO(result);
   }
 
@@ -378,8 +372,8 @@ export class StudentGradeService {
     studentGrade: StudentGrade
   ): Promise<StudentGrade> {
     try {
-      const student = await Container.get(StudentService).getByNim(nim);
-      const result = await this.gradeRepository.save(
+      const student = await Container.get(StudentService).getStudentByNim(nim);
+      const result = await prisma.studentGrade.save(
         plainToClass(StudentGrade, {
           studentId: student.id,
           ...studentGrade,
@@ -415,7 +409,7 @@ export class StudentGradeService {
     });
 
     if (nimArray.length !== gradeArray.length)
-      throw new Error("Array length must be the same!");
+      throw new Error('Array length must be the same!');
 
     const errorArray = [];
     for (let i = 0; i < nimArray.length; i++) {
@@ -441,49 +435,51 @@ export class StudentGradeService {
     studentGrade: Partial<StudentGrade>
   ): Promise<StudentGrade> {
     studentGrade.id = id;
-    // await this.gradeRepository.update(
+    // await prisma.studentGrade.update(
     //   studentGrade.id,
     //   plainToClass(StudentGrade, { id: studentGrade.id, ...studentGrade })
     // );
-    await this.gradeRepository.save(plainToClass(StudentGrade, studentGrade));
-    const grade = await this.getOne(id);
+    await prisma.studentGrade.save(plainToClass(StudentGrade, studentGrade));
+    const grade = await this.getGradeById(id);
     // console.log(grade);
     return await this.updateLO(grade);
   }
 
   public async updateLO(grade: StudentGrade): Promise<StudentGrade> {
     // update LO
-    console.log("updateCumulativeLO");
+    console.log('updateCumulativeLO');
     // const grade = await Container.get(StudentGradeService).getOne(this.id);
-    const student = await Container.get(StudentService).getOne(grade.studentId);
+    const student = await Container.get(StudentService).getStudentById(
+      grade.studentId
+    );
     const lo = await Container.get(StudentGradeService).getCumulativeLoByNim(
       student.nim
     );
-    console.log("lo");
+    console.log('lo');
     console.log(lo);
     console.log(student.id);
 
-    await Container.get(StudentService).update(student.id, { ...lo });
+    await Container.get(StudentService).updateStudent(student.id, { ...lo });
 
-    return this.getOne(grade.id);
+    return this.getGradeById(grade.id);
   }
 
   public async updateByNim(
     nim: string,
     studentGrade: StudentGrade
   ): Promise<StudentGrade> {
-    console.log("sebelum get student");
-    const student = await Container.get(StudentService).getByNim(nim);
+    console.log('sebelum get student');
+    const student = await Container.get(StudentService).getStudentByNim(nim);
 
-    await this.gradeRepository.update(
+    await prisma.studentGrade.update(
       student.id,
       plainToClass(StudentGrade, { studentId: student.id, ...studentGrade })
     );
-    return this.getOne(student.id);
+    return this.getGradeById(student.id);
   }
 
   public async delete(id: number): Promise<void> {
-    await this.gradeRepository.delete(id);
+    await prisma.studentGrade.delete(id);
     return;
   }
 }

@@ -1,7 +1,7 @@
-import "reflect-metadata";
-import Answer from "@/entity/Answer";
-import { AnswerService } from "@/services/AnswerService";
-import { IsNumber, IsString, IsOptional } from "class-validator";
+import 'reflect-metadata';
+import Answer from '@/entity/Answer';
+import { AnswerService } from '@/services/AnswerService';
+import { IsNumber, IsString, IsOptional } from 'class-validator';
 import {
   Body,
   Get,
@@ -10,8 +10,8 @@ import {
   Delete,
   JsonController,
   Param,
-} from "routing-controllers";
-import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
+} from 'routing-controllers';
+import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 
 export class CreateAnswerBody {
   @IsNumber()
@@ -95,17 +95,17 @@ export class AnswerResponse {
   public formId: number;
 }
 
-@JsonController("/answer")
+@JsonController('/answer')
 export class AnswerController {
   constructor(private answerService: AnswerService) {}
 
-  @Get("/")
+  @Get('/')
   @ResponseSchema(AnswerResponse, { isArray: true })
   @OpenAPI({
-    description: "Get all answers from database",
+    description: 'Get all answers from database',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
@@ -113,75 +113,75 @@ export class AnswerController {
     return this.answerService.getAll();
   }
 
-  @Get("/:id")
+  @Get('/:id')
   @ResponseSchema(AnswerResponse)
   @OpenAPI({
-    description: "Get an answer with given id",
+    description: 'Get an answer with given id',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
-  public getAnswerByID(@Param("id") id: number) {
+  public getAnswerByID(@Param('id') id: number) {
     return this.answerService.getOne(id);
   }
 
-  @Get("/form/:id")
+  @Get('/form/:id')
   @ResponseSchema(AnswerResponse, { isArray: true })
   @OpenAPI({
-    description: "Get list of answers from given form id",
+    description: 'Get list of answers from given form id',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
-  public getFormAnswers(@Param("id") id: number) {
+  public getFormAnswers(@Param('id') id: number) {
     return this.answerService.getFormAnswers(id);
   }
 
-  @Get("/course/:code")
+  @Get('/course/:code')
   @ResponseSchema(AnswerResponse, { isArray: true })
   @OpenAPI({
-    description: "Get list of answers from given course",
+    description: 'Get list of answers from given course',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
-  public getCourseAnswers(@Param("code") code: string) {
+  public getCourseAnswers(@Param('code') code: string) {
     return this.answerService.getCourseAnswers(code);
   }
 
-  @Get("/course/:code/:formId")
+  @Get('/course/:code/:formId')
   @ResponseSchema(AnswerResponse, { isArray: true })
   @OpenAPI({
-    description: "Get list of answers from given course and form",
+    description: 'Get list of answers from given course and form',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
   public getCourseFormAnswers(
-    @Param("code") code: string,
-    @Param("formId") formId: number
+    @Param('code') code: string,
+    @Param('formId') formId: number
   ) {
     return this.answerService.getCourseFormAnswers(code, formId);
   }
 
-  @Post("/")
+  @Post('/')
   @ResponseSchema(AnswerResponse)
   @OpenAPI({
-    description: "Create a new answer",
+    description: 'Create a new answer',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
-      "400": {
-        description: "Bad request",
+      '400': {
+        description: 'Bad request',
       },
     },
   })
@@ -189,33 +189,33 @@ export class AnswerController {
     return this.answerService.create(answer as Answer);
   }
 
-  @Put("/:id")
+  @Put('/:id')
   @ResponseSchema(AnswerResponse)
   @OpenAPI({
-    description: "Update an answer with given id",
+    description: 'Update an answer with given id',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
   public updateAnswer(
-    @Param("id") id: number,
+    @Param('id') id: number,
     @Body() answer: UpdateAnswerBody
   ) {
     return this.answerService.update(id, answer as Answer);
   }
 
-  @Delete("/:id")
+  @Delete('/:id')
   @OpenAPI({
-    description: "Delete an answer with given id",
+    description: 'Delete an answer with given id',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
-  public deleteAnswer(@Param("id") id: number) {
+  public deleteAnswer(@Param('id') id: number) {
     this.answerService.delete(id);
   }
 }

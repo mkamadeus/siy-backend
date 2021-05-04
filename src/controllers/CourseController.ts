@@ -1,6 +1,5 @@
-import "reflect-metadata";
-import Course from "@/entity/Course";
-import { CourseService } from "@/services/CourseService";
+import 'reflect-metadata';
+import { CourseService } from '@/services/CourseService';
 import {
   Body,
   Delete,
@@ -9,89 +8,90 @@ import {
   Param,
   Post,
   Put,
-} from "routing-controllers";
-import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
-import { CourseResponse } from "./response/CourseResponse";
-import { CreateCourseBody, UpdateCourseBody } from "./request/CourseRequest";
+} from 'routing-controllers';
+import { Course } from '@prisma/client';
+import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
+import { CourseResponse } from './response/CourseResponse';
+import { CreateCourseBody, UpdateCourseBody } from './request/CourseRequest';
+import Container from 'typedi';
 
-@JsonController("/courses")
+@JsonController('/courses')
 export class CourseController {
-  constructor(private courseService: CourseService) {
-    this.courseService = courseService;
-  }
-
-  @Get("/")
+  @Get('/')
   @ResponseSchema(CourseResponse, { isArray: true })
   @OpenAPI({
-    description: "Get all courses",
+    description: 'Get all courses',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
-  public getAllCourses() {
-    return this.courseService.getAll();
+  public async getAllCourses(): Promise<Course[]> {
+    return Container.get(CourseService).getAllCourses();
   }
 
-  @Get("/:id")
+  @Get('/:id')
   @ResponseSchema(CourseResponse)
   @OpenAPI({
-    description: "Get course data by ID",
+    description: 'Get course data by ID',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
-  public getCourseById(@Param("id") id: number) {
-    return this.courseService.getOne(id);
+  public async getCourseById(@Param('id') id: number): Promise<Course> {
+    return await Container.get(CourseService).getCourseById(id);
   }
 
-  @Post("/")
+  @Post('/')
   @ResponseSchema(CourseResponse)
   @OpenAPI({
-    description: "Create new course",
+    description: 'Create new course',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
-      "400": {
-        description: "Bad request",
+      '400': {
+        description: 'Bad request',
       },
     },
   })
-  public createCourse(@Body() course: CreateCourseBody) {
-    return this.courseService.create(course as Course);
+  public createCourse(@Body() course: CreateCourseBody): Promise<Course> {
+    return Container.get(CourseService).createCourse(course as Course);
   }
 
-  @Put("/:id")
+  @Put('/:id')
   @ResponseSchema(CourseResponse)
   @OpenAPI({
-    description: "Update course, allows partial update",
+    description: 'Update course, allows partial update',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
   public async updateCourse(
-    @Param("id") id: number,
+    @Param('id') id: number,
     @Body() course: UpdateCourseBody
-  ) {
-    return await this.courseService.update(id, course as Course);
+  ): Promise<Course> {
+    return await Container.get(CourseService).updateCourse(
+      id,
+      course as Course
+    );
   }
 
-  @Delete("/:id")
+  @Delete('/:id')
   @OpenAPI({
-    description: "Delete course by ID",
+    description: 'Delete course by ID',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
-  public removeCourse(@Param("id") id: number) {
-    return this.courseService.delete(id);
+  public removeCourse(@Param('id') id: number): Promise<Course> {
+    return Container.get(CourseService).deleteCourse(id);
   }
 }

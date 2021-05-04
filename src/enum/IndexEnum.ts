@@ -1,11 +1,11 @@
 export enum IndexEnum {
-  A = "A",
-  AB = "AB",
-  B = "B",
-  BC = "BC",
-  C = "C",
-  D = "D",
-  E = "E",
+  A = 'A',
+  AB = 'AB',
+  B = 'B',
+  BC = 'BC',
+  C = 'C',
+  D = 'D',
+  E = 'E',
 }
 
 export enum IndexValueEnum {

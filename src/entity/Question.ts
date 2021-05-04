@@ -1,4 +1,4 @@
-import { Exclude } from "class-transformer";
+import { Exclude } from 'class-transformer';
 import {
   BaseEntity,
   Column,
@@ -7,8 +7,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
-} from "typeorm";
-import Answer from "./Answer";
+} from 'typeorm';
+import Answer from './Answer';
 
 // FIXME: Waiting for client confirmation
 @Entity()

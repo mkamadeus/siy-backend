@@ -1,5 +1,5 @@
-import "reflect-metadata";
-import Teacher from "@/entity/Teacher";
+import 'reflect-metadata';
+import Teacher from '@/entity/Teacher';
 import {
   Authorized,
   Body,
@@ -9,27 +9,27 @@ import {
   Param,
   Post,
   Put,
-} from "routing-controllers";
-import { TeacherService } from "@/services/TeacherService";
-import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
-import { TeacherResponse } from "./response/TeacherResponse";
-import { CreateTeacherBody, UpdateTeacherBody } from "./request/TeacherRequest";
-import { UserRoleEnum } from "@/enum/UserRoleEnum";
+} from 'routing-controllers';
+import { TeacherService } from '@/services/TeacherService';
+import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
+import { TeacherResponse } from './response/TeacherResponse';
+import { CreateTeacherBody, UpdateTeacherBody } from './request/TeacherRequest';
+import { UserRoleEnum } from '@/enum/UserRoleEnum';
 
-@JsonController("/teachers")
+@JsonController('/teachers')
 export class TeacherController {
   constructor(private teacherService: TeacherService) {
     this.teacherService = teacherService;
   }
 
   // @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
-  @Get("/")
+  @Get('/')
   @ResponseSchema(TeacherResponse, { isArray: true })
   @OpenAPI({
-    description: "Get all teachers",
+    description: 'Get all teachers',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
@@ -38,31 +38,31 @@ export class TeacherController {
   }
 
   // @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
-  @Get("/:id")
+  @Get('/:id')
   @ResponseSchema(TeacherResponse)
   @OpenAPI({
-    description: "Get teacher data by ID",
+    description: 'Get teacher data by ID',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
-  public getTeacherById(@Param("id") id: number) {
+  public getTeacherById(@Param('id') id: number) {
     return this.teacherService.getOne(id);
   }
 
   // @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
-  @Post("/")
+  @Post('/')
   @ResponseSchema(TeacherResponse)
   @OpenAPI({
-    description: "Create new teacher",
+    description: 'Create new teacher',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
-      "400": {
-        description: "Bad request",
+      '400': {
+        description: 'Bad request',
       },
     },
   })
@@ -70,33 +70,33 @@ export class TeacherController {
     return this.teacherService.create(teacher as Teacher);
   }
 
-  @Put("/:id")
+  @Put('/:id')
   @ResponseSchema(TeacherResponse)
   @OpenAPI({
-    description: "Update teacher",
+    description: 'Update teacher',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
   public async updateTeacher(
-    @Param("id") id: number,
+    @Param('id') id: number,
     @Body() teacher: UpdateTeacherBody
   ) {
     return await this.teacherService.update(id, teacher as Teacher);
   }
 
-  @Delete("/:id")
+  @Delete('/:id')
   @OpenAPI({
-    description: "Delete teacher by ID",
+    description: 'Delete teacher by ID',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
-  public removeTeacher(@Param("id") id: number) {
+  public removeTeacher(@Param('id') id: number) {
     return this.teacherService.delete(id);
   }
 }

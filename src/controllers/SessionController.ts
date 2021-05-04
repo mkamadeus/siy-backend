@@ -1,57 +1,61 @@
-import { UserRoleEnum } from "@/enum/UserRoleEnum";
-import { AuthService } from "@/services/AuthService";
-import { StudentGradeService } from "@/services/StudentGradeService";
-import { StudentService } from "@/services/StudentService";
-import { TeacherService } from "@/services/TeacherService";
+import { UserRoleEnum } from '@/enum/UserRoleEnum';
+import { AuthService } from '@/services/AuthService';
+import { StudentGradeService } from '@/services/StudentGradeService';
+import { StudentService } from '@/services/StudentService';
+import { TeacherService } from '@/services/TeacherService';
 import {
   Authorized,
   Get,
   HeaderParam,
   JsonController,
-} from "routing-controllers";
-import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
-import Container from "typedi";
-import { GradeResponse } from "./response/StudentGradeResponse";
-import { StudentResponse } from "./response/StudentResponse";
-import { TeacherResponse } from "./response/TeacherResponse";
+} from 'routing-controllers';
+import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
+import Container from 'typedi';
+import { GradeResponse } from './response/StudentGradeResponse';
+import { StudentResponse } from './response/StudentResponse';
+import { TeacherResponse } from './response/TeacherResponse';
 
 @Authorized([UserRoleEnum.STUDENT])
-@JsonController("/session/student")
+@JsonController('/session/student')
 export class StudentSessionController {
-  @Get("/")
+  @Get('/')
   @ResponseSchema(StudentResponse)
   @OpenAPI({
-    description: "Get student grades by session token",
+    description: 'Get student grades by session token',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
   public async getStudentBySession(
-    @HeaderParam("Authorization") token: string
+    @HeaderParam('Authorization') token: string
   ) {
     const jwtToken = Container.get(AuthService).parseBearerToken(token);
     const user = await Container.get(AuthService).getUserByToken(jwtToken);
-    const student = await Container.get(StudentService).getByUserId(user.id);
+    const student = await Container.get(StudentService).getStudentByUserId(
+      user.id
+    );
     return student;
   }
 
-  @Get("/grades")
+  @Get('/grades')
   @ResponseSchema(GradeResponse, { isArray: true })
   @OpenAPI({
-    description: "Get student grades by session token",
+    description: 'Get student grades by session token',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
-  public async getGradesBySession(@HeaderParam("Authorization") token: string) {
+  public async getGradesBySession(@HeaderParam('Authorization') token: string) {
     const jwtToken = Container.get(AuthService).parseBearerToken(token);
     const user = await Container.get(AuthService).getUserByToken(jwtToken);
-    const student = await Container.get(StudentService).getByUserId(user.id);
-    const grades = await Container.get(StudentGradeService).getByStudentId(
+    const student = await Container.get(StudentService).getStudentByUserId(
+      user.id
+    );
+    const grades = await Container.get(StudentGradeService).getGradeByStudentId(
       student.id
     );
     console.log(grades);
@@ -81,20 +85,20 @@ export class StudentSessionController {
 }
 
 @Authorized([UserRoleEnum.TEACHER])
-@JsonController("/session/teacher")
+@JsonController('/session/teacher')
 export class TeacherSessionController {
-  @Get("/")
+  @Get('/')
   @ResponseSchema(TeacherResponse)
   @OpenAPI({
-    description: "Get student grades by session token",
+    description: 'Get student grades by session token',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
   public async getTeacherBySession(
-    @HeaderParam("Authorization") token: string
+    @HeaderParam('Authorization') token: string
   ) {
     const jwtToken = Container.get(AuthService).parseBearerToken(token);
     const user = await Container.get(AuthService).getUserByToken(jwtToken);

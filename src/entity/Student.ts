@@ -1,4 +1,4 @@
-import { Exclude } from "class-transformer";
+import { Exclude } from 'class-transformer';
 import {
   BaseEntity,
   Column,
@@ -9,18 +9,18 @@ import {
   PrimaryGeneratedColumn,
   JoinColumn,
   OneToOne,
-} from "typeorm";
-import StudentGrade from "./StudentGrade";
-import Answer from "./Answer";
-import Faker from "faker";
-import User from "./User";
+} from 'typeorm';
+import StudentGrade from './StudentGrade';
+import Answer from './Answer';
+import Faker from 'faker';
+import User from './User';
 
 @Entity()
 export default class Student extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: "user_id", nullable: true })
+  @Column({ name: 'user_id', nullable: true })
   userId: number;
 
   @Column({ unique: true })
@@ -32,28 +32,28 @@ export default class Student extends BaseEntity {
   @Column({ default: Faker.internet.avatar() })
   imgPath: string;
 
-  @Column({ type: "float", default: 0 })
+  @Column({ type: 'float', default: 0 })
   loA: number;
 
-  @Column({ type: "float", default: 0 })
+  @Column({ type: 'float', default: 0 })
   loB: number;
 
-  @Column({ type: "float", default: 0 })
+  @Column({ type: 'float', default: 0 })
   loC: number;
 
-  @Column({ type: "float", default: 0 })
+  @Column({ type: 'float', default: 0 })
   loD: number;
 
-  @Column({ type: "float", default: 0 })
+  @Column({ type: 'float', default: 0 })
   loE: number;
 
-  @Column({ type: "float", default: 0 })
+  @Column({ type: 'float', default: 0 })
   loF: number;
 
-  @Column({ type: "float", default: 0 })
+  @Column({ type: 'float', default: 0 })
   loG: number;
 
-  @Column({ type: "float", default: 0 })
+  @Column({ type: 'float', default: 0 })
   ipk: number;
 
   @OneToMany(() => StudentGrade, (studentGrade) => studentGrade.student)
@@ -63,7 +63,7 @@ export default class Student extends BaseEntity {
   answer: Answer[];
 
   @OneToOne(() => User)
-  @JoinColumn({ name: "user_id" })
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
   @CreateDateColumn()

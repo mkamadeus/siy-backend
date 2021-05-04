@@ -1,4 +1,4 @@
-import { Exclude } from "class-transformer";
+import { Exclude } from 'class-transformer';
 import {
   BaseEntity,
   Column,
@@ -7,8 +7,8 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-} from "typeorm";
-import Lecture from "./Lecture";
+} from 'typeorm';
+import Lecture from './Lecture';
 
 // FIXME: Recheck
 @Entity()
@@ -16,22 +16,22 @@ export default class Course extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: "code" })
+  @Column({ name: 'code' })
   code: string;
 
-  @Column({ name: "name" })
+  @Column({ name: 'name' })
   name: string;
 
-  @Column({ name: "credits" })
+  @Column({ name: 'credits' })
   credits: number;
 
-  @Column({ name: "brief_syllabus" })
+  @Column({ name: 'brief_syllabus' })
   briefSyllabus: string;
 
-  @Column({ name: "complete_syllabus" })
+  @Column({ name: 'complete_syllabus' })
   completeSyllabus: string;
 
-  @Column({ name: "outcome" })
+  @Column({ name: 'outcome' })
   outcome: string;
 
   @OneToMany(() => Lecture, (lecture) => lecture.course)

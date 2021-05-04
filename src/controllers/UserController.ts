@@ -1,6 +1,6 @@
-import User from "@/entity/User";
-import { UserRoleEnum } from "@/enum/UserRoleEnum";
-import { UserService } from "@/services/UserService";
+import User from '@/entity/User';
+import { UserRoleEnum } from '@/enum/UserRoleEnum';
+import { UserService } from '@/services/UserService';
 import {
   Authorized,
   Body,
@@ -8,55 +8,55 @@ import {
   JsonController,
   Param,
   Post,
-} from "routing-controllers";
-import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
-import { CreateUserBody } from "./request/UserRequest";
-import { UserResponse } from "./response/UserResponse";
+} from 'routing-controllers';
+import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
+import { CreateUserBody } from './request/UserRequest';
+import { UserResponse } from './response/UserResponse';
 
-@JsonController("/users")
+@JsonController('/users')
 export class UserController {
   constructor(private userService: UserService) {
     this.userService = userService;
   }
 
   // @Authorized(UserRoleEnum.ADMIN)
-  @Get("/")
+  @Get('/')
   @ResponseSchema(UserResponse, { isArray: true })
   @OpenAPI({
-    description: "Get all users",
+    description: 'Get all users',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
   public async getAllUsers() {
-    return await this.userService.getUsers();
+    return await this.userService.getAllUsers();
   }
 
   @Authorized(UserRoleEnum.ADMIN)
-  @Get("/:id")
+  @Get('/:id')
   @ResponseSchema(UserResponse)
   @OpenAPI({
-    description: "Get user by ID",
+    description: 'Get user by ID',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
-  public async getUserById(@Param("id") id: number) {
+  public async getUserById(@Param('id') id: number) {
     return await this.userService.getUserById(id);
   }
 
   // @Authorized(UserRoleEnum.ADMIN)
-  @Post("/")
+  @Post('/')
   @ResponseSchema(UserResponse)
   @OpenAPI({
-    description: "Registers a new user",
+    description: 'Registers a new user',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })

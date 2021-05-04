@@ -1,6 +1,6 @@
-import { Express } from "express";
-import morgan from "morgan";
+import { Express } from 'express';
+import morgan from 'morgan';
 
 export const morganLoader = (expressApp: Express) => {
-  expressApp.use(morgan("tiny"));
+  expressApp.use(morgan('tiny'));
 };

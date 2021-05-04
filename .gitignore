@@ -1,4 +1,5 @@
 /node_modules
 /uploads
 ormconfig.json
-.env
+.env*
+!.env.example

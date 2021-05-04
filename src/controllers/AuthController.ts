@@ -1,25 +1,25 @@
-import { AuthService } from "@/services/AuthService";
-import { Body, JsonController, Param, Post, Put } from "routing-controllers";
-import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
-import { LoginBody, RefreshBody } from "./request/AuthRequest";
-import { LoginResponse } from "./response/AuthResponse";
+import { AuthService } from '@/services/AuthService';
+import { Body, JsonController, Param, Post, Put } from 'routing-controllers';
+import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
+import { LoginBody, RefreshBody } from './request/AuthRequest';
+import { LoginResponse } from './response/AuthResponse';
 
-@JsonController("/auth")
+@JsonController('/auth')
 export class AuthController {
   constructor(private authService: AuthService) {
     this.authService = authService;
   }
 
-  @Post("/login")
+  @Post('/login')
   @ResponseSchema(LoginResponse)
   @OpenAPI({
-    description: "User login",
+    description: 'User login',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
-      "400": {
-        description: "Invalid credentials",
+      '400': {
+        description: 'Invalid credentials',
       },
     },
   })
@@ -30,16 +30,16 @@ export class AuthController {
     );
   }
 
-  @Post("/refresh")
+  @Post('/refresh')
   @ResponseSchema(LoginResponse)
   @OpenAPI({
-    description: "Refresh user token",
+    description: 'Refresh user token',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
-      "400": {
-        description: "Invalid credentials",
+      '400': {
+        description: 'Invalid credentials',
       },
     },
   })
@@ -47,17 +47,17 @@ export class AuthController {
     return await this.authService.refreshToken(token.refreshToken);
   }
 
-  @Put("/invalidate/:username")
+  @Put('/invalidate/:username')
   @ResponseSchema(null)
   @OpenAPI({
-    description: "Create new grade",
+    description: 'Create new grade',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
-  public async invalidateUser(@Param("username") username: string) {
+  public async invalidateUser(@Param('username') username: string) {
     return await this.authService.invalidateUser(username);
   }
 }

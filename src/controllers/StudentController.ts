@@ -1,6 +1,5 @@
-import "reflect-metadata";
-import Student from "@/entity/Student";
-import { StudentService } from "@/services/StudentService";
+import 'reflect-metadata';
+import { StudentService } from '@/services/StudentService';
 import {
   Authorized,
   Body,
@@ -11,156 +10,152 @@ import {
   Param,
   Post,
   Put,
-} from "routing-controllers";
-import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
-import { StudentResponse } from "./response/StudentResponse";
-import { CreateStudentBody, UpdateStudentBody } from "./request/StudentRequest";
-import { UserRoleEnum } from "@/enum/UserRoleEnum";
-import Container from "typedi";
-import { StudentGradeService } from "@/services/StudentGradeService";
-import { AuthService } from "@/services/AuthService";
+} from 'routing-controllers';
+import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
+import { StudentResponse } from './response/StudentResponse';
+import { CreateStudentBody, UpdateStudentBody } from './request/StudentRequest';
+import { UserRoleEnum } from '@/enum/UserRoleEnum';
+import Container from 'typedi';
+import { StudentGradeService } from '@/services/StudentGradeService';
+import { AuthService } from '@/services/AuthService';
+import { Student } from '.prisma/client';
 
 @OpenAPI({
   security: [{ BasicAuth: [] }],
 })
-@JsonController("/students")
+@JsonController('/students')
 export class StudentController {
-  constructor(
-    private studentService: StudentService,
-    private gradeService: StudentGradeService
-  ) {
-    this.studentService = Container.get(StudentService);
-    this.gradeService = Container.get(StudentGradeService);
-  }
-
-  //@Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
-  @Get("/")
+  @Get('/')
   @ResponseSchema(StudentResponse, { isArray: true })
   @OpenAPI({
-    description: "Get all students with grades",
+    description: 'Get all students with grades',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
-  public getAllStudents() {
-    return this.studentService.getAll();
+  public getAllStudents(): Promise<Student[]> {
+    return Container.get(StudentService).getAllStudents();
   }
 
   // @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
-  @Get("/nim/:nim")
+  @Get('/nim/:nim')
   @ResponseSchema(StudentResponse)
   @OpenAPI({
-    description: "Get student data by NIM with grades",
+    description: 'Get student data by NIM with grades',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
-  public getStudentByNIM(@Param("nim") nim: string) {
-    return this.studentService.getByNim(nim);
+  public getStudentByNIM(@Param('nim') nim: string): Promise<Student> {
+    return Container.get(StudentService).getStudentByNim(nim);
   }
 
   //@Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
-  @Get("/nim/:nim/grades/:year")
+  @Get('/nim/:nim/grades/:year')
   @ResponseSchema(StudentResponse)
   @OpenAPI({
-    description: "Get student grades by NIM",
+    description: 'Get student grades by NIM',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
   public getStudentGradeByYear(
-    @Param("nim") nim: string,
-    @Param("year") year: number
-  ) {
-    return this.gradeService.getByNimPerYear(nim, year);
+    @Param('nim') nim: string,
+    @Param('year') year: number
+  ): Promise<Student> {
+    return Container.get(StudentGradeService).getGradeByNimPerYear(nim, year);
   }
 
-  @Get("/nim/:nim/grades/:year/:semester")
+  @Get('/nim/:nim/grades/:year/:semester')
   @ResponseSchema(StudentResponse)
   @OpenAPI({
-    description: "Get student grades by NIM",
+    description: 'Get student grades by NIM',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
   public getStudentGradeBySemester(
-    @Param("nim") nim: string,
-    @Param("year") year: number,
-    @Param("semester") semester: number
+    @Param('nim') nim: string,
+    @Param('year') year: number,
+    @Param('semester') semester: number
   ) {
-    return this.gradeService.getByNimPerSemester(nim, year, semester);
+    return Container.get(StudentGradeService).getByNimPerSemester(
+      nim,
+      year,
+      semester
+    );
   }
 
   // @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
-  @Get("/nim/:nim/grades/")
+  @Get('/nim/:nim/grades/')
   @ResponseSchema(StudentResponse)
   @OpenAPI({
-    description: "Get student grades by NIM",
+    description: 'Get student grades by NIM',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
-  public getGradeThisSemester(@Param("nim") nim: string) {
-    return this.gradeService.getByNim(nim);
+  public getGradeThisSemester(@Param('nim') nim: string) {
+    return Container.get(StudentGradeService).getGradeByNim(nim);
   }
 
   //@Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
-  @Post("/")
+  @Post('/')
   @ResponseSchema(StudentResponse)
   @OpenAPI({
-    description: "Create new student",
+    description: 'Create new student',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
-      "400": {
-        description: "Bad request",
+      '400': {
+        description: 'Bad request',
       },
     },
   })
-  public createStudent(@Body() student: CreateStudentBody) {
-    return this.studentService.create(student as Student);
+  public createStudent(@Body() student: CreateStudentBody): Promise<Student> {
+    return Container.get(StudentService).createStudent(student as Student);
   }
 
   //@Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
-  @Put("/:id")
+  @Put('/:id')
   @ResponseSchema(StudentResponse)
   @OpenAPI({
-    description: "Update student, allows partial update",
+    description: 'Update student, allows partial update',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
   public updateStudent(
-    @Param("id") id: number,
+    @Param('id') id: number,
     @Body() student: UpdateStudentBody
-  ) {
-    return this.studentService.update(id, student as Student);
+  ): Promise<Student> {
+    return Container.get(StudentService).updateStudent(id, student as Student);
   }
 
   //@Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
-  @Delete("/:id")
+  @Delete('/:id')
   @OpenAPI({
-    description: "Delete student",
+    description: 'Delete student',
     responses: {
-      "200": {
-        description: "OK",
+      '200': {
+        description: 'OK',
       },
     },
   })
-  public removeStudent(@Param("id") id: number) {
-    return this.studentService.delete(id);
+  public removeStudent(@Param('id') id: number): Promise<Student> {
+    return Container.get(StudentService).deleteStudent(id);
   }
 }

@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional } from "class-validator";
+import { IsNumber, IsOptional } from 'class-validator';
 
 export class CreateTeachesBody {
   @IsNumber()
@@ -11,7 +11,7 @@ export class CreateTeachesBody {
 export class UpdateTeachesBody {
   @IsNumber()
   @IsOptional()
-  public teacherId: Number;
+  public teacherId: number;
 
   @IsNumber()
   @IsOptional()

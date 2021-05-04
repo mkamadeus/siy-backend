@@ -1,5 +1,5 @@
-import { IndexEnum } from "@/enum/IndexEnum";
-import { IsArray, IsEnum, IsNumber, IsString } from "class-validator";
+import { IndexEnum } from '@/enum/IndexEnum';
+import { IsArray, IsEnum, IsNumber, IsString } from 'class-validator';
 
 export class GradeResponse {
   @IsNumber()

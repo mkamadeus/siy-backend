@@ -1,5 +1,5 @@
-import { UserRoleEnum as UserRoleEnum } from "@/enum/UserRoleEnum";
-import { Exclude } from "class-transformer";
+import { UserRoleEnum as UserRoleEnum } from '@/enum/UserRoleEnum';
+import { Exclude } from 'class-transformer';
 import {
   BaseEntity,
   Column,
@@ -7,20 +7,20 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-} from "typeorm";
+} from 'typeorm';
 
 @Entity()
 export default class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({'unique': true})
+  @Column({ unique: true })
   username: string;
 
   @Column()
   password: string;
 
-  @Column({ type: "enum", enum: UserRoleEnum, default: UserRoleEnum.STUDENT })
+  @Column({ type: 'enum', enum: UserRoleEnum, default: UserRoleEnum.STUDENT })
   role: UserRoleEnum;
 
   @Column({ nullable: true })

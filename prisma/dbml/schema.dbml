@@ -1,0 +1,205 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table Answer {
+  id Int [pk, increment]
+  questionId Int
+  studentId Int
+  lectureId Int
+  courseId Int
+  strAnswer String [not null, default: '']
+  intAnswer Int [not null, default: 0]
+  fileAnswer String [not null, default: '']
+  formId Int [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  lecture Lecture
+  question Question
+  student Student
+}
+
+Table Course {
+  id Int [pk, increment]
+  code String [not null]
+  name String [not null]
+  credits Int [not null]
+  briefSyllabus String [not null]
+  completeSyllabus String [not null]
+  outcome String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  lecture Lecture [not null]
+}
+
+Table Question {
+  id Int [pk, increment]
+  question String [not null]
+  answerType String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  answer Answer [not null]
+}
+
+Table RatingQuestionnaire {
+  id Int [pk, increment]
+  student_id Int [not null]
+  lecture_id Int [not null]
+  rating_m_1 Int [not null]
+  rating_m_3 Int [not null]
+  rating_m_4 Int [not null]
+  rating_m_5 Int [not null]
+  rating_m_7 Int [not null]
+  rating_m_8 Int [not null]
+  rating_m_10 Int [not null]
+  rating_m_11 Int [not null]
+  rating_m_12 Int [not null]
+  rating_m_2 Float [not null]
+  rating_m_6 Float [not null]
+  rating_m_9 Float [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  lecture Lecture [not null]
+  student Student [not null]
+}
+
+Table Lecture {
+  id Int [pk, increment]
+  courseId Int [not null]
+  semester Int [not null]
+  year Int [not null]
+  loKmtWeight Float [not null]
+  loFinalTestWeight Float [not null]
+  loMidTestWeight Float [not null]
+  loHomeworkWeight Float [not null]
+  loQuizWeight Float [not null]
+  loPracticumWeight Float [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  course Course [not null]
+  answer Answer [not null]
+  ratingQuestionnaire RatingQuestionnaire [not null]
+  teachedBy TeachingHistory [not null]
+  lectureHistory LectureHistory [not null]
+}
+
+Table Student {
+  id Int [pk, increment]
+  userId Int [unique]
+  nim String [unique, not null]
+  name String [not null]
+  lok Float [not null]
+  gpa Float [not null, default: 0]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  user User
+  answer Answer [not null]
+  ratingQuestionnaire RatingQuestionnaire [not null]
+  lectureHistory LectureHistory [not null]
+}
+
+Table Grade {
+  id Int [pk, increment]
+  grade StudentGradeIndex
+  lo Float [not null]
+  quiz Float [default: 0]
+  midTest Float [default: 0]
+  finalTest Float [default: 0]
+  practicum Float [default: 0]
+  homework Float [default: 0]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  lectureHistory LectureHistory
+}
+
+Table LectureHistory {
+  studentId Int [not null]
+  lectureId Int [not null]
+  gradeId Int [not null]
+  attendance Float [not null, default: 0]
+  lecture Lecture
+  student Student
+  grade Grade
+
+  indexes {
+    (studentId, lectureId, gradeId) [pk]
+  }
+}
+
+Table Teacher {
+  id Int [pk, increment]
+  userId Int [unique]
+  name String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  user User
+  teaches TeachingHistory [not null]
+}
+
+Table TeachingHistory {
+  teacherId Int [not null]
+  lectureId Int [not null]
+  portfolio Float [default: 0]
+  teacher Teacher [not null]
+  lecture Lecture [not null]
+
+  indexes {
+    (teacherId, lectureId) [pk]
+  }
+}
+
+Table User {
+  id Int [pk, increment]
+  username String [unique, not null]
+  password String [not null]
+  imgPath String
+  role UserRole [not null, default: 'STUDENT']
+  refreshToken String
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  student Student
+  teacher Teacher
+}
+
+Enum StudentGradeIndex {
+  A
+  AB
+  B
+  BC
+  C
+  D
+  E
+  T
+}
+
+Enum UserRole {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+Ref: Answer.lectureId > Lecture.id
+
+Ref: Answer.questionId > Question.id
+
+Ref: Answer.studentId > Student.id
+
+Ref: RatingQuestionnaire.lecture_id > Lecture.id
+
+Ref: RatingQuestionnaire.student_id > Student.id
+
+Ref: Lecture.courseId > Course.id
+
+Ref: Student.userId - User.id
+
+Ref: LectureHistory.lectureId > Lecture.id
+
+Ref: LectureHistory.studentId > Student.id
+
+Ref: LectureHistory.gradeId - Grade.id
+
+Ref: Teacher.userId - User.id
+
+Ref: TeachingHistory.teacherId > Teacher.id
+
+Ref: TeachingHistory.lectureId > Lecture.id

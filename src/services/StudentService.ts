@@ -1,41 +1,33 @@
-import Student from "@/entity/Student";
-import Container, { Service } from "typedi";
-import { getRepository, Repository } from "typeorm";
+import { Prisma, Student } from '@prisma/client';
+import { prisma } from '@/repository/prisma';
+import { Service } from 'typedi';
 
 @Service()
 export class StudentService {
-  private studentRepository: Repository<Student> = getRepository(
-    Student,
-    process.env.NODE_ENV === "test" ? "test" : "default"
-  );
-
   /**
    * Get all students from database.
    */
-  public async getAll(): Promise<Student[]> {
-    return await this.studentRepository.find().then((cls) => cls);
-
-    // return await this.studentRepository
-    //   .createQueryBuilder("student")
-    //   // .leftJoinAndSelect("student.studentGrades", "studentGrade")
-    //   // .leftJoinAndSelect(
-    //   //   "studentGrade.lecture",
-    //   //   "studentGrades.lectureId = lectures.id"
-    //   // )
-    //   .getMany();
+  public async getAllStudents(): Promise<Student[]> {
+    const students = await prisma.student.findMany();
+    return students;
   }
 
   /**
    * Get student by database ID
    * @param id ID of the student
    */
-  public async getOne(id: number): Promise<Student> {
-    const student = await this.studentRepository.findOne({ where: { id } });
+  public async getStudentById(id: number): Promise<Student> {
+    const student = await prisma.student.findUnique({ where: { id } });
     return student;
   }
 
-  public async getByUserId(userId: number): Promise<Student> {
-    const student = await this.studentRepository.findOne({ where: { userId } });
+  /**
+   *
+   * @param userId User ID
+   * @returns Student object
+   */
+  public async getStudentByUserId(userId: number): Promise<Student> {
+    const student = await prisma.student.findFirst({ where: { userId } });
     return student;
   }
 
@@ -43,10 +35,8 @@ export class StudentService {
    * Get student by NIM
    * @param nim NIM of the student
    */
-  public async getByNim(nim: string): Promise<Student> {
-    const student = await this.studentRepository.findOne({
-      where: { nim },
-    });
+  public async getStudentByNim(nim: string): Promise<Student> {
+    const student = await prisma.student.findFirst({ where: { nim } });
     return student;
   }
 
@@ -54,42 +44,46 @@ export class StudentService {
    * Create new student
    * @param student Student object that is going to be created
    */
-  public async create(student: Student): Promise<Student> {
-    return await this.studentRepository.save(student);
+  public async createStudent(
+    data: Prisma.StudentCreateInput
+  ): Promise<Student> {
+    data.lok = Array(7).fill(0);
+    const student = await prisma.student.create({ data });
+    return student;
   }
 
   /**
    * Update student by ID
    * @param id Student ID in database
-   * @param student Student object that is going to be updated
+   * @param data Student data
    */
-  public async update(id: number, student: Partial<Student>): Promise<Student> {
-    student.id = id;
-    await this.studentRepository.update(id, student);
-    var tes = await Container.get(StudentService).getOne(id);
-    // console.log(tes);
-    return tes;
+  public async updateStudent(
+    id: number,
+    data: Prisma.StudentUpdateInput
+  ): Promise<Student> {
+    const student = await prisma.student.update({ where: { id }, data });
+    return student;
   }
 
   /**
    * Update student by NIM
    * @param nim Student NIM in database
-   * @param student Student object that is going to be updated
+   * @param data Student data
    */
-  public async updateByNim(
+  public async updateStudentByNim(
     nim: string,
-    student: Partial<Student>
+    data: Prisma.StudentUpdateInput
   ): Promise<Student> {
-    student.nim = nim;
-    return await this.studentRepository.save(student);
+    const student = await prisma.student.update({ where: { nim }, data });
+    return student;
   }
 
   /**
    * Delete student by ID
    * @param id Student ID
    */
-  public async delete(id: number): Promise<void> {
-    await this.studentRepository.delete(id);
-    return;
+  public async deleteStudent(id: number): Promise<Student> {
+    const student = await prisma.student.delete({ where: { id } });
+    return student;
   }
 }

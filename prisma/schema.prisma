@@ -1,0 +1,208 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
+model Answer {
+  id Int @id @default(autoincrement())
+
+  questionId Int?
+  studentId  Int?
+  lectureId  Int?
+  courseId   Int?
+  strAnswer  String   @default("") @db.VarChar
+  intAnswer  Int      @default(0)
+  fileAnswer String   @default("") @db.VarChar
+  formId     Int
+  createdAt  DateTime @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime @default(now()) @db.Timestamp(6)
+
+  lecture  Lecture?  @relation(fields: [lectureId], references: [id])
+  question Question? @relation(fields: [questionId], references: [id])
+  student  Student?  @relation(fields: [studentId], references: [id])
+}
+
+model Course {
+  id Int @id @default(autoincrement())
+
+  code             String   @db.VarChar
+  name             String   @db.VarChar
+  credits          Int
+  briefSyllabus    String   @db.VarChar
+  completeSyllabus String   @db.VarChar
+  outcome          String   @db.VarChar
+  createdAt        DateTime @default(now()) @db.Timestamp(6)
+  updatedAt        DateTime @default(now()) @db.Timestamp(6)
+
+  lecture Lecture[]
+}
+
+model Question {
+  id Int @id @default(autoincrement())
+
+  question   String   @db.VarChar
+  answerType String   @db.VarChar
+  createdAt  DateTime @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime @default(now()) @db.Timestamp(6)
+
+  answer Answer[]
+}
+
+model RatingQuestionnaire {
+  id Int @id @default(autoincrement())
+
+  student_id  Int
+  lecture_id  Int
+  rating_m_1  Int
+  rating_m_3  Int
+  rating_m_4  Int
+  rating_m_5  Int
+  rating_m_7  Int
+  rating_m_8  Int
+  rating_m_10 Int
+  rating_m_11 Int
+  rating_m_12 Int
+  rating_m_2  Float
+  rating_m_6  Float
+  rating_m_9  Float
+  createdAt   DateTime @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime @default(now()) @db.Timestamp(6)
+
+  lecture Lecture @relation(fields: [lecture_id], references: [id])
+  student Student @relation(fields: [student_id], references: [id])
+}
+
+model Lecture {
+  id Int @id @default(autoincrement())
+
+  courseId Int
+
+  semester          Int
+  year              Int
+  loKmtWeight       Float[]
+  loFinalTestWeight Float[]
+  loMidTestWeight   Float[]
+  loHomeworkWeight  Float[]
+  loQuizWeight      Float[]
+  loPracticumWeight Float[]
+  createdAt         DateTime @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime @default(now()) @db.Timestamp(6)
+
+  course   Course @relation(fields: [courseId], references: [id])
+  answer              Answer[]
+  ratingQuestionnaire RatingQuestionnaire[]
+  teachedBy           TeachingHistory[]
+  lectureHistory      LectureHistory[]
+}
+
+model Student {
+  id Int @id @default(autoincrement())
+
+  userId Int?  @unique
+
+  nim       String   @unique @db.VarChar
+  name      String   @db.VarChar
+  lok       Float[]
+  gpa       Float    @default(0)
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @db.Timestamp(6)
+
+  user   User? @relation(fields: [userId], references: [id])
+  answer              Answer[]
+  ratingQuestionnaire RatingQuestionnaire[]
+  lectureHistory LectureHistory[]
+}
+
+model Grade {
+  id Int @id @default(autoincrement())
+
+  grade     StudentGradeIndex?
+  lo        Float[]
+  quiz      Float?             @default(0)
+  midTest   Float?             @default(0)
+  finalTest Float?             @default(0)
+  practicum Float?             @default(0)
+  homework  Float?             @default(0)
+  createdAt DateTime           @default(now()) @db.Timestamp(6)
+  updatedAt DateTime           @default(now()) @db.Timestamp(6)
+
+  lectureHistory LectureHistory?
+}
+
+model LectureHistory {
+
+  studentId  Int
+  lectureId  Int
+  gradeId    Int
+  attendance Float @default(0)
+
+  lecture Lecture? @relation(fields: [lectureId], references: [id])
+  student Student? @relation(fields: [studentId], references: [id])
+  grade   Grade?   @relation(fields: [gradeId], references: [id])
+  @@id([studentId, lectureId, gradeId])
+}
+
+model Teacher {
+  id Int @id @default(autoincrement())
+
+  userId Int?  @unique
+
+  name      String   @db.VarChar
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @db.Timestamp(6)
+
+  user   User? @relation(fields: [userId], references: [id])
+  teaches TeachingHistory[]
+}
+
+model TeachingHistory {
+
+  teacherId Int
+  lectureId Int
+  portfolio Float? @default(0)
+
+
+  teacher   Teacher @relation(fields: [teacherId], references: [id])
+  lecture   Lecture @relation(fields: [lectureId], references: [id])
+
+  @@id([teacherId, lectureId])
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique @db.VarChar
+  password     String   @db.VarChar
+  imgPath      String?  @db.VarChar
+  role         UserRole @default(STUDENT)
+  refreshToken String?  @db.VarChar
+  createdAt    DateTime @default(now()) @db.Timestamp(6)
+  updatedAt    DateTime @default(now()) @db.Timestamp(6)
+
+  student Student?
+  teacher Teacher?
+}
+
+enum StudentGradeIndex {
+  A
+  AB
+  B
+  BC
+  C
+  D
+  E
+  T
+}
+
+enum UserRole {
+  STUDENT
+  TEACHER
+  ADMIN
+}

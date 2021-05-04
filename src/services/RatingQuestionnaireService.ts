@@ -1,14 +1,14 @@
-import RatingQuestionnaire from "@/entity/RatingQuestionnaire";
-import { plainToClass } from "class-transformer";
-import Container, { Service } from "typedi";
-import { getRepository, Repository } from "typeorm";
-import { StudentService } from "./StudentService";
+import RatingQuestionnaire from '@/entity/RatingQuestionnaire';
+import { plainToClass } from 'class-transformer';
+import Container, { Service } from 'typedi';
+import { getRepository, Repository } from 'typeorm';
+import { StudentService } from './StudentService';
 
 @Service()
 export class RatingQuestionnaireService {
   private ratingQuestionnaireRepository: Repository<RatingQuestionnaire> = getRepository(
     RatingQuestionnaire,
-    process.env.NODE_ENV === "test" ? "test" : "default"
+    process.env.NODE_ENV === 'test' ? 'test' : 'default'
   );
 
   public async getAll(): Promise<RatingQuestionnaire[]> {
@@ -24,12 +24,12 @@ export class RatingQuestionnaireService {
   public async getByLectureId(
     lectureId: number
   ): Promise<RatingQuestionnaire[]> {
-    console.log("rating wuesionier");
+    console.log('rating wuesionier');
     return await this.ratingQuestionnaireRepository
-      .createQueryBuilder("rating_questionnaire")
-      .leftJoinAndSelect("rating_questionnaire.lectures", "lecture")
+      .createQueryBuilder('rating_questionnaire')
+      .leftJoinAndSelect('rating_questionnaire.lectures', 'lecture')
       //.leftJoinAndSelect("teaches.lecture", "lecture")
-      .where("lecture.id = :lectureId", { lectureId })
+      .where('lecture.id = :lectureId', { lectureId })
       .getMany();
   }
 
@@ -44,7 +44,7 @@ export class RatingQuestionnaireService {
     rq: RatingQuestionnaire
   ): Promise<RatingQuestionnaire> {
     try {
-      const student = await Container.get(StudentService).getByNim(nim);
+      const student = await Container.get(StudentService).getStudentByNim(nim);
       const result = await this.ratingQuestionnaireRepository.save(
         plainToClass(RatingQuestionnaire, {
           studentId: student.id,

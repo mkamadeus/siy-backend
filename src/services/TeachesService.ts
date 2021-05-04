@@ -1,20 +1,20 @@
-import Teaches from "@/entity/Teaches";
-import { Service } from "typedi";
-import { getRepository, Repository } from "typeorm";
+import Teaches from '@/entity/Teaches';
+import { Service } from 'typedi';
+import { getRepository, Repository } from 'typeorm';
 
 @Service()
 export class TeachesService {
   private teachesRepository: Repository<Teaches> = getRepository(
     Teaches,
-    process.env.NODE_ENV === "test" ? "test" : "default"
+    process.env.NODE_ENV === 'test' ? 'test' : 'default'
   );
 
   public async getAll(): Promise<Teaches[]> {
     return await this.teachesRepository
       //.find().then((teaches) => teaches);
-      .createQueryBuilder("teaches")
-      .leftJoinAndSelect("teaches.teacher", "teacher")
-      .leftJoinAndSelect("teaches.lecture", "lectures")
+      .createQueryBuilder('teaches')
+      .leftJoinAndSelect('teaches.teacher', 'teacher')
+      .leftJoinAndSelect('teaches.lecture', 'lectures')
       .getMany();
   }
 
@@ -22,28 +22,28 @@ export class TeachesService {
     return await this.teachesRepository
       //.findOne({where: {id}})
       //.then((teaches) => teaches);
-      .createQueryBuilder("teaches")
-      .leftJoinAndSelect("teaches.teacher", "teacher")
-      .leftJoinAndSelect("teaches.lecture", "lectures")
-      .where("teaches.id = :id", { id })
+      .createQueryBuilder('teaches')
+      .leftJoinAndSelect('teaches.teacher', 'teacher')
+      .leftJoinAndSelect('teaches.lecture', 'lectures')
+      .where('teaches.id = :id', { id })
       .getOne();
   }
 
   public async getByTeacherId(teacherId: number): Promise<Teaches[]> {
     return await this.teachesRepository
-      .createQueryBuilder("teaches")
-      .leftJoinAndSelect("teaches.teacher", "teacher")
-      .leftJoinAndSelect("teaches.lecture", "lectures")
-      .where("teacher.id = :teacherId", { teacherId })
+      .createQueryBuilder('teaches')
+      .leftJoinAndSelect('teaches.teacher', 'teacher')
+      .leftJoinAndSelect('teaches.lecture', 'lectures')
+      .where('teacher.id = :teacherId', { teacherId })
       .getMany();
   }
 
   public async getByLectureId(lectureId: number): Promise<Teaches[]> {
     return await this.teachesRepository
-      .createQueryBuilder("teaches")
-      .leftJoinAndSelect("teaches.teacher", "teacher")
-      .leftJoinAndSelect("teaches.lecture", "lecture")
-      .where("lecture.id = :lectureId", { lectureId })
+      .createQueryBuilder('teaches')
+      .leftJoinAndSelect('teaches.teacher', 'teacher')
+      .leftJoinAndSelect('teaches.lecture', 'lecture')
+      .where('lecture.id = :lectureId', { lectureId })
       .getMany();
   }
 
@@ -69,9 +69,9 @@ export class TeachesService {
     // .execute();
 
     const teaches2 = await this.teachesRepository
-      .createQueryBuilder("teaches")
-      .where("lecture_id = :lectureId", { lectureId })
-      .andWhere("teacher_id = :teacherId", { teacherId })
+      .createQueryBuilder('teaches')
+      .where('lecture_id = :lectureId', { lectureId })
+      .andWhere('teacher_id = :teacherId', { teacherId })
       .getOne();
     teaches.lectureId = lectureId;
     teaches.teacherId = teacherId;

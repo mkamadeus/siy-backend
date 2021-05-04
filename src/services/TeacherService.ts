@@ -1,12 +1,12 @@
-import Teacher from "@/entity/Teacher";
-import { Service } from "typedi";
-import { getRepository, Repository } from "typeorm";
+import Teacher from '@/entity/Teacher';
+import { Service } from 'typedi';
+import { getRepository, Repository } from 'typeorm';
 
 @Service()
 export class TeacherService {
   private teacherRepository: Repository<Teacher> = getRepository(
     Teacher,
-    process.env.NODE_ENV === "test" ? "test" : "default"
+    process.env.NODE_ENV === 'test' ? 'test' : 'default'
   );
 
   /**

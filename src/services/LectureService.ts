@@ -1,53 +1,67 @@
-import { CourseAssessment } from "@/controllers/response/CourseAssessmentResponse";
-import { GradeResponse } from "@/controllers/response/StudentGradeResponse";
-import Lecture from "@/entity/Lecture";
-import { IndexValueEnum } from "@/enum/IndexEnum";
-import { LoEntry } from "@/enum/LoEnum";
-import { LectureRating } from "@/enum/LectureRatingEnum";
-import Container, { Service } from "typedi";
-import { getRepository, Repository } from "typeorm";
-import { CourseService } from "./CourseService";
-import { RatingQuestionnaireService } from "./RatingQuestionnaireService";
-import { StudentGradeService } from "./StudentGradeService";
-import { TeachesService } from "./TeachesService";
+import { CourseAssessment } from '@/controllers/response/CourseAssessmentResponse';
+import { IndexValueEnum } from '@/enum/IndexEnum';
+import { LoEntry } from '@/enum/LoEnum';
+import { LectureRating } from '@/enum/LectureRatingEnum';
+import Container, { Service } from 'typedi';
+import { CourseService } from './CourseService';
+import { RatingQuestionnaireService } from './RatingQuestionnaireService';
+import { StudentGradeService } from './StudentGradeService';
+import { TeachesService } from './TeachesService';
+import { prisma } from '@/repository/prisma';
+import { Lecture } from '@prisma/client';
 
 @Service()
 export class LectureService {
-  private lectureRepository: Repository<Lecture> = getRepository(
-    Lecture,
-    process.env.NODE_ENV === "test" ? "test" : "default"
-  );
-
   /**
    * Get all Lectures
    */
-  public async getAll(): Promise<Lecture[]> {
-    return await this.lectureRepository.find().then((cls) => cls);
+  public async getAllLectures(): Promise<Lecture[]> {
+    const lectures = await prisma.lecture.findMany();
+    return lectures;
   }
 
   /**
    * Get lecture by database ID
    * @param id ID of the lecture
    */
-  public async getOne(id: number): Promise<Lecture> {
-    return await this.lectureRepository.findOne({ where: { id } });
+  public async getLectureById(id: number): Promise<Lecture> {
+    const lecture = await prisma.lecture.findFirst({ where: { id } });
+    return lecture;
   }
 
-  public async getByCourse(id: number): Promise<Lecture[]> {
-    return await this.lectureRepository.find({ where: { courseId: id } });
+  /**
+   * Get lecture by course ID
+   * @param id Course ID
+   * @returns Lecture with specific course ID
+   */
+  public async getLectureByCourse(courseId: number): Promise<Lecture[]> {
+    const lectures = await prisma.lecture.findMany({ where: { courseId } });
+    return lectures;
   }
 
-  public async getByYear(year: number): Promise<Lecture[]> {
-    return await this.lectureRepository.find({ where: { year: year } });
+  /**
+   * Get lecture by year
+   * @param year Lecture year
+   * @returns Lecture with specific year
+   */
+  public async getLectureByYear(year: number): Promise<Lecture[]> {
+    const lectures = await prisma.lecture.findMany({ where: { year } });
+    return lectures;
   }
 
-  public async getByYearSemester(
+  /**
+   * Get lecture by lecture by year and semester
+   * @param year Lecture year
+   * @returns Lecture with specific year
+   */
+  public async getLectureByYearSemester(
     year: number,
     semester: number
   ): Promise<Lecture[]> {
-    return await this.lectureRepository.find({
-      where: { year: year, semester: semester },
+    const lectures = await prisma.lecture.findMany({
+      where: { year, semester },
     });
+    return lectures;
   }
 
   /**
@@ -56,22 +70,24 @@ export class LectureService {
    * @param lo type of lo
    */
   public async getCourseOutcomeLO(id: number, lo: string): Promise<number> {
-    const grades = await Container.get(StudentGradeService).getByLectureId(id);
-    var totalLO = 0;
+    const grades = await Container.get(StudentGradeService).getGradeByLectureId(
+      id
+    );
+    let totalLO = 0;
     grades.forEach((grade) => {
-      if (lo == "A") {
+      if (lo == 'A') {
         totalLO += grade.loA;
-      } else if (lo == "B") {
+      } else if (lo == 'B') {
         totalLO += grade.loB;
-      } else if (lo == "C") {
+      } else if (lo == 'C') {
         totalLO += grade.loC;
-      } else if (lo == "D") {
+      } else if (lo == 'D') {
         totalLO += grade.loD;
-      } else if (lo == "E") {
+      } else if (lo == 'E') {
         totalLO += grade.loE;
-      } else if (lo == "F") {
+      } else if (lo == 'F') {
         totalLO += grade.loF;
-      } else if (lo == "G") {
+      } else if (lo == 'G') {
         totalLO += grade.loG;
       }
     });
@@ -86,17 +102,17 @@ export class LectureService {
    * @param id ID of the lecture
    */
   public async getCourseOutcome(lectureId: number): Promise<number> {
-    const grades = await Container.get(StudentGradeService).getByLectureId(
+    const grades = await Container.get(StudentGradeService).getGradeByLectureId(
       lectureId
     );
-    var totalIdx = 0;
+    let totalIdx = 0;
 
     grades.forEach((grade) => {
-      var index = IndexValueEnum[grade.index];
+      const index = IndexValueEnum[grade.index];
       totalIdx += index;
     });
 
-    var totalStudent = grades.length;
+    const totalStudent = grades.length;
     if (totalStudent > 0) {
       return totalIdx / totalStudent;
     } else {
@@ -156,7 +172,7 @@ export class LectureService {
   }
 
   public async getKMT(lectureId: number) {
-    const lecture = await this.getOne(lectureId);
+    const lecture = await this.getLectureById(lectureId);
     const listKMT: LoEntry = {
       loA: lecture.loAKMTWeight,
       loB: lecture.loBKMTWeight,
@@ -235,7 +251,7 @@ export class LectureService {
     const teachers = await Container.get(TeachesService).getByLectureId(
       lectureId
     );
-    var total = 0;
+    let total = 0;
     if (lectureId == 2) {
       console.log(teachers);
     }
@@ -254,10 +270,10 @@ export class LectureService {
    * @param id ID of the lecture
    */
   public async getCourseAssessmentByID(lectureId: number) {
-    const lecture = await this.getOne(lectureId);
-    var courseOutcome = await this.getCourseOutcome(lectureId);
+    const lecture = await this.getLectureById(lectureId);
+    const courseOutcome = await this.getCourseOutcome(lectureId);
     const rating = await this.getLectureRating(lecture);
-    var portofolio = await this.getLecturePortofolioByID(lectureId);
+    let portofolio = await this.getLecturePortofolioByID(lectureId);
 
     const averageRating = this.getAverageRating(rating);
 
@@ -276,7 +292,7 @@ export class LectureService {
    * Get All Detailed Course Assessment
    */
   public async getCourseAssessment() {
-    const lectures = await this.getAll();
+    const lectures = await this.getAllLectures();
     return await this.getDetailedCA(lectures);
   }
 
@@ -284,40 +300,40 @@ export class LectureService {
     const teaches = await Container.get(TeachesService).getInstancesByTeacherId(
       teacherId
     );
-    var lectures: Lecture[] = [];
+    const lectures: Lecture[] = [];
     for (const teach of teaches) {
-      lectures.push(await this.getOne(teach.lectureId));
+      lectures.push(await this.getLectureById(teach.lectureId));
     }
 
     return await this.getDetailedCA(lectures);
   }
 
   public async getDetailedCA(lectures: Lecture[]) {
-    var results: CourseAssessment[] = [];
+    const results: CourseAssessment[] = [];
     for (const lecture of lectures) {
       //console.log("foreach");
       // console.log(lecture);
-      var result: CourseAssessment = {
+      const result: CourseAssessment = {
         id: -1,
-        code: "code",
-        name: "name",
+        code: 'code',
+        name: 'name',
         courseOutcome: -1,
         questionnaires: -1,
         portofolio: -1,
         courseAssessment: -1,
-        mark: "mark",
+        mark: 'mark',
       };
       //console.log("after declaring course assessment");
       //console.log(lecture.courseId);
 
-      const course = await Container.get(CourseService).getOne(
+      const course = await Container.get(CourseService).getCourseById(
         lecture.courseId
       );
       //console.log("getCourse");
       //console.log(course);
       const rating = await this.getLectureRating(lecture);
       const averageRating = this.getAverageRating(rating);
-      var porto = await this.getLecturePortofolioByID(lecture.id);
+      const porto = await this.getLecturePortofolioByID(lecture.id);
 
       result.id = lecture.id;
       result.code = course.name;
@@ -327,11 +343,11 @@ export class LectureService {
       result.courseAssessment = await this.getCourseAssessmentByID(lecture.id);
 
       if (result.courseAssessment > 3) {
-        result.mark = "MANTAIN";
+        result.mark = 'MANTAIN';
       } else if (result.courseAssessment == -1) {
-        result.mark = "MISSING DATA";
+        result.mark = 'MISSING DATA';
       } else {
-        result.mark = "IMPROVE";
+        result.mark = 'IMPROVE';
       }
 
       results.push(result);
@@ -362,29 +378,29 @@ export class LectureService {
       rating.m10 +
       rating.m11 +
       rating.m12;
-    var averageRating = totalRating > 0 ? totalRating / 12 : -1;
+    const averageRating = totalRating > 0 ? totalRating / 12 : -1;
 
     return averageRating;
   }
 
   public async create(lecture: Lecture): Promise<Lecture> {
-    return await this.lectureRepository.save(lecture);
+    return await prisma.lecture.save(lecture);
   }
 
   public async update(id: number, lecture: Lecture): Promise<Lecture> {
     lecture.id = id;
-    await this.lectureRepository.update(id, lecture);
-    var grades = await Container.get(StudentGradeService).getByLectureId(
+    await prisma.lecture.update(id, lecture);
+    const grades = await Container.get(StudentGradeService).getGradeByLectureId(
       lecture.id
     );
     grades.forEach((grade) => {
       Container.get(StudentGradeService).updateLO(grade);
     });
-    return await this.getOne(id);
+    return await this.getLectureById(id);
   }
 
   public async delete(id: number): Promise<void> {
-    await this.lectureRepository.delete(id);
+    await prisma.lecture.delete(id);
     return;
   }
 }

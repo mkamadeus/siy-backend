@@ -1,6 +1,6 @@
-import { UserRoleEnum as UserRoleEnum } from "@/enum/UserRoleEnum";
-import { Exclude } from "class-transformer";
-import { IsEnum, IsNumber, IsString } from "class-validator";
+import { UserRoleEnum as UserRoleEnum } from '@/enum/UserRoleEnum';
+import { Exclude } from 'class-transformer';
+import { IsEnum, IsNumber, IsString } from 'class-validator';
 
 export class UserResponse {
   @IsNumber()

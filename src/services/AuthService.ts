@@ -1,9 +1,9 @@
-import Container, { Service } from "typedi";
-import argon2 from "argon2";
-import { UserService } from "./UserService";
-import jwt from "jsonwebtoken";
-import { env } from "@/env";
-import { DecodedToken } from "@/enum/SessionEnum";
+import Container, { Service } from 'typedi';
+import argon2 from 'argon2';
+import { UserService } from './UserService';
+import jwt from 'jsonwebtoken';
+import { env } from '@/env';
+import { DecodedToken } from '@/enum/SessionEnum';
 
 @Service()
 export class AuthService {
@@ -11,7 +11,7 @@ export class AuthService {
     const user = await Container.get(UserService).getUserByUsername(username);
 
     if (!user) {
-      throw new Error("Credentials invalid");
+      throw new Error('Credentials invalid');
     }
 
     if (await argon2.verify(user.password, password)) {
@@ -34,7 +34,7 @@ export class AuthService {
       return { accessToken, refreshToken };
     }
 
-    throw new Error("Credentials invalid");
+    throw new Error('Credentials invalid');
   }
 
   public async refreshToken(refreshToken: string) {
@@ -57,7 +57,7 @@ export class AuthService {
   public async invalidateUser(username: string) {
     const user = await Container.get(UserService).getUserByUsername(username);
     if (!user.username) {
-      throw new Error("No user with that username");
+      throw new Error('No user with that username');
     }
 
     await Container.get(UserService).updateUser(user.id, {
@@ -76,8 +76,8 @@ export class AuthService {
   }
 
   public parseBearerToken(token: string) {
-    const jwtToken = token.split(" ");
-    if (jwtToken.length != 2) throw new Error("Invalid token");
+    const jwtToken = token.split(' ');
+    if (jwtToken.length != 2) throw new Error('Invalid token');
 
     return jwtToken[1];
   }

@@ -1,13 +1,13 @@
-import multer from "multer";
-import { Service } from "typedi";
-import { CellValue, Workbook } from "exceljs";
-import path from "path";
+import multer from 'multer';
+import { Service } from 'typedi';
+import { CellValue, Workbook } from 'exceljs';
+import path from 'path';
 
 export const fileUploadOptions = (): multer.Options => {
   return {
     storage: multer.diskStorage({
       destination: (_req, _file, cb) => {
-        cb(null, "./uploads");
+        cb(null, './uploads');
       },
       filename: (_req, file, cb) => {
         cb(null, `${file.fieldname}-${Date.now()}.xlsx`);
@@ -16,9 +16,9 @@ export const fileUploadOptions = (): multer.Options => {
     fileFilter: (_req, file, cb) => {
       if (
         file.mimetype !==
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       ) {
-        cb(new Error("Wrong file type"));
+        cb(new Error('Wrong file type'));
         return;
       }
       cb(null, true);
@@ -34,10 +34,10 @@ export class UploadService {
    */
   public async parseExcel(
     filePath: string,
-    sheetIndex: number = 1
+    sheetIndex = 1
   ): Promise<CellValue[][]> {
     const workbook = new Workbook();
-    const absolutePath = path.join(__dirname, "../../uploads", filePath);
+    const absolutePath = path.join(__dirname, '../../uploads', filePath);
     await workbook.xlsx.readFile(absolutePath);
     const worksheet = workbook.getWorksheet(sheetIndex);
     const result: CellValue[][] = [];

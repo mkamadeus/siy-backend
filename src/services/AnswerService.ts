@@ -1,6 +1,6 @@
-import Answer from "@/entity/Answer";
-import { Service } from "typedi";
-import { getRepository, Repository } from "typeorm";
+import Answer from '@/entity/Answer';
+import { Service } from 'typedi';
+import { getRepository, Repository } from 'typeorm';
 
 @Service()
 export class AnswerService {
@@ -35,9 +35,9 @@ export class AnswerService {
    */
   public async getCourseAnswers(code: string): Promise<Answer[]> {
     return await this.answerRepository
-      .createQueryBuilder("answer")
-      .innerJoin("answer.course", "course")
-      .where("course.code = :code", { code })
+      .createQueryBuilder('answer')
+      .innerJoin('answer.course', 'course')
+      .where('course.code = :code', { code })
       .getMany();
   }
 
@@ -51,10 +51,10 @@ export class AnswerService {
     formId: number
   ): Promise<Answer[]> {
     return await this.answerRepository
-      .createQueryBuilder("answer")
-      .innerJoin("answer.course", "course")
-      .where("course.code = :code", { code })
-      .andWhere("answer.formId = :formId", { formId })
+      .createQueryBuilder('answer')
+      .innerJoin('answer.course', 'course')
+      .where('course.code = :code', { code })
+      .andWhere('answer.formId = :formId', { formId })
       .getMany();
   }
 
