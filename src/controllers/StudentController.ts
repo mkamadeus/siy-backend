@@ -14,9 +14,8 @@ import {
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 import { StudentResponse } from './response/StudentResponse';
 import { CreateStudentBody, UpdateStudentBody } from './request/StudentRequest';
-import { UserRoleEnum } from '@/enum/UserRoleEnum';
 import Container from 'typedi';
-import { StudentGradeService } from '@/services/StudentGradeService';
+import { StudentGradeService } from '@/services/GradeService';
 import { AuthService } from '@/services/AuthService';
 import { Student } from '.prisma/client';
 
@@ -39,7 +38,7 @@ export class StudentController {
     return Container.get(StudentService).getAllStudents();
   }
 
-  // @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  // @Authorized([UserRole.ADMIN, UserRole.TEACHER])
   @Get('/nim/:nim')
   @ResponseSchema(StudentResponse)
   @OpenAPI({
@@ -54,7 +53,7 @@ export class StudentController {
     return Container.get(StudentService).getStudentByNim(nim);
   }
 
-  //@Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  //@Authorized([UserRole.ADMIN, UserRole.TEACHER])
   @Get('/nim/:nim/grades/:year')
   @ResponseSchema(StudentResponse)
   @OpenAPI({
@@ -94,7 +93,7 @@ export class StudentController {
     );
   }
 
-  // @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  // @Authorized([UserRole.ADMIN, UserRole.TEACHER])
   @Get('/nim/:nim/grades/')
   @ResponseSchema(StudentResponse)
   @OpenAPI({
@@ -109,7 +108,7 @@ export class StudentController {
     return Container.get(StudentGradeService).getGradeByNim(nim);
   }
 
-  //@Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  //@Authorized([UserRole.ADMIN, UserRole.TEACHER])
   @Post('/')
   @ResponseSchema(StudentResponse)
   @OpenAPI({
@@ -127,7 +126,7 @@ export class StudentController {
     return Container.get(StudentService).createStudent(student as Student);
   }
 
-  //@Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  //@Authorized([UserRole.ADMIN, UserRole.TEACHER])
   @Put('/:id')
   @ResponseSchema(StudentResponse)
   @OpenAPI({
@@ -145,7 +144,7 @@ export class StudentController {
     return Container.get(StudentService).updateStudent(id, student as Student);
   }
 
-  //@Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  //@Authorized([UserRole.ADMIN, UserRole.TEACHER])
   @Delete('/:id')
   @OpenAPI({
     description: 'Delete student',

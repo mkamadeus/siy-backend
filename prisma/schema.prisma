@@ -96,7 +96,7 @@ model Lecture {
   createdAt         DateTime @default(now()) @db.Timestamp(6)
   updatedAt         DateTime @default(now()) @db.Timestamp(6)
 
-  course   Course @relation(fields: [courseId], references: [id])
+  course              Course                @relation(fields: [courseId], references: [id])
   answer              Answer[]
   ratingQuestionnaire RatingQuestionnaire[]
   teachedBy           TeachingHistory[]
@@ -106,7 +106,7 @@ model Lecture {
 model Student {
   id Int @id @default(autoincrement())
 
-  userId Int?  @unique
+  userId Int? @unique
 
   nim       String   @unique @db.VarChar
   name      String   @db.VarChar
@@ -115,10 +115,10 @@ model Student {
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @default(now()) @db.Timestamp(6)
 
-  user   User? @relation(fields: [userId], references: [id])
+  user                User?                 @relation(fields: [userId], references: [id])
   answer              Answer[]
   ratingQuestionnaire RatingQuestionnaire[]
-  lectureHistory LectureHistory[]
+  lectureHistory      LectureHistory[]
 }
 
 model Grade {
@@ -153,13 +153,13 @@ model LectureHistory {
 model Teacher {
   id Int @id @default(autoincrement())
 
-  userId Int?  @unique
+  userId Int? @unique
 
   name      String   @db.VarChar
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @default(now()) @db.Timestamp(6)
 
-  user   User? @relation(fields: [userId], references: [id])
+  user    User?             @relation(fields: [userId], references: [id])
   teaches TeachingHistory[]
 }
 
@@ -170,8 +170,8 @@ model TeachingHistory {
   portfolio Float? @default(0)
 
 
-  teacher   Teacher @relation(fields: [teacherId], references: [id])
-  lecture   Lecture @relation(fields: [lectureId], references: [id])
+  teacher Teacher @relation(fields: [teacherId], references: [id])
+  lecture Lecture @relation(fields: [lectureId], references: [id])
 
   @@id([teacherId, lectureId])
 }

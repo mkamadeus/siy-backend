@@ -1,4 +1,4 @@
-import { StudentGradeService } from '@/services/StudentGradeService';
+import { StudentGradeService } from '@/services/GradeService';
 import { Exclude } from 'class-transformer';
 import Container from 'typedi';
 import {

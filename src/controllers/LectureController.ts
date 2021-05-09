@@ -178,7 +178,7 @@ export class LectureController {
     },
   })
   public createLecture(@Body() lecture: CreateLectureBody) {
-    return this.lectureService.create(lecture as Lecture);
+    return this.lectureService.createLecture(lecture as Lecture);
   }
 
   @Put('/:id')
@@ -195,7 +195,7 @@ export class LectureController {
     @Param('id') id: number,
     @Body() lecture: UpdateLectureBody
   ) {
-    return await this.lectureService.update(id, lecture as Lecture);
+    return await this.lectureService.updateLecture(id, lecture as Lecture);
   }
 
   @Delete('/:id')
@@ -208,6 +208,6 @@ export class LectureController {
     },
   })
   public removeLecture(@Param('id') id: number) {
-    return this.lectureService.delete(id);
+    return this.lectureService.deleteLecture(id);
   }
 }

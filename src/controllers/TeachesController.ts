@@ -1,29 +1,28 @@
 import 'reflect-metadata';
 import Teaches from '@/entity/Teaches';
 import {
+  Authorized,
+  Body,
+  Delete,
   Get,
   JsonController,
   Param,
   Post,
-  Body,
   Put,
-  Delete,
-  Authorized,
 } from 'routing-controllers';
-import { TeachesService } from '@/services/TeachesService';
+import { TeachingHistoryService } from '@/services/TeachingHistoryService';
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 import { TeachesResponse } from './response/TeachesResponse';
-import { UserRoleEnum } from '@/enum/UserRoleEnum';
 
 import { CreateTeachesBody, UpdateTeachesBody } from './request/TeachesRequest';
 
 @JsonController('/teaches')
 export class TeachesController {
-  constructor(private teachesService: TeachesService) {
+  constructor(private teachesService: TeachingHistoryService) {
     this.teachesService = teachesService;
   }
 
-  // @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  // @Authorized([UserRole.ADMIN, UserRole.TEACHER])
   @Get('/')
   @ResponseSchema(TeachesResponse, { isArray: true })
   @OpenAPI({
@@ -35,10 +34,10 @@ export class TeachesController {
     },
   })
   public getAllTeaches() {
-    return this.teachesService.getAll();
+    return this.teachesService.getAllTeachingHistory();
   }
 
-  // @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  // @Authorized([UserRole.ADMIN, UserRole.TEACHER])
   @Get('/:id')
   @ResponseSchema(TeachesResponse)
   @OpenAPI({
@@ -53,7 +52,7 @@ export class TeachesController {
     return this.teachesService.getOne(id);
   }
 
-  // @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  // @Authorized([UserRole.ADMIN, UserRole.TEACHER])
   @Get('/teacher/:id')
   @ResponseSchema(TeachesResponse)
   @OpenAPI({
@@ -65,10 +64,10 @@ export class TeachesController {
     },
   })
   public getTeachesByTeacher(@Param('id') id: number) {
-    return this.teachesService.getByTeacherId(id);
+    return this.teachesService.getTeachingHistoryByTeacherId(id);
   }
 
-  // @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  // @Authorized([UserRole.ADMIN, UserRole.TEACHER])
   @Get('/lecture/:id')
   @ResponseSchema(TeachesResponse)
   @OpenAPI({
@@ -80,10 +79,10 @@ export class TeachesController {
     },
   })
   public getTeachesByLecture(@Param('id') id: number) {
-    return this.teachesService.getByLectureId(id);
+    return this.teachesService.getTeachingHistoryByLectureId(id);
   }
 
-  // @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  // @Authorized([UserRole.ADMIN, UserRole.TEACHER])
   @Post('/')
   @ResponseSchema(TeachesResponse)
   @OpenAPI({
@@ -98,7 +97,7 @@ export class TeachesController {
     },
   })
   public createTeaches(@Body() teaches: CreateTeachesBody) {
-    return this.teachesService.create(teaches as Teaches);
+    return this.teachesService.createTeachingHistory(teaches as Teaches);
   }
 
   @Put('/portofolio/:lid/:tid')
@@ -117,7 +116,7 @@ export class TeachesController {
     @Body() teaches: UpdateTeachesBody
     // @Body() prototype: UpdatePortoBody
   ) {
-    return await this.teachesService.updatePortofolio(
+    return await this.teachesService.updateTeachingHistory(
       lid,
       tid,
       teaches as Teaches
@@ -125,7 +124,7 @@ export class TeachesController {
   }
 
   //TODO: Is this necessary?
-  @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  @Authorized([UserRole.ADMIN, UserRole.TEACHER])
   @Put('/:id')
   @ResponseSchema(TeachesResponse)
   @OpenAPI({
@@ -143,7 +142,7 @@ export class TeachesController {
     return await this.teachesService.update(id, teaches as Teaches);
   }
 
-  @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  @Authorized([UserRole.ADMIN, UserRole.TEACHER])
   @Delete('/:id')
   @OpenAPI({
     description: 'Delete teaching information by ID',
@@ -154,6 +153,6 @@ export class TeachesController {
     },
   })
   public removeTeaches(@Param('id') id: number) {
-    return this.teachesService.delete(id);
+    return this.teachesService.deleteTeachingHistory(id);
   }
 }

@@ -1,4 +1,8 @@
-import { Prisma, Student } from '@prisma/client';
+import {
+  Student,
+  StudentCreateInput,
+  StudentUpdateInput,
+} from '@/models/Student';
 import { prisma } from '@/repository/prisma';
 import { Service } from 'typedi';
 
@@ -44,9 +48,7 @@ export class StudentService {
    * Create new student
    * @param student Student object that is going to be created
    */
-  public async createStudent(
-    data: Prisma.StudentCreateInput
-  ): Promise<Student> {
+  public async createStudent(data: StudentCreateInput): Promise<Student> {
     data.lok = Array(7).fill(0);
     const student = await prisma.student.create({ data });
     return student;
@@ -59,7 +61,7 @@ export class StudentService {
    */
   public async updateStudent(
     id: number,
-    data: Prisma.StudentUpdateInput
+    data: StudentUpdateInput
   ): Promise<Student> {
     const student = await prisma.student.update({ where: { id }, data });
     return student;
@@ -72,7 +74,7 @@ export class StudentService {
    */
   public async updateStudentByNim(
     nim: string,
-    data: Prisma.StudentUpdateInput
+    data: StudentUpdateInput
   ): Promise<Student> {
     const student = await prisma.student.update({ where: { nim }, data });
     return student;

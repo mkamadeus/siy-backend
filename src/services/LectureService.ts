@@ -1,14 +1,15 @@
 import { CourseAssessment } from '@/controllers/response/CourseAssessmentResponse';
-import { IndexValueEnum } from '@/enum/IndexEnum';
 import { LoEntry } from '@/enum/LoEnum';
 import { LectureRating } from '@/enum/LectureRatingEnum';
 import Container, { Service } from 'typedi';
 import { CourseService } from './CourseService';
 import { RatingQuestionnaireService } from './RatingQuestionnaireService';
-import { StudentGradeService } from './StudentGradeService';
-import { TeachesService } from './TeachesService';
+import { GradeService } from './GradeService';
+import { TeachingHistoryService } from './TeachingHistoryService';
 import { prisma } from '@/repository/prisma';
 import { Lecture } from '@prisma/client';
+import { LectureCreateInput, LectureUpdateInput } from '@/models/Lecture';
+import { calculateCourseOutcome } from '@/utils/LectureUtils';
 
 @Service()
 export class LectureService {
@@ -69,32 +70,12 @@ export class LectureService {
    * @param id ID of the lecture
    * @param lo type of lo
    */
-  public async getCourseOutcomeLO(id: number, lo: string): Promise<number> {
+  public async getCourseOutcomeLO(id: number): Promise<number[]> {
     const grades = await Container.get(StudentGradeService).getGradeByLectureId(
       id
     );
-    let totalLO = 0;
-    grades.forEach((grade) => {
-      if (lo == 'A') {
-        totalLO += grade.loA;
-      } else if (lo == 'B') {
-        totalLO += grade.loB;
-      } else if (lo == 'C') {
-        totalLO += grade.loC;
-      } else if (lo == 'D') {
-        totalLO += grade.loD;
-      } else if (lo == 'E') {
-        totalLO += grade.loE;
-      } else if (lo == 'F') {
-        totalLO += grade.loF;
-      } else if (lo == 'G') {
-        totalLO += grade.loG;
-      }
-    });
-    if (totalLO == null || grades.length == 0) {
-      return 0;
-    }
-    return totalLO / grades.length;
+    const lo = calculateCourseOutcome(grades);
+    return lo;
   }
 
   /**
@@ -194,7 +175,6 @@ export class LectureService {
     const questionnaires = await Container.get(
       RatingQuestionnaireService
     ).getByLectureId(lecture.id);
-    //console.log(questionnaires);
     const totalRating: LectureRating = {
       m1: 0,
       m2: 0,
@@ -248,13 +228,13 @@ export class LectureService {
    * @param id ID of the lecture
    */
   public async getLecturePortofolioByID(lectureId: number): Promise<number> {
-    const teachers = await Container.get(TeachesService).getByLectureId(
-      lectureId
-    );
+    const teachers = await Container.get(
+      TeachingHistoryService
+    ).getTeachingHistoryByLectureId(lectureId);
     let total = 0;
-    if (lectureId == 2) {
-      console.log(teachers);
-    }
+    // if (lectureId == 2) {
+
+    // }
     teachers.forEach(async (teacher) => {
       total += teacher.portofolio;
     });
@@ -277,9 +257,6 @@ export class LectureService {
 
     const averageRating = this.getAverageRating(rating);
 
-    // console.log(courseOutcome);
-    // console.log(averageRating);
-    // console.log(portofolio);
     if (averageRating > 0 && portofolio > 0 && courseOutcome > 0) {
       portofolio = this.scaleToIndex(portofolio);
       return 0.5 * courseOutcome + 0.4 * averageRating + 0.1 * portofolio;
@@ -297,9 +274,9 @@ export class LectureService {
   }
 
   public async getCourseAssessmentByTeacherId(teacherId: number) {
-    const teaches = await Container.get(TeachesService).getInstancesByTeacherId(
-      teacherId
-    );
+    const teaches = await Container.get(
+      TeachingHistoryService
+    ).getInstancesByTeacherId(teacherId);
     const lectures: Lecture[] = [];
     for (const teach of teaches) {
       lectures.push(await this.getLectureById(teach.lectureId));
@@ -311,8 +288,6 @@ export class LectureService {
   public async getDetailedCA(lectures: Lecture[]) {
     const results: CourseAssessment[] = [];
     for (const lecture of lectures) {
-      //console.log("foreach");
-      // console.log(lecture);
       const result: CourseAssessment = {
         id: -1,
         code: 'code',
@@ -323,14 +298,10 @@ export class LectureService {
         courseAssessment: -1,
         mark: 'mark',
       };
-      //console.log("after declaring course assessment");
-      //console.log(lecture.courseId);
 
       const course = await Container.get(CourseService).getCourseById(
         lecture.courseId
       );
-      //console.log("getCourse");
-      //console.log(course);
       const rating = await this.getLectureRating(lecture);
       const averageRating = this.getAverageRating(rating);
       const porto = await this.getLecturePortofolioByID(lecture.id);
@@ -383,24 +354,30 @@ export class LectureService {
     return averageRating;
   }
 
-  public async create(lecture: Lecture): Promise<Lecture> {
-    return await prisma.lecture.save(lecture);
+  public async createLecture(data: LectureCreateInput): Promise<Lecture> {
+    const lecture = await prisma.lecture.create({ data });
+    return lecture;
   }
 
-  public async update(id: number, lecture: Lecture): Promise<Lecture> {
-    lecture.id = id;
-    await prisma.lecture.update(id, lecture);
-    const grades = await Container.get(StudentGradeService).getGradeByLectureId(
+  public async updateLecture(
+    id: number,
+    data: LectureUpdateInput
+  ): Promise<Lecture> {
+    const lecture = await prisma.lecture.update({ data, where: { id } });
+
+    // Update grades
+    const grades = await Container.get(GradeService).getGradeByLectureId(
       lecture.id
     );
     grades.forEach((grade) => {
-      Container.get(StudentGradeService).updateLO(grade);
+      Container.get(GradeService).updateLO(grade);
     });
-    return await this.getLectureById(id);
+
+    return lecture;
   }
 
-  public async delete(id: number): Promise<void> {
-    await prisma.lecture.delete(id);
-    return;
+  public async deleteLecture(id: number): Promise<Lecture> {
+    const lecture = await prisma.lecture.delete({ where: { id } });
+    return lecture;
   }
 }

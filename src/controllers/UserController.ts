@@ -1,5 +1,4 @@
 import User from '@/entity/User';
-import { UserRoleEnum } from '@/enum/UserRoleEnum';
 import { UserService } from '@/services/UserService';
 import {
   Authorized,
@@ -19,7 +18,7 @@ export class UserController {
     this.userService = userService;
   }
 
-  // @Authorized(UserRoleEnum.ADMIN)
+  // @Authorized(UserRole.ADMIN)
   @Get('/')
   @ResponseSchema(UserResponse, { isArray: true })
   @OpenAPI({
@@ -34,7 +33,7 @@ export class UserController {
     return await this.userService.getAllUsers();
   }
 
-  @Authorized(UserRoleEnum.ADMIN)
+  @Authorized(UserRole.ADMIN)
   @Get('/:id')
   @ResponseSchema(UserResponse)
   @OpenAPI({
@@ -49,7 +48,7 @@ export class UserController {
     return await this.userService.getUserById(id);
   }
 
-  // @Authorized(UserRoleEnum.ADMIN)
+  // @Authorized(UserRole.ADMIN)
   @Post('/')
   @ResponseSchema(UserResponse)
   @OpenAPI({

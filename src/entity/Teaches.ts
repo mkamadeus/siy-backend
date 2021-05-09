@@ -1,10 +1,10 @@
 import {
   BaseEntity,
-  Entity,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  JoinColumn,
   Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import Teacher from './Teacher';
 import Lecture from './Lecture';

@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { Container } from 'typedi';
 import { prisma } from '@/repository/prisma';
 
-describe('StudentService test', () => {
+describe('Student service test', () => {
   before(() => {
     prisma.$connect();
   });

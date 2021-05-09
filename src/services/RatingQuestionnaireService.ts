@@ -1,7 +1,7 @@
 import RatingQuestionnaire from '@/entity/RatingQuestionnaire';
 import { plainToClass } from 'class-transformer';
 import Container, { Service } from 'typedi';
-import { getRepository, Repository } from 'typeorm';
+import { Repository, getRepository } from 'typeorm';
 import { StudentService } from './StudentService';
 
 @Service()
@@ -24,7 +24,6 @@ export class RatingQuestionnaireService {
   public async getByLectureId(
     lectureId: number
   ): Promise<RatingQuestionnaire[]> {
-    console.log('rating wuesionier');
     return await this.ratingQuestionnaireRepository
       .createQueryBuilder('rating_questionnaire')
       .leftJoinAndSelect('rating_questionnaire.lectures', 'lecture')

@@ -5,7 +5,6 @@ import { mainLoader } from '@/loaders';
 import { Container } from 'typedi';
 import chalk from 'chalk';
 import { AuthService } from './services/AuthService';
-import { UserRoleEnum } from './enum/UserRoleEnum';
 
 useContainer(Container);
 

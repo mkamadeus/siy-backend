@@ -2,12 +2,12 @@ import { Exclude } from 'class-transformer';
 import {
   BaseEntity,
   Column,
-  Entity,
-  PrimaryGeneratedColumn,
   CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
+  Entity,
   JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import Question from './Question';
 import Student from './Student';

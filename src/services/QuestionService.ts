@@ -1,6 +1,6 @@
 import Question from '@/entity/Question';
 import { Service } from 'typedi';
-import { getRepository, Repository } from 'typeorm';
+import { Repository, getRepository } from 'typeorm';
 
 @Service()
 export class QuestionService {

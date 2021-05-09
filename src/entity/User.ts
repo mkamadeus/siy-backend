@@ -1,4 +1,4 @@
-import { UserRoleEnum as UserRoleEnum } from '@/enum/UserRoleEnum';
+import { UserRole } from '.prisma/client';
 import { Exclude } from 'class-transformer';
 import {
   BaseEntity,
@@ -20,8 +20,8 @@ export default class User extends BaseEntity {
   @Column()
   password: string;
 
-  @Column({ type: 'enum', enum: UserRoleEnum, default: UserRoleEnum.STUDENT })
-  role: UserRoleEnum;
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.STUDENT })
+  role: UserRole;
 
   @Column({ nullable: true })
   refreshToken: string;

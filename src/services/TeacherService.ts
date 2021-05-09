@@ -1,33 +1,32 @@
-import Teacher from '@/entity/Teacher';
+import { prisma } from '@/repository/prisma';
+import {
+  Teacher,
+  TeacherCreateInput,
+  TeacherUpdateInput,
+} from '@/models/Teacher';
 import { Service } from 'typedi';
-import { getRepository, Repository } from 'typeorm';
 
 @Service()
 export class TeacherService {
-  private teacherRepository: Repository<Teacher> = getRepository(
-    Teacher,
-    process.env.NODE_ENV === 'test' ? 'test' : 'default'
-  );
-
   /**
    * Get all teachers from database.
    */
-  public async getAll(): Promise<Teacher[]> {
-    return await this.teacherRepository.find().then((teacher) => teacher);
+  public async getAllTeachers(): Promise<Teacher[]> {
+    const teachers = await prisma.teacher.findMany();
+    return teachers;
   }
 
   /**
    * Get one teacher by id.
    * @param {number} id The teacher ID queried.
    */
-  public async getOne(id: number): Promise<Teacher> {
-    return await this.teacherRepository
-      .findOne({ where: { id } })
-      .then((teacher) => teacher);
+  public async getTeacherById(id: number): Promise<Teacher> {
+    const teacher = await prisma.teacher.findUnique({ where: { id } });
+    return teacher;
   }
 
-  public async getByUserId(userId: number): Promise<Teacher> {
-    const teacher = await this.teacherRepository.findOne({ where: { userId } });
+  public async getTeacherByUserId(userId: number): Promise<Teacher> {
+    const teacher = await prisma.teacher.findFirst({ where: { userId } });
     return teacher;
   }
 
@@ -35,8 +34,8 @@ export class TeacherService {
    * Create new teacher entry in the database.
    * @param {Teacher} teacher The teacher ID queried.
    */
-  public async create(teacher: Teacher): Promise<Teacher> {
-    return await this.teacherRepository.save(teacher);
+  public async createTeacher(data: TeacherCreateInput): Promise<Teacher> {
+    return await prisma.teacher.create({ data });
   }
 
   /**
@@ -44,18 +43,20 @@ export class TeacherService {
    * @param id The teacher ID queried.
    * @param teacher The teacher body for updating entries.
    */
-  public async update(id: number, teacher: Teacher): Promise<Teacher> {
-    teacher.id = id;
-    await this.teacherRepository.update(id, teacher);
-    return await this.getOne(id);
+  public async updateTeacher(
+    id: number,
+    data: TeacherUpdateInput
+  ): Promise<Teacher> {
+    const teacher = await prisma.teacher.update({ data, where: { id } });
+    return teacher;
   }
 
   /**
    * Delete existing teacher entry from the database.
    * @param id The teacher ID queried.
    */
-  public async delete(id: number): Promise<void> {
-    await this.teacherRepository.delete(id);
-    return;
+  public async deleteTeacher(id: number): Promise<Teacher> {
+    const teacher = await prisma.teacher.delete({ where: { id } });
+    return teacher;
   }
 }

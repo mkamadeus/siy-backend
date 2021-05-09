@@ -1,7 +1,7 @@
 import { Service } from 'typedi';
 import argon2 from 'argon2';
 import { prisma } from '@/repository/prisma';
-import { Prisma, User } from '@prisma/client';
+import { User, UserCreateInput, UserUpdateInput } from '@/models/User';
 
 @Service()
 export class UserService {
@@ -20,16 +20,13 @@ export class UserService {
     return user;
   }
 
-  public async createUser(data: Prisma.UserCreateInput): Promise<User> {
+  public async createUser(data: UserCreateInput): Promise<User> {
     data.password = await argon2.hash(data.password);
     const user = await prisma.user.create({ data });
     return user;
   }
 
-  public async updateUser(
-    id: number,
-    data: Prisma.UserUpdateInput
-  ): Promise<User> {
+  public async updateUser(id: number, data: UserUpdateInput): Promise<User> {
     if (data.password) {
       data.password = await argon2.hash(data.password as string);
     }

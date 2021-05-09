@@ -3,11 +3,12 @@ import argon2 from 'argon2';
 import { UserService } from './UserService';
 import jwt from 'jsonwebtoken';
 import { env } from '@/env';
-import { DecodedToken } from '@/enum/SessionEnum';
+import { DecodedToken, Token } from '@/models/Auth';
+import { User } from '@/models/User';
 
 @Service()
 export class AuthService {
-  public async login(username: string, password: string) {
+  public async login(username: string, password: string): Promise<Token> {
     const user = await Container.get(UserService).getUserByUsername(username);
 
     if (!user) {
@@ -37,7 +38,7 @@ export class AuthService {
     throw new Error('Credentials invalid');
   }
 
-  public async refreshToken(refreshToken: string) {
+  public async refreshToken(refreshToken: string): Promise<Token> {
     const decoded: DecodedToken = jwt.verify(
       refreshToken,
       env.refreshTokenSecret
@@ -54,7 +55,7 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  public async invalidateUser(username: string) {
+  public async invalidateUser(username: string): Promise<void> {
     const user = await Container.get(UserService).getUserByUsername(username);
     if (!user.username) {
       throw new Error('No user with that username');
@@ -65,7 +66,7 @@ export class AuthService {
     });
   }
 
-  public async getUserByToken(accessToken: string) {
+  public async getUserByToken(accessToken: string): Promise<User> {
     const decoded: DecodedToken = jwt.verify(
       accessToken,
       env.accessTokenSecret
@@ -73,12 +74,5 @@ export class AuthService {
 
     const user = await Container.get(UserService).getUserById(decoded.id);
     return user;
-  }
-
-  public parseBearerToken(token: string) {
-    const jwtToken = token.split(' ');
-    if (jwtToken.length != 2) throw new Error('Invalid token');
-
-    return jwtToken[1];
   }
 }

@@ -5,6 +5,10 @@ module.exports = {
         'cross-env NODE_ENV=production ts-node-transpile-only -r tsconfig-paths/register src/app.ts',
       description: 'Run the API in production mode.',
     },
+    prepare: {
+      script: 'husky install',
+      description: 'Setup husky',
+    },
     dev: {
       script:
         'nodemon --exec ts-node-transpile-only -r tsconfig-paths/register src/app.ts',
@@ -44,12 +48,12 @@ module.exports = {
     },
     lint: {
       run: {
-        script: 'eslint . --ext .ts',
+        script: 'eslint . --ext .ts --max-warnings=0',
         description: 'Lint the project.',
       },
       fix: {
         script:
-          'prettier --config .prettierrc "src/**/*.ts" --write && eslint . --ext .ts --fix',
+          'prettier --config .prettierrc "src/**/*.ts" --write && eslint . --ext .ts --fix --max-warnings=0',
         description: 'Fix linting errors in the project.',
       },
     },

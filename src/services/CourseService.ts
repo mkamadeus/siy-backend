@@ -1,5 +1,5 @@
 import { prisma } from '@/repository/prisma';
-import { Course, CourseUpdateInput, CourseCreateInput } from '@/models/Course';
+import { Course, CourseCreateInput, CourseUpdateInput } from '@/models/Course';
 import { Service } from 'typedi';
 
 @Service()

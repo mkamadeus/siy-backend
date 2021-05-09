@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import StudentGrade from '@/entity/StudentGrade';
-import { StudentGradeService } from '@/services/StudentGradeService';
+import { StudentGradeService } from '@/services/GradeService';
 import {
   Body,
   BodyParam,

@@ -1,15 +1,15 @@
 import 'reflect-metadata';
 import Answer from '@/entity/Answer';
 import { AnswerService } from '@/services/AnswerService';
-import { IsNumber, IsString, IsOptional } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 import {
   Body,
-  Get,
-  Post,
-  Put,
   Delete,
+  Get,
   JsonController,
   Param,
+  Post,
+  Put,
 } from 'routing-controllers';
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 

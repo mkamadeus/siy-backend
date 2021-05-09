@@ -1,23 +1,17 @@
 import { Express } from 'express';
-import { typeormLoader } from './typeormLoader';
 import { morganLoader } from './morganLoader';
 import { redocLoader } from './redocLoader';
+import { Logger } from 'tslog';
 import chalk from 'chalk';
 
-export const mainLoader = async (expressApp: Express) => {
+export const mainLoader = async (expressApp: Express): Promise<void> => {
+  const log: Logger = new Logger();
   try {
-    // Load TypeORM
-    // await typeormLoader();
-    console.info(`🍞 ${chalk.yellow('TypeORM')} loaded successfully!`);
-
     morganLoader(expressApp);
-    console.info(`🍞 ${chalk.yellow('Morgan')} logger loaded successfully!`);
-
+    log.info(`🌵 ${chalk.yellow('Morgan')} logger loaded successfully!`);
     redocLoader(expressApp);
-    console.info(
-      `🍞 ${chalk.yellow('Redoc')} documentation loaded successfully!`
-    );
+    log.info(`🌵 ${chalk.yellow('Redoc')} documentation loaded successfully!`);
   } catch (err) {
-    console.info(`❌ Error at loaders: ${chalk.red(err)}`);
+    log.trace(`❌ Error at loaders: ${chalk.red(err)}`);
   }
 };

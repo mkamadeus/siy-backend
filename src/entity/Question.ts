@@ -2,11 +2,11 @@ import { Exclude } from 'class-transformer';
 import {
   BaseEntity,
   Column,
-  Entity,
-  PrimaryGeneratedColumn,
   CreateDateColumn,
-  UpdateDateColumn,
+  Entity,
   OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import Answer from './Answer';
 

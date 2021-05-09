@@ -4,7 +4,7 @@ import { defaultMetadataStorage } from 'class-transformer/cjs/storage';
 import { Express } from 'express';
 import { validationMetadatasToSchemas } from 'class-validator-jsonschema';
 
-export const redocLoader = (expressApp: Express) => {
+export const redocLoader = (expressApp: Express): void => {
   const storage = getMetadataArgsStorage();
   const schemas = validationMetadatasToSchemas({
     classTransformerMetadataStorage: defaultMetadataStorage,

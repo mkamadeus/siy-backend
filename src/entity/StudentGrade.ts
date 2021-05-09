@@ -1,23 +1,23 @@
 import { Exclude } from 'class-transformer';
 
 import {
+  AfterInsert,
+  AfterRemove,
+  AfterUpdate,
   BaseEntity,
   Column,
-  Entity,
-  ManyToOne,
-  UpdateDateColumn,
   CreateDateColumn,
-  PrimaryGeneratedColumn,
+  Entity,
   JoinColumn,
-  AfterInsert,
-  AfterUpdate,
-  AfterRemove,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import Student from './Student';
 import { IndexEnum } from '@/enum/IndexEnum';
 import Lecture from './Lecture';
 import Container from 'typedi';
-import { StudentGradeService } from '@/services/StudentGradeService';
+import { StudentGradeService } from '@/services/GradeService';
 import { StudentService } from '@/services/StudentService';
 
 @Entity()
@@ -105,7 +105,6 @@ export default class StudentGrade extends BaseEntity {
     const ipk = await Container.get(StudentGradeService).getIpkByNim(
       student.nim
     );
-    console.log('updateIPK');
     await Container.get(StudentService).updateStudent(grade.studentId, { ipk });
   }
   // @AfterUpdate()
@@ -124,16 +123,11 @@ export default class StudentGrade extends BaseEntity {
   // @AfterRemove()
   // @AfterInsert()
   // public async updateCumulativeLo() {
-  //   console.log("updateCumulativeLO");
   //   const grade = await Container.get(StudentGradeService).getOne(this.id);
   //   const student = await Container.get(StudentService).getOne(grade.studentId);
   //   const lo = await Container.get(StudentGradeService).getCumulativeLoByNim(
   //     student.nim
   //   );
-
-  //   console.log("lo");
-  //   console.log(lo);
-  //   console.log(student.id);
 
   //   await Container.get(StudentService).update(student.id, { ...lo });
   // }
@@ -147,7 +141,6 @@ export default class StudentGrade extends BaseEntity {
   //   const lo = await Container.get(StudentGradeService).getCumulativeLoByNim(
   //     student.nim
   //   );
-  //   console.log(student);
   //   await Container.get(StudentService).update(student.id, { ...lo });
   // }
 

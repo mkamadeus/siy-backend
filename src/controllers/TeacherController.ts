@@ -14,7 +14,6 @@ import { TeacherService } from '@/services/TeacherService';
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 import { TeacherResponse } from './response/TeacherResponse';
 import { CreateTeacherBody, UpdateTeacherBody } from './request/TeacherRequest';
-import { UserRoleEnum } from '@/enum/UserRoleEnum';
 
 @JsonController('/teachers')
 export class TeacherController {
@@ -22,7 +21,7 @@ export class TeacherController {
     this.teacherService = teacherService;
   }
 
-  // @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  // @Authorized([UserRole.ADMIN, UserRole.TEACHER])
   @Get('/')
   @ResponseSchema(TeacherResponse, { isArray: true })
   @OpenAPI({
@@ -34,10 +33,10 @@ export class TeacherController {
     },
   })
   public getAllTeachers() {
-    return this.teacherService.getAll();
+    return this.teacherService.getAllTeachers();
   }
 
-  // @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  // @Authorized([UserRole.ADMIN, UserRole.TEACHER])
   @Get('/:id')
   @ResponseSchema(TeacherResponse)
   @OpenAPI({
@@ -49,10 +48,10 @@ export class TeacherController {
     },
   })
   public getTeacherById(@Param('id') id: number) {
-    return this.teacherService.getOne(id);
+    return this.teacherService.getTeacherById(id);
   }
 
-  // @Authorized([UserRoleEnum.ADMIN, UserRoleEnum.TEACHER])
+  // @Authorized([UserRole.ADMIN, UserRole.TEACHER])
   @Post('/')
   @ResponseSchema(TeacherResponse)
   @OpenAPI({
@@ -67,7 +66,7 @@ export class TeacherController {
     },
   })
   public createTeacher(@Body() teacher: CreateTeacherBody) {
-    return this.teacherService.create(teacher as Teacher);
+    return this.teacherService.createTeacher(teacher as Teacher);
   }
 
   @Put('/:id')
@@ -84,7 +83,7 @@ export class TeacherController {
     @Param('id') id: number,
     @Body() teacher: UpdateTeacherBody
   ) {
-    return await this.teacherService.update(id, teacher as Teacher);
+    return await this.teacherService.updateTeacher(id, teacher as Teacher);
   }
 
   @Delete('/:id')
@@ -97,6 +96,6 @@ export class TeacherController {
     },
   })
   public removeTeacher(@Param('id') id: number) {
-    return this.teacherService.delete(id);
+    return this.teacherService.deleteTeacher(id);
   }
 }
