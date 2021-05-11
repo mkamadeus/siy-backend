@@ -33,5 +33,5 @@ export const calculateCumulativeLo = (semesterLos: number[][]): number[] => {
       cumulativeSum[i] += lo[i];
     }
   });
-  return cumulativeSum.map((s) => s / grades.length);
+  return cumulativeSum.map((s) => s / semesterLos.length);
 };
