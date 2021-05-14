@@ -369,8 +369,10 @@ export class StudentGradeService {
   }
 
   public async create(studentGrade: StudentGrade): Promise<StudentGrade> {
-    var result = await this.gradeRepository.save(studentGrade);
-    return this.updateLO(result);
+    const result = await this.gradeRepository.save(studentGrade);
+    await this.updateLO(result.studentId);
+    await this.updateIpk(result.studentId);
+    return this.getOne(result.id);
   }
 
   public async createByNim(
@@ -447,15 +449,17 @@ export class StudentGradeService {
     // );
     await this.gradeRepository.save(plainToClass(StudentGrade, studentGrade));
     const grade = await this.getOne(id);
+    await this.updateLO(grade.studentId);
+    await this.updateIpk(grade.studentId);
     // console.log(grade);
-    return await this.updateLO(grade);
+    return await this.getOne(id);
   }
 
-  public async updateLO(grade: StudentGrade): Promise<StudentGrade> {
+  public async updateLO(id: number): Promise<void> {
     // update LO
     console.log("updateCumulativeLO");
     // const grade = await Container.get(StudentGradeService).getOne(this.id);
-    const student = await Container.get(StudentService).getOne(grade.studentId);
+    const student = await Container.get(StudentService).getOne(id);
     const lo = await Container.get(StudentGradeService).getCumulativeLoByNim(
       student.nim
     );
@@ -464,26 +468,39 @@ export class StudentGradeService {
     console.log(student.id);
 
     await Container.get(StudentService).update(student.id, { ...lo });
-
-    return this.getOne(grade.id);
+    return;
   }
 
-  public async updateByNim(
-    nim: string,
-    studentGrade: StudentGrade
-  ): Promise<StudentGrade> {
-    console.log("sebelum get student");
-    const student = await Container.get(StudentService).getByNim(nim);
+  public async updateIpk(studentId: number) {
+    console.log("updateIPK");
+    // const grade = await Container.get(StudentGradeService).getOne(this.id);
+    const student = await Container.get(StudentService).getOne(studentId);
+    const ipk = await this.getIpkByNim(student.nim);
 
-    await this.gradeRepository.update(
-      student.id,
-      plainToClass(StudentGrade, { studentId: student.id, ...studentGrade })
-    );
-    return this.getOne(student.id);
+    await Container.get(StudentService).update(studentId, { ipk });
+    return;
   }
+
+  // public async updateByNim(
+  //   nim: string,
+  //   studentGrade: StudentGrade
+  // ): Promise<StudentGrade> {
+  //   const student = await Container.get(StudentService).getByNim(nim);
+
+  //   await this.gradeRepository.update(
+  //     student.id,
+  //     plainToClass(StudentGrade, { studentId: student.id, ...studentGrade })
+  //   );
+  //   return this.getOne(student.id);
+  // }
 
   public async delete(id: number): Promise<void> {
+    const deleted = await this.getOne(id);
+    const studentId = deleted.studentId;
     await this.gradeRepository.delete(id);
+
+    this.updateLO(studentId);
+    this.updateIpk(studentId);
     return;
   }
 }

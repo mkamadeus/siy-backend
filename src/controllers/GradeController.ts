@@ -168,22 +168,22 @@ export class GradeController {
     return this.gradeService.createByNim(nim, grade as StudentGrade);
   }
 
-  @Put("/student/nim/:nim")
-  @ResponseSchema(GradeResponse)
-  @OpenAPI({
-    description: "Update grade, allows partial update.",
-    responses: {
-      "200": {
-        description: "OK",
-      },
-    },
-  })
-  public updateGradeByNim(
-    @Param("nim") nim: string,
-    @Body() grade: UpdateGradeBody
-  ) {
-    return this.gradeService.updateByNim(nim, grade as StudentGrade);
-  }
+  // @Put("/student/nim/:nim")
+  // @ResponseSchema(GradeResponse)
+  // @OpenAPI({
+  //   description: "Update grade, allows partial update.",
+  //   responses: {
+  //     "200": {
+  //       description: "OK",
+  //     },
+  //   },
+  // })
+  // public updateGradeByNim(
+  //   @Param("nim") nim: string,
+  //   @Body() grade: UpdateGradeBody
+  // ) {
+  //   return this.gradeService.updateByNim(nim, grade as StudentGrade);
+  // }
 
   @Post("/upload")
   @UseBefore(express.urlencoded({ extended: true }))

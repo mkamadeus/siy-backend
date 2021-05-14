@@ -24,7 +24,6 @@ export class RatingQuestionnaireService {
   public async getByLectureId(
     lectureId: number
   ): Promise<RatingQuestionnaire[]> {
-    console.log("rating wuesionier");
     return await this.ratingQuestionnaireRepository
       .createQueryBuilder("rating_questionnaire")
       .leftJoinAndSelect("rating_questionnaire.lectures", "lecture")

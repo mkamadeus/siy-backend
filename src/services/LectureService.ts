@@ -1,5 +1,5 @@
+import { LOAssessment } from "@/controllers/response/LOAssessmentResponse";
 import { CourseAssessment } from "@/controllers/response/CourseAssessmentResponse";
-import { GradeResponse } from "@/controllers/response/StudentGradeResponse";
 import Lecture from "@/entity/Lecture";
 import { IndexValueEnum } from "@/enum/IndexEnum";
 import { LoEntry } from "@/enum/LoEnum";
@@ -236,9 +236,6 @@ export class LectureService {
       lectureId
     );
     var total = 0;
-    if (lectureId == 2) {
-      console.log(teachers);
-    }
     teachers.forEach(async (teacher) => {
       total += teacher.portofolio;
     });
@@ -292,6 +289,12 @@ export class LectureService {
     return await this.getDetailedCA(lectures);
   }
 
+  public async getCourseAssessmentPerSemester(year: number, semester: number) {
+    const lectures = await this.getByYearSemester(year, semester);
+
+    return await this.getDetailedCA(lectures);
+  }
+
   public async getDetailedCA(lectures: Lecture[]) {
     var results: CourseAssessment[] = [];
     for (const lecture of lectures) {
@@ -336,6 +339,136 @@ export class LectureService {
 
       results.push(result);
     }
+    return results;
+  }
+
+  public async getLOAssessment(year: number, semester: number) {
+    var lectures = await this.getByYearSemester(year, semester);
+    var result: LoEntry = {
+      loA: 0,
+      loB: 0,
+      loC: 0,
+      loD: 0,
+      loE: 0,
+      loF: 0,
+      loG: 0,
+    };
+
+    var totalKMT: LoEntry = {
+      loA: 0,
+      loB: 0,
+      loC: 0,
+      loD: 0,
+      loE: 0,
+      loF: 0,
+      loG: 0,
+    };
+
+    for (const lecture of lectures) {
+      const courseAssessment = await this.getCourseAssessmentByID(lecture.id);
+      if (courseAssessment != -1) {
+        totalKMT.loA += lecture.loAKMTWeight;
+        totalKMT.loB += lecture.loBKMTWeight;
+        totalKMT.loC += lecture.loCKMTWeight;
+        totalKMT.loD += lecture.loDKMTWeight;
+        totalKMT.loE += lecture.loEKMTWeight;
+        totalKMT.loF += lecture.loFKMTWeight;
+        totalKMT.loG += lecture.loGKMTWeight;
+
+        console.log("TESTT");
+        console.log(lecture.id);
+        console.log(lecture);
+        console.log(courseAssessment);
+
+        result.loA += courseAssessment * lecture.loAKMTWeight;
+        result.loB += courseAssessment * lecture.loBKMTWeight;
+        result.loC += courseAssessment * lecture.loCKMTWeight;
+        result.loD += courseAssessment * lecture.loDKMTWeight;
+        result.loE += courseAssessment * lecture.loEKMTWeight;
+        result.loF += courseAssessment * lecture.loFKMTWeight;
+        result.loG += courseAssessment * lecture.loGKMTWeight;
+      }
+    }
+
+    console.log("result");
+    console.log(result);
+    console.log("totalKMT");
+    console.log(totalKMT);
+
+    if (result.loA > 0) {
+      result.loA /= totalKMT.loA > 0 ? totalKMT.loA : 1;
+    }
+    if (result.loB > 0) {
+      result.loB /= totalKMT.loB > 0 ? totalKMT.loB : 1;
+    }
+    if (result.loC > 0) {
+      result.loC /= totalKMT.loC > 0 ? totalKMT.loC : 1;
+    }
+    if (result.loD > 0) {
+      result.loD /= totalKMT.loD > 0 ? totalKMT.loD : 1;
+    }
+    if (result.loE) {
+      result.loE /= totalKMT.loE > 0 ? totalKMT.loE : 1;
+    }
+    if (result.loF) {
+      result.loF /= totalKMT.loF > 0 ? totalKMT.loF : 1;
+    }
+    if (result.loG) {
+      result.loG /= totalKMT.loG > 0 ? totalKMT.loG : 1;
+    }
+
+    return result;
+
+    // lo A = sum (courseAssessment_i*kmt_i) / total_kmt
+  }
+
+  public async getLOAssessmentDetail(year: number, semester: number) {
+    const los = await this.getLOAssessment(year, semester);
+    var results: LOAssessment[] = [
+      {
+        id: 1,
+        loType: "LO A",
+        value: los.loA,
+        mark: los.loA > 3 ? "MAINTAIN" : "IMPROVE",
+      },
+      {
+        id: 2,
+        loType: "LO B",
+        value: los.loB,
+        mark: los.loB > 3 ? "MAINTAIN" : "IMPROVE",
+      },
+      {
+        id: 3,
+        loType: "LO C",
+        value: los.loC,
+        mark: los.loC > 3 ? "MAINTAIN" : "IMPROVE",
+      },
+      {
+        id: 4,
+        loType: "LO D",
+        value: los.loD,
+        mark: los.loD > 3 ? "MAINTAIN" : "IMPROVE",
+      },
+      {
+        id: 5,
+        loType: "LO E",
+        value: los.loE,
+        mark: los.loE > 3 ? "MAINTAIN" : "IMPROVE",
+      },
+      {
+        id: 6,
+        loType: "LO F",
+        value: los.loF,
+        mark: los.loF > 3 ? "MAINTAIN" : "IMPROVE",
+      },
+      {
+        id: 7,
+        loType: "LO G",
+        value: los.loG,
+        mark: los.loG > 3 ? "MAINTAIN" : "IMPROVE",
+      },
+    ];
+
     return results;
   }
 
