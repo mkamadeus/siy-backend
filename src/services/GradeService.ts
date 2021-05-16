@@ -103,7 +103,7 @@ export class GradeService {
       year,
       semester
     );
-    const semesterGpa = calculateSemesterGpa(grades);
+    const semesterGpa = await calculateSemesterGpa(grades);
     return semesterGpa;
   }
 

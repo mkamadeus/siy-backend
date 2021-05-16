@@ -115,14 +115,14 @@ Table Grade {
 Table LectureHistory {
   studentId Int [not null]
   lectureId Int [not null]
-  gradeId Int [not null]
+  gradeId Int
   attendance Float [not null, default: 0]
   lecture Lecture
   student Student
   grade Grade
 
   indexes {
-    (studentId, lectureId, gradeId) [pk]
+    (studentId, lectureId) [pk]
   }
 }
 

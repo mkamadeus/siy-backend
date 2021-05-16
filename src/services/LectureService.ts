@@ -366,7 +366,7 @@ export class LectureService {
     const lecture = await prisma.lecture.update({ data, where: { id } });
 
     // Update grades
-    const grades = await Container.get(GradeService).getGradeByLectureId(
+    const grades = await Container.get(GradeService).getGradesByLectureId(
       lecture.id
     );
     grades.forEach((grade) => {

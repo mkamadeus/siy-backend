@@ -141,13 +141,13 @@ model LectureHistory {
 
   studentId  Int
   lectureId  Int
-  gradeId    Int
+  gradeId    Int?
   attendance Float @default(0)
 
   lecture Lecture? @relation(fields: [lectureId], references: [id])
   student Student? @relation(fields: [studentId], references: [id])
   grade   Grade?   @relation(fields: [gradeId], references: [id])
-  @@id([studentId, lectureId, gradeId])
+  @@id([studentId, lectureId])
 }
 
 model Teacher {
