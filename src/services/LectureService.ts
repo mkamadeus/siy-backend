@@ -55,7 +55,7 @@ export class LectureService {
    * @param year Lecture year
    * @returns Lecture with specific year
    */
-  public async getLectureByYearSemester(
+  public async getLectureBySemester(
     year: number,
     semester: number
   ): Promise<Lecture[]> {

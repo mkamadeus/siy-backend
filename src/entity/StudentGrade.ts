@@ -96,15 +96,11 @@ export default class StudentGrade extends BaseEntity {
   @AfterRemove()
   @AfterInsert()
   public async updateIpk() {
-    const grade = await Container.get(GradeService).getGradeById(
-      this.id
-    );
+    const grade = await Container.get(GradeService).getGradeById(this.id);
     const student = await Container.get(StudentService).getStudentById(
       grade.studentId
     );
-    const ipk = await Container.get(GradeService).getIpkByNim(
-      student.nim
-    );
+    const ipk = await Container.get(GradeService).getIpkByNim(student.nim);
     await Container.get(StudentService).updateStudent(grade.studentId, { ipk });
   }
   // @AfterUpdate()
