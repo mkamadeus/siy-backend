@@ -3,8 +3,9 @@ import { Express } from 'express';
 import { Action, createExpressServer, useContainer } from 'routing-controllers';
 import { mainLoader } from '@/loaders';
 import { Container } from 'typedi';
-import chalk from 'chalk';
 import { AuthService } from './services/AuthService';
+import logger from '@/logger';
+import chalk from 'chalk';
 
 useContainer(Container);
 
@@ -29,9 +30,9 @@ const app = createExpressServer({
 mainLoader(app)
   .then(() => {
     app.listen(process.env.PORT, () => {
-      console.info(`⭐ Live on port ${chalk.bold.yellow(process.env.PORT)}`);
+      logger.info(`⭐ Live on port ${chalk.bold.yellow(process.env.PORT)}`);
     });
   })
   .catch((err) => {
-    console.info(err.message);
+    logger.info(err.message);
   });

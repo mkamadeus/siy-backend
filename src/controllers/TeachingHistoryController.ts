@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import Teaches from '@/entity/Teaches';
+import { TeachingHistory } from '@/models/TeachingHistory';
 import {
   Authorized,
   Body,
@@ -12,19 +12,19 @@ import {
 } from 'routing-controllers';
 import { TeachingHistoryService } from '@/services/TeachingHistoryService';
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
-import { TeachesResponse } from './response/TeachesResponse';
+import { TeachingHistoryResponse } from './response/TeachingHistoryResponse';
 
-import { CreateTeachesBody, UpdateTeachesBody } from './request/TeachesRequest';
+import {
+  CreateTeachingHistoryBody,
+  UpdateTeachingHistoryBody,
+} from './request/TeachingHistoryRequest';
+import Container from 'typedi';
 
-@JsonController('/teaches')
-export class TeachesController {
-  constructor(private teachesService: TeachingHistoryService) {
-    this.teachesService = teachesService;
-  }
-
+@JsonController('/teaching-history')
+export class TeachingHistoryController {
   // @Authorized([UserRole.ADMIN, UserRole.TEACHER])
   @Get('/')
-  @ResponseSchema(TeachesResponse, { isArray: true })
+  @ResponseSchema(TeachingHistoryResponse, { isArray: true })
   @OpenAPI({
     description: 'Get all teaching information',
     responses: {
@@ -33,28 +33,13 @@ export class TeachesController {
       },
     },
   })
-  public getAllTeaches() {
-    return this.teachesService.getAllTeachingHistory();
-  }
-
-  // @Authorized([UserRole.ADMIN, UserRole.TEACHER])
-  @Get('/:id')
-  @ResponseSchema(TeachesResponse)
-  @OpenAPI({
-    description: 'Get one teaching information by ID',
-    responses: {
-      '200': {
-        description: 'OK',
-      },
-    },
-  })
-  public getTeachesById(@Param('id') id: number) {
-    return this.teachesService.getOne(id);
+  public getAllTeachingHistory(): Promise<TeachingHistory[]> {
+    return Container.get(TeachingHistoryService).getAllTeachingHistory();
   }
 
   // @Authorized([UserRole.ADMIN, UserRole.TEACHER])
   @Get('/teacher/:id')
-  @ResponseSchema(TeachesResponse)
+  @ResponseSchema(TeachingHistoryResponse)
   @OpenAPI({
     description: 'Get teaching information of a teacher',
     responses: {
@@ -63,13 +48,17 @@ export class TeachesController {
       },
     },
   })
-  public getTeachesByTeacher(@Param('id') id: number) {
-    return this.teachesService.getTeachingHistoryByTeacherId(id);
+  public getTeachingHistoryByTeacher(
+    @Param('id') id: number
+  ): Promise<TeachingHistory[]> {
+    return Container.get(TeachingHistoryService).getTeachingHistoryByTeacherId(
+      id
+    );
   }
 
   // @Authorized([UserRole.ADMIN, UserRole.TEACHER])
   @Get('/lecture/:id')
-  @ResponseSchema(TeachesResponse)
+  @ResponseSchema(TeachingHistoryResponse)
   @OpenAPI({
     description: 'Get teaching information for a lecture',
     responses: {
@@ -78,13 +67,17 @@ export class TeachesController {
       },
     },
   })
-  public getTeachesByLecture(@Param('id') id: number) {
-    return this.teachesService.getTeachingHistoryByLectureId(id);
+  public getTeachingHistoryByLecture(
+    @Param('id') id: number
+  ): Promise<TeachingHistory[]> {
+    return Container.get(TeachingHistoryService).getTeachingHistoryByLectureId(
+      id
+    );
   }
 
   // @Authorized([UserRole.ADMIN, UserRole.TEACHER])
   @Post('/')
-  @ResponseSchema(TeachesResponse)
+  @ResponseSchema(TeachingHistoryResponse)
   @OpenAPI({
     description: 'Create new teaching information',
     responses: {
@@ -96,12 +89,14 @@ export class TeachesController {
       },
     },
   })
-  public createTeaches(@Body() teaches: CreateTeachesBody) {
-    return this.teachesService.createTeachingHistory(teaches as Teaches);
+  public createTeachingHistory(
+    @Body() teaches: CreateTeachingHistoryBody
+  ): Promise<TeachingHistory> {
+    return Container.get(TeachingHistoryService).createTeachingHistory(teaches);
   }
 
   @Put('/portofolio/:lid/:tid')
-  @ResponseSchema(TeachesResponse)
+  @ResponseSchema(TeachingHistoryResponse)
   @OpenAPI({
     description: 'Update teaching information',
     responses: {
@@ -113,20 +108,20 @@ export class TeachesController {
   public async updatePorto(
     @Param('lid') lid: number,
     @Param('tid') tid: number,
-    @Body() teaches: UpdateTeachesBody
+    @Body() teaches: UpdateTeachingHistoryBody
     // @Body() prototype: UpdatePortoBody
-  ) {
-    return await this.teachesService.updateTeachingHistory(
+  ): Promise<TeachingHistory> {
+    return await Container.get(TeachingHistoryService).updateTeachingHistory(
       lid,
       tid,
-      teaches as Teaches
+      teaches
     );
   }
 
   //TODO: Is this necessary?
-  @Authorized([UserRole.ADMIN, UserRole.TEACHER])
+  // @Authorized([UserRole.ADMIN, UserRole.TEACHER])
   @Put('/:id')
-  @ResponseSchema(TeachesResponse)
+  @ResponseSchema(TeachingHistoryResponse)
   @OpenAPI({
     description: 'Update teaching information',
     responses: {
@@ -135,14 +130,17 @@ export class TeachesController {
       },
     },
   })
-  public async updateTeaches(
+  public async updateTeachingHistory(
     @Param('id') id: number,
-    @Body() teaches: UpdateTeachesBody
+    @Body() teaches: UpdateTeachingHistoryBody
   ) {
-    return await this.teachesService.update(id, teaches as Teaches);
+    return await Container.get(TeachingHistoryService).update(
+      id,
+      teaches as TeachingHistory
+    );
   }
 
-  @Authorized([UserRole.ADMIN, UserRole.TEACHER])
+  // @Authorized([UserRole.ADMIN, UserRole.TEACHER])
   @Delete('/:id')
   @OpenAPI({
     description: 'Delete teaching information by ID',
@@ -152,7 +150,7 @@ export class TeachesController {
       },
     },
   })
-  public removeTeaches(@Param('id') id: number) {
-    return this.teachesService.deleteTeachingHistory(id);
+  public removeTeachingHistory(@Param('id') id: number) {
+    return Container.get(TeachingHistoryService).deleteTeachingHistory(id);
   }
 }

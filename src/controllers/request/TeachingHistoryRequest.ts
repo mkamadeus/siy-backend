@@ -1,6 +1,6 @@
 import { IsNumber, IsOptional } from 'class-validator';
 
-export class CreateTeachesBody {
+export class CreateTeachingHistoryBody {
   @IsNumber()
   public teacherId: number;
 
@@ -8,7 +8,7 @@ export class CreateTeachesBody {
   public lectureId: number;
 }
 
-export class UpdateTeachesBody {
+export class UpdateTeachingHistoryBody {
   @IsNumber()
   @IsOptional()
   public teacherId: number;

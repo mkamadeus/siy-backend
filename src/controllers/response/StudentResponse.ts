@@ -17,8 +17,4 @@ export class StudentResponse {
 
   @IsNumber()
   public ipk: number;
-
-  @ValidateNested()
-  @Type(() => GradeResponse)
-  public studentGrades: GradeResponse[];
 }

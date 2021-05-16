@@ -33,7 +33,7 @@ export class UserController {
     return await this.userService.getAllUsers();
   }
 
-  @Authorized(UserRole.ADMIN)
+  // @Authorized(UserRole.ADMIN)
   @Get('/:id')
   @ResponseSchema(UserResponse)
   @OpenAPI({

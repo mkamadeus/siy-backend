@@ -15,6 +15,6 @@ export class UserResponse {
   @IsString()
   public refreshToken: string;
 
-  @IsEnum(UserRole)
-  public role: UserRole;
+  // @IsEnum(UserRole)
+  // public role: UserRole;
 }
