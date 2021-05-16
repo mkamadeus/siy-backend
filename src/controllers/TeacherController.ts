@@ -1,7 +1,6 @@
 import 'reflect-metadata';
-import Teacher from '@/entity/Teacher';
+import { Teacher } from '@/models/Teacher';
 import {
-  Authorized,
   Body,
   Delete,
   Get,
@@ -14,13 +13,12 @@ import { TeacherService } from '@/services/TeacherService';
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 import { TeacherResponse } from './response/TeacherResponse';
 import { CreateTeacherBody, UpdateTeacherBody } from './request/TeacherRequest';
+import Container from 'typedi';
+import { TeachingHistory } from '@/models/TeachingHistory';
+import { TeachingHistoryService } from '@/services/TeachingHistoryService';
 
 @JsonController('/teachers')
 export class TeacherController {
-  constructor(private teacherService: TeacherService) {
-    this.teacherService = teacherService;
-  }
-
   // @Authorized([UserRole.ADMIN, UserRole.TEACHER])
   @Get('/')
   @ResponseSchema(TeacherResponse, { isArray: true })
@@ -32,8 +30,8 @@ export class TeacherController {
       },
     },
   })
-  public getAllTeachers() {
-    return this.teacherService.getAllTeachers();
+  public async getAllTeachers(): Promise<Teacher[]> {
+    return await Container.get(TeacherService).getAllTeachers();
   }
 
   // @Authorized([UserRole.ADMIN, UserRole.TEACHER])
@@ -47,8 +45,26 @@ export class TeacherController {
       },
     },
   })
-  public getTeacherById(@Param('id') id: number) {
-    return this.teacherService.getTeacherById(id);
+  public getTeacherById(@Param('id') id: number): Promise<Teacher> {
+    return Container.get(TeacherService).getTeacherById(id);
+  }
+
+  @Get('/:id/teaching-history')
+  @ResponseSchema(TeacherResponse)
+  @OpenAPI({
+    description: 'Get teacher data by ID',
+    responses: {
+      '200': {
+        description: 'OK',
+      },
+    },
+  })
+  public async getTeacherTeachingHistory(
+    @Param('id') id: number
+  ): Promise<TeachingHistory[]> {
+    return await Container.get(
+      TeachingHistoryService
+    ).getTeachingHistoryByTeacherId(id);
   }
 
   // @Authorized([UserRole.ADMIN, UserRole.TEACHER])
@@ -65,8 +81,8 @@ export class TeacherController {
       },
     },
   })
-  public createTeacher(@Body() teacher: CreateTeacherBody) {
-    return this.teacherService.createTeacher(teacher as Teacher);
+  public createTeacher(@Body() teacher: CreateTeacherBody): Promise<Teacher> {
+    return Container.get(TeacherService).createTeacher(teacher);
   }
 
   @Put('/:id')
@@ -82,8 +98,8 @@ export class TeacherController {
   public async updateTeacher(
     @Param('id') id: number,
     @Body() teacher: UpdateTeacherBody
-  ) {
-    return await this.teacherService.updateTeacher(id, teacher as Teacher);
+  ): Promise<Teacher> {
+    return await Container.get(TeacherService).updateTeacher(id, teacher);
   }
 
   @Delete('/:id')
@@ -95,7 +111,7 @@ export class TeacherController {
       },
     },
   })
-  public removeTeacher(@Param('id') id: number) {
-    return this.teacherService.deleteTeacher(id);
+  public removeTeacher(@Param('id') id: number): Promise<Teacher> {
+    return Container.get(TeacherService).deleteTeacher(id);
   }
 }

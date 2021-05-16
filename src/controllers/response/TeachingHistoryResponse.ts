@@ -1,6 +1,6 @@
 import { IsNumber } from 'class-validator';
 
-export class TeachesResponse {
+export class TeachingHistoryResponse {
   @IsNumber()
   public id: number;
 
