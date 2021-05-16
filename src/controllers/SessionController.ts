@@ -63,4 +63,13 @@ export class SessionController {
     ).getAuthenticatedTeachingHistory(bearer);
     return history;
   }
+
+  // TODO: LO Suplemen
+  @Get('/learning-outcome')
+  public async getAuthenticatedLearningOutcome(
+    @HeaderParam('Authorization') bearer: string
+  ): Promise<number[]> {
+    const lo = [];
+    return lo;
+  }
 }

@@ -4,20 +4,18 @@ import { Grade } from '@/models/Grade';
 import { AcademicYear } from '@/models/LectureHistory';
 import { prisma } from '@/repository/prisma';
 import {
-  calculateGpa,
-  calculateSemesterGpa,
+  calculateAverageGrade,
+  // calculateSemesterGpa,
   calculateSemesterLo,
 } from '@/utils/GradeUtils';
 import {
   getMinAcademicYear,
   getMaxAcademicYear,
-  getAcademicYear,
   isAcademicYearBetween,
   incrementAcademicYear,
 } from '@/utils/LectureHistoryUtils';
 import { plainToClass } from 'class-transformer';
 import Container, { Service } from 'typedi';
-import { CourseService } from './CourseService';
 import { LectureHistoryService } from './LectureHistoryService';
 import { LectureService } from './LectureService';
 import { StudentService } from './StudentService';
@@ -103,7 +101,7 @@ export class GradeService {
       year,
       semester
     );
-    const semesterGpa = await calculateSemesterGpa(grades);
+    const semesterGpa = await calculateAverageGrade(grades);
     return semesterGpa;
   }
 
@@ -147,8 +145,8 @@ export class GradeService {
    * @param nim NIM of the student
    */
   public async getGpaByStudentId(studentId: number): Promise<number> {
-    const semesterGpas = await this.getAllSemesterGpaByStudentId(studentId);
-    const gpa = calculateGpa(semesterGpas);
+    const grades = await this.getGradesByStudentId(studentId); // get all grades
+    const gpa = calculateAverageGrade(grades);
     return gpa;
   }
 
@@ -169,142 +167,6 @@ export class GradeService {
   // TODO: Get LO by student ID
   public async getLoByStudentId(): Promise<number[]> {
     return [];
-    // const totalLo: LoEntry = {
-    //   loA: 0,
-    //   loB: 0,
-    //   loC: 0,
-    //   loD: 0,
-    //   loE: 0,
-    //   loF: 0,
-    //   loG: 0,
-    // };
-
-    // const lecture = await Container.get(LectureService).getLectureById(
-    //   grade.lectureId
-    // );
-    // const loATotalWeight =
-    //   lecture.loAMidWeight +
-    //   lecture.loAQuizWeight +
-    //   lecture.loAFinalWeight +
-    //   lecture.loAPracticumWeight +
-    //   lecture.loAHomeworkWeight;
-    // const loBTotalWeight =
-    //   lecture.loBMidWeight +
-    //   lecture.loBQuizWeight +
-    //   lecture.loBFinalWeight +
-    //   lecture.loBPracticumWeight +
-    //   lecture.loBHomeworkWeight;
-    // const loCTotalWeight =
-    //   lecture.loCMidWeight +
-    //   lecture.loCQuizWeight +
-    //   lecture.loCFinalWeight +
-    //   lecture.loCPracticumWeight +
-    //   lecture.loCHomeworkWeight;
-    // const loDTotalWeight =
-    //   lecture.loDMidWeight +
-    //   lecture.loDQuizWeight +
-    //   lecture.loDFinalWeight +
-    //   lecture.loDPracticumWeight +
-    //   lecture.loDHomeworkWeight;
-    // const loETotalWeight =
-    //   lecture.loEMidWeight +
-    //   lecture.loEQuizWeight +
-    //   lecture.loEFinalWeight +
-    //   lecture.loEPracticumWeight +
-    //   lecture.loEHomeworkWeight;
-    // const loFTotalWeight =
-    //   lecture.loFMidWeight +
-    //   lecture.loFQuizWeight +
-    //   lecture.loFFinalWeight +
-    //   lecture.loFPracticumWeight +
-    //   lecture.loFHomeworkWeight;
-    // const loGTotalWeight =
-    //   lecture.loGMidWeight +
-    //   lecture.loGQuizWeight +
-    //   lecture.loGFinalWeight +
-    //   lecture.loGPracticumWeight +
-    //   lecture.loGHomeworkWeight;
-    // totalLo.loA =
-    //   loATotalWeight > 0
-    //     ? ((grade.midTest * lecture.loAMidWeight +
-    //         grade.quiz * lecture.loAQuizWeight +
-    //         grade.finalTest * lecture.loAFinalWeight +
-    //         grade.practicum * lecture.loAPracticumWeight +
-    //         grade.homework * lecture.loAHomeworkWeight) *
-    //         4) /
-    //       (loATotalWeight * 100)
-    //     : 0;
-    // totalLo.loB =
-    //   loBTotalWeight > 0
-    //     ? ((grade.midTest * lecture.loBMidWeight +
-    //         grade.quiz * lecture.loBQuizWeight +
-    //         grade.finalTest * lecture.loBFinalWeight +
-    //         grade.practicum * lecture.loBPracticumWeight +
-    //         grade.homework * lecture.loBHomeworkWeight) *
-    //         4) /
-    //       (loBTotalWeight * 100)
-    //     : 0;
-    // totalLo.loC =
-    //   loCTotalWeight > 0
-    //     ? ((grade.midTest * lecture.loCMidWeight +
-    //         grade.quiz * lecture.loCQuizWeight +
-    //         grade.finalTest * lecture.loCFinalWeight +
-    //         grade.practicum * lecture.loCPracticumWeight +
-    //         grade.homework * lecture.loCHomeworkWeight) *
-    //         4) /
-    //       (loCTotalWeight * 100)
-    //     : 0;
-    // totalLo.loD =
-    //   loDTotalWeight > 0
-    //     ? ((grade.midTest * lecture.loDMidWeight +
-    //         grade.quiz * lecture.loDQuizWeight +
-    //         grade.finalTest * lecture.loDFinalWeight +
-    //         grade.practicum * lecture.loDPracticumWeight +
-    //         grade.homework * lecture.loDHomeworkWeight) *
-    //         4) /
-    //       (loDTotalWeight * 100)
-    //     : 0;
-    // totalLo.loE =
-    //   loETotalWeight > 0
-    //     ? ((grade.midTest * lecture.loEMidWeight +
-    //         grade.quiz * lecture.loEQuizWeight +
-    //         grade.finalTest * lecture.loEFinalWeight +
-    //         grade.practicum * lecture.loEPracticumWeight +
-    //         grade.homework * lecture.loEHomeworkWeight) *
-    //         4) /
-    //       (loETotalWeight * 100)
-    //     : 0;
-    // totalLo.loF =
-    //   loFTotalWeight > 0
-    //     ? ((grade.midTest * lecture.loFMidWeight +
-    //         grade.quiz * lecture.loFQuizWeight +
-    //         grade.finalTest * lecture.loFFinalWeight +
-    //         grade.practicum * lecture.loFPracticumWeight +
-    //         grade.homework * lecture.loFHomeworkWeight) *
-    //         4) /
-    //       (loFTotalWeight * 100)
-    //     : 0;
-    // totalLo.loG =
-    //   loGTotalWeight > 0
-    //     ? ((grade.midTest * lecture.loGMidWeight +
-    //         grade.quiz * lecture.loGQuizWeight +
-    //         grade.finalTest * lecture.loGFinalWeight +
-    //         grade.practicum * lecture.loGPracticumWeight +
-    //         grade.homework * lecture.loGHomeworkWeight) *
-    //         4) /
-    //       (loGTotalWeight * 100)
-    //     : 0;
-
-    // grade.loA = totalLo.loA;
-    // grade.loB = totalLo.loB;
-    // grade.loC = totalLo.loC;
-    // grade.loD = totalLo.loD;
-    // grade.loE = totalLo.loE;
-    // grade.loF = totalLo.loF;
-    // grade.loG = totalLo.loG;
-
-    // await prisma.grade.update(grade.id, grade);
-    // return totalLo;
   }
 
   /**
@@ -395,9 +257,17 @@ export class GradeService {
     return cumulativeSum;
   }
 
+  public async updateAll(grade: Grade): Promise<void> {
+    // tar aja y hehe pokoknya update ipk dan LO suplemen semuanya
+  }
+
   public async create(studentGrade: Grade): Promise<Grade> {
     const result = await prisma.grade.save(studentGrade);
-    return this.updateLO(result);
+    const updatedGrade = this.updateLO(result);
+
+    await this.updateAll(grade);
+
+    return updatedGrade;
   }
 
   public async createByNim(nim: string, studentGrade: Grade): Promise<Grade> {
@@ -450,7 +320,7 @@ export class GradeService {
           semester,
           ...gradeArray[i],
         };
-        await this.createByNim(nimArray[i], body as Grade);
+        await this.createByNim(nimArray[i], body);
       } catch (err) {
         errorArray.push((err as Error).message);
       }
@@ -470,6 +340,7 @@ export class GradeService {
     // );
     await prisma.grade.save(plainToClass(Grade, studentGrade));
     const grade = await this.getGradeById(id);
+
     return await this.updateLO(grade);
   }
 

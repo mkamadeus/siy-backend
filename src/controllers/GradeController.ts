@@ -182,35 +182,6 @@ export class GradeController {
     return Container.get(GradeService).updateByNim(nim, grade as StudentGrade);
   }
 
-  @Post('/upload')
-  @UseBefore(express.urlencoded({ extended: true }))
-  @OpenAPI({
-    description:
-      'Upload grade using Excel file. Use form data and insert the file using file field.',
-    responses: {
-      '200': {
-        description: 'OK',
-      },
-    },
-  })
-  public async uploadGrade(
-    @UploadedFile('file', { required: true, options: fileUploadOptions() })
-    file: Express.Multer.File,
-    @BodyParam('lectureId') lectureId: number,
-    @BodyParam('year') year: number,
-    @BodyParam('semester') semester: number
-  ) {
-    if (!lectureId || !year || !semester)
-      throw new Error('Provide necessary info.');
-    const result = Container.get(GradeService).createBulk(
-      lectureId,
-      year,
-      semester,
-      file
-    );
-    return result;
-  }
-
   @Put('/:id')
   @ResponseSchema(GradeResponse)
   @OpenAPI({
