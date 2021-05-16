@@ -17,7 +17,7 @@ import Student from './Student';
 import { IndexEnum } from '@/enum/IndexEnum';
 import Lecture from './Lecture';
 import Container from 'typedi';
-import { StudentGradeService } from '@/services/GradeService';
+import { GradeService } from '@/services/GradeService';
 import { StudentService } from '@/services/StudentService';
 
 @Entity()
@@ -96,13 +96,13 @@ export default class StudentGrade extends BaseEntity {
   @AfterRemove()
   @AfterInsert()
   public async updateIpk() {
-    const grade = await Container.get(StudentGradeService).getGradeById(
+    const grade = await Container.get(GradeService).getGradeById(
       this.id
     );
     const student = await Container.get(StudentService).getStudentById(
       grade.studentId
     );
-    const ipk = await Container.get(StudentGradeService).getIpkByNim(
+    const ipk = await Container.get(GradeService).getIpkByNim(
       student.nim
     );
     await Container.get(StudentService).updateStudent(grade.studentId, { ipk });

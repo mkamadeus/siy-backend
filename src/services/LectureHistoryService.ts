@@ -48,6 +48,16 @@ export class LectureHistoryService {
     return history;
   }
 
+  public async getLectureHistoryByGradeId(
+    gradeId: number
+  ): Promise<LectureHistory> {
+    const history = await prisma.lectureHistory.findFirst({
+      include: { lecture: true, student: true, grade: true },
+      where: { gradeId },
+    });
+    return history;
+  }
+
   // public async getLectureHistoryBetweenAcademicYear(
   //   minYear: AcademicYear,
   //   maxYear: AcademicYear
