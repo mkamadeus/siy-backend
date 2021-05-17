@@ -42,25 +42,17 @@ Table Question {
 }
 
 Table RatingQuestionnaire {
-  id Int [pk, increment]
-  student_id Int [not null]
-  lecture_id Int [not null]
-  rating_m_1 Int [not null]
-  rating_m_3 Int [not null]
-  rating_m_4 Int [not null]
-  rating_m_5 Int [not null]
-  rating_m_7 Int [not null]
-  rating_m_8 Int [not null]
-  rating_m_10 Int [not null]
-  rating_m_11 Int [not null]
-  rating_m_12 Int [not null]
-  rating_m_2 Float [not null]
-  rating_m_6 Float [not null]
-  rating_m_9 Float [not null]
+  studentId Int [not null]
+  lectureId Int [not null]
+  ratings_m Float [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [default: `now()`, not null]
   lecture Lecture [not null]
   student Student [not null]
+
+  indexes {
+    (studentId, lectureId) [pk]
+  }
 }
 
 Table Lecture {
@@ -184,9 +176,9 @@ Ref: Answer.questionId > Question.id
 
 Ref: Answer.studentId > Student.id
 
-Ref: RatingQuestionnaire.lecture_id > Lecture.id
+Ref: RatingQuestionnaire.lectureId > Lecture.id
 
-Ref: RatingQuestionnaire.student_id > Student.id
+Ref: RatingQuestionnaire.studentId > Student.id
 
 Ref: Lecture.courseId > Course.id
 

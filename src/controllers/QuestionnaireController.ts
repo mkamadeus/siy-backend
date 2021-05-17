@@ -15,57 +15,58 @@ import {
   CreateQuestionnaireBody,
   UpdateQuestionnaireBody,
 } from './request/QuestionnaireRequest';
-import RatingQuestionnaire from '@/entity/RatingQuestionnaire';
+import { RatingQuestionnaire } from '@/models/RatingQuestionnaire';
+import Container from 'typedi';
 
-@JsonController('/questionnaire')
+@JsonController('/lectures')
 export class QuestionnaireController {
-  constructor(private questionnaireService: RatingQuestionnaireService) {
-    this.questionnaireService = questionnaireService;
-  }
+  //constructor(private questionnaireService: RatingQuestionnaireService) {
+  //  this.questionnaireService = questionnaireService;
+  //}
 
-  @Get('/')
-  @ResponseSchema(QuestionnaireResponse, { isArray: true })
-  @OpenAPI({
-    description: 'Get all questionnaires',
-    responses: {
-      '200': {
-        description: 'OK',
-      },
-    },
-  })
-  public getAllQuestionnaires() {
-    return this.questionnaireService.getAll();
-  }
+  //@Get('/')
+  //@ResponseSchema(QuestionnaireResponse, { isArray: true })
+  //@OpenAPI({
+  //  description: 'Get all questionnaires',
+  //  responses: {
+  //    '200': {
+  //      description: 'OK',
+  //    },
+  //  },
+  //})
+  //public getAllQuestionnaires() {
+  //  return this.questionnaireService.getAll();
+  //}
+//
+  //@Get('/:id')
+  //@ResponseSchema(QuestionnaireResponse)
+  //@OpenAPI({
+  //  description: 'Get one questionnaires by ID',
+  //  responses: {
+  //    '200': {
+  //      description: 'OK',
+  //    },
+  //  },
+  //})
+  //public getOneQuestionnaire(@Param('id') id: number) {
+  //  return this.questionnaireService.getOne(id);
+  //}
+//
+  //@Get('/lectures/:id')
+  //@ResponseSchema(QuestionnaireResponse)
+  //@OpenAPI({
+  //  description: 'Get questionnaires by Lecture',
+  //  responses: {
+  //    '200': {
+  //      description: 'OK',
+  //    },
+  //  },
+  //})
+  //public getQuestionnairesByLecture(@Param('id') id: number) {
+  //  return this.questionnaireService.getByLectureId(id);
+  //}
 
-  @Get('/:id')
-  @ResponseSchema(QuestionnaireResponse)
-  @OpenAPI({
-    description: 'Get one questionnaires by ID',
-    responses: {
-      '200': {
-        description: 'OK',
-      },
-    },
-  })
-  public getOneQuestionnaire(@Param('id') id: number) {
-    return this.questionnaireService.getOne(id);
-  }
-
-  @Get('/lectures/:id')
-  @ResponseSchema(QuestionnaireResponse)
-  @OpenAPI({
-    description: 'Get questionnaires by Lecture',
-    responses: {
-      '200': {
-        description: 'OK',
-      },
-    },
-  })
-  public getQuestionnairesByLecture(@Param('id') id: number) {
-    return this.questionnaireService.getByLectureId(id);
-  }
-
-  @Post('/')
+  @Post('/:id/questionnaire')
   @ResponseSchema(QuestionnaireResponse)
   @OpenAPI({
     description: 'Create new questionnaire response',
@@ -78,8 +79,12 @@ export class QuestionnaireController {
       },
     },
   })
-  public createQuestionnaire(@Body() rq: CreateQuestionnaireBody) {
-    return this.questionnaireService.create(rq as RatingQuestionnaire);
+  public createQuestionnaire(
+    @Body() rq: CreateQuestionnaireBody
+  ): Promise<RatingQuestionnaire> {
+    return Container.get(RatingQuestionnaireService).createRatingQuestionnaire(
+      rq as RatingQuestionnaire
+    );
   }
 
   //Create based on a nim and a lecture, note that the student HAS to take the lecture

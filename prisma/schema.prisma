@@ -57,27 +57,18 @@ model Question {
 }
 
 model RatingQuestionnaire {
-  id Int @id @default(autoincrement())
+  //id Int @id @default(autoincrement())
 
-  student_id  Int
-  lecture_id  Int
-  rating_m_1  Int
-  rating_m_3  Int
-  rating_m_4  Int
-  rating_m_5  Int
-  rating_m_7  Int
-  rating_m_8  Int
-  rating_m_10 Int
-  rating_m_11 Int
-  rating_m_12 Int
-  rating_m_2  Float
-  rating_m_6  Float
-  rating_m_9  Float
-  createdAt   DateTime @default(now()) @db.Timestamp(6)
-  updatedAt   DateTime @default(now()) @db.Timestamp(6)
+  studentId Int
+  lectureId Int
+  ratings_m Float[]
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @db.Timestamp(6)
 
-  lecture Lecture @relation(fields: [lecture_id], references: [id])
-  student Student @relation(fields: [student_id], references: [id])
+
+  lecture Lecture @relation(fields: [lectureId], references: [id])
+  student Student @relation(fields: [studentId], references: [id])
+  @@id([studentId, lectureId])
 }
 
 model Lecture {
