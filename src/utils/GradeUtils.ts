@@ -2,7 +2,7 @@ import { IndexValueEnum } from '@/models/Grade';
 import { CourseService } from '@/services/CourseService';
 import { LectureHistoryService } from '@/services/LectureHistoryService';
 import { LectureService } from '@/services/LectureService';
-import { Grade, LectureHistory } from '@prisma/client';
+import { Grade, Lecture } from '@prisma/client';
 import Container from 'typedi';
 
 /**
@@ -10,10 +10,10 @@ import Container from 'typedi';
  * @param grades
  * @returns weighted average from grades
  */
-export const calculateAverageGrade = async (
+export const calculateAverageGrade = (
   credits: number[],
   grades: Grade[]
-): Promise<number> => {
+): number => {
   if (credits.length !== grades.length) throw new Error('Length must be equal');
 
   let cumulativeSum = 0;
@@ -33,6 +33,41 @@ export const calculateAverageGrade = async (
   return cumulativeSum / totalCredits;
 };
 
+/**
+ * Calculate grade LO from final, mid, practicum, homework, and quiz score
+ * @param lecture lecture of grade
+ * @param grade
+ * @returns lo result
+ */
+export const calculateGradeLO = (lecture: Lecture, grade: Grade): number[] => {
+  var result = Array(7).fill(0);
+
+  for (let i = 0; i < 7; i++) {
+    let cumulativeSum = 0;
+    let totalWeight = 0;
+
+    let finalWeight = lecture.loFinalTestWeight[i];
+    let midWeight = lecture.loMidTestWeight[i];
+    let pracWeight = lecture.loPracticumWeight[i];
+    let homeworkWeight = lecture.loHomeworkWeight[i];
+    let quizWeight = lecture.loQuizWeight[i];
+
+    cumulativeSum =
+      grade.finalTest * finalWeight +
+      grade.midTest * midWeight +
+      grade.practicum * pracWeight +
+      grade.homework * homeworkWeight +
+      grade.quiz * quizWeight;
+
+    totalWeight =
+      finalWeight + midWeight + pracWeight + homeworkWeight + quizWeight;
+
+    result[i] = totalWeight > 0 ? cumulativeSum / totalWeight : 0;
+  }
+
+  return result;
+};
+
 // export const calculateGpa = (semesterGpas: number[]): number => {
 //   const total = 0;
 
@@ -48,29 +83,37 @@ export const calculateAverageGrade = async (
 //   return total;
 // };
 
-export const calculateSemesterLo = (
-  lecHistory: LectureHistory[],
+/**
+ *
+ * @param weights array of its KMT weights
+ * @param grades
+ * @returns weighted average of los
+ */
+export const calculateAverageLo = (
+  weights: number[][],
   grades: Grade[]
 ): number[] => {
-  const cumulativeSum = Array(7).fill(0);
+  if (weights.length !== grades.length) throw new Error('Length must be equal');
+
+  var cumulativeSum = Array(7).fill(0);
+  var totalKMT = Array(7).fill(0);
+  var averageLO = Array(7).fill(0);
   for (let i = 0; i < grades.length; i++) {
     // const lecHistory = await Container.get(
     //   LectureHistoryService
     // ).getLectureHistoryByGradeId(grade.id);
-    for (let j = 0; j < 7; i++) {
-      const loKmtWeight = lecHistory[i].lecture.loKmtWeight;
-      cumulativeSum[i] += grades[i].lo[j] * loKmtWeight[j];
+    const loKmtWeight = weights[i];
+    for (let j = 0; j < 7; j++) {
+      cumulativeSum[j] += grades[i].lo[j] * loKmtWeight[j];
+      totalKMT[j] += loKmtWeight[j];
     }
   }
 
-  //   // lectures.push(await this.getLectureById(teach.lectureId));
-  // }
-  grades.forEach((grade) => {
-    for (let i = 0; i < 7; i++) {
-      cumulativeSum[i] /= grade.lo[i];
-    }
-  });
-  return cumulativeSum.map((s) => s / grades.length);
+  for (let i = 0; i < 7; i++) {
+    averageLO[i] = totalKMT[i] > 0 ? cumulativeSum[i] / totalKMT[i] : 0;
+  }
+
+  return averageLO;
 };
 
 export const calculateCumulativeLo = (semesterLos: number[][]): number[] => {

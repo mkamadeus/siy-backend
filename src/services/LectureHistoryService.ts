@@ -58,6 +58,9 @@ export class LectureHistoryService {
     return history;
   }
 
+  // TO DO : GET STUDENT LIST BY LECTURE ID 
+  //public async getStudentsadasda
+
   // public async getLectureHistoryBetweenAcademicYear(
   //   minYear: AcademicYear,
   //   maxYear: AcademicYear

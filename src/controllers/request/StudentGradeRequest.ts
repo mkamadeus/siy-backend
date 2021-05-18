@@ -1,57 +1,72 @@
+import { StudentGradeIndex } from '.prisma/client';
 import { IndexEnum } from '@/enum/IndexEnum';
-import { IsEnum, IsNumber, IsOptional } from 'class-validator';
+import { IsArray, IsEnum, IsNumber, IsOptional } from 'class-validator';
 
 export class CreateGradeBody {
-  @IsNumber()
-  public studentId: number;
+  @IsEnum(StudentGradeIndex)
+  public grade: StudentGradeIndex;
 
-  @IsNumber()
-  public lectureId: number;
-
+  @IsArray()
   @IsOptional()
-  @IsEnum(IndexEnum)
-  public index: string;
+  public lo: number[];
 
   @IsNumber()
-  public semester: number;
+  public quiz: number;
 
   @IsNumber()
-  public year: number;
-}
-
-export class CreateGradeByNimBody {
-  @IsNumber()
-  public lectureId: number;
-
-  @IsOptional()
-  @IsEnum(IndexEnum)
-  public index: string;
+  public midTest: number;
 
   @IsNumber()
-  public semester: number;
+  public finalTest: number;
 
   @IsNumber()
-  public year: number;
+  public practicum: number;
+
+  @IsNumber()
+  public homework: number;
 }
 
 export class UpdateGradeBody {
-  @IsNumber()
+  @IsEnum(StudentGradeIndex)
   @IsOptional()
-  public studentId: number;
+  public grade: StudentGradeIndex;
+
+  @IsArray()
+  @IsOptional()
+  public lo: number[];
 
   @IsNumber()
   @IsOptional()
-  public lectureId: number;
-
-  @IsEnum(IndexEnum)
-  @IsOptional()
-  public index: string;
+  public quiz: number;
 
   @IsNumber()
   @IsOptional()
-  public semester: number;
+  public midTest: number;
 
   @IsNumber()
   @IsOptional()
-  public year: number;
+  public finalTest: number;
+
+  @IsNumber()
+  @IsOptional()
+  public practicum: number;
+
+  @IsNumber()
+  @IsOptional()
+  public homework: number;
 }
+
+// export class CreateGradeByNimBody {
+//   @IsNumber()
+//   public lectureId: number;
+
+//   @IsOptional()
+//   @IsEnum(IndexEnum)
+//   public index: string;
+
+//   @IsNumber()
+//   public semester: number;
+
+//   @IsNumber()
+//   public year: number;
+// }

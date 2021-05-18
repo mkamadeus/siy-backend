@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import { StudentService } from '@/services/StudentService';
+import { GradeService } from '@/services/GradeService';
 import {
   Body,
   Delete,
@@ -13,9 +14,9 @@ import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 import { StudentResponse } from './response/StudentResponse';
 import { CreateStudentBody, UpdateStudentBody } from './request/StudentRequest';
 import Container from 'typedi';
-import { GradeService } from '@/services/GradeService';
-import { Student } from '.prisma/client';
+// import { Student } from '.prisma/client';
 import { Grade } from '@/models/Grade';
+import { Student } from '@/models/Student';
 
 @OpenAPI({
   security: [{ BasicAuth: [] }],
