@@ -1,28 +1,28 @@
 import 'reflect-metadata';
 import StudentGrade from '@/entity/StudentGrade';
-import { GradeService, StudentGradeService } from '@/services/GradeService';
+import { GradeService } from '@/services/GradeService';
 import {
   Body,
-  BodyParam,
+  // BodyParam,
   Delete,
   Get,
   JsonController,
   Param,
   Post,
   Put,
-  UploadedFile,
-  UseBefore,
+  // UploadedFile,
+  // UseBefore,
 } from 'routing-controllers';
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
-import { fileUploadOptions } from '@/services/UploadService';
+// import { fileUploadOptions } from '@/services/UploadService';
 import { GradeResponse } from './response/StudentGradeResponse';
 import {
   CreateGradeBody,
-  CreateGradeByNimBody,
   UpdateGradeBody,
 } from './request/StudentGradeRequest';
-import express from 'express';
+// import express from 'express';
 import Container from 'typedi';
+import { Grade } from '@/models/Grade';
 
 @JsonController('/grades')
 export class GradeController {
@@ -97,7 +97,7 @@ export class GradeController {
     @Param('year') year: number,
     @Param('semester') semester: number
   ) {
-    return Container.get(GradeService).getLOPerSemester(nim, year, semester);
+    return Container.get(GradeService).getSemesterLoByNIM(nim, year, semester);
   }
 
   @Get('/lecture/:id')
@@ -141,46 +141,46 @@ export class GradeController {
       },
     },
   })
-  public createGrade(@Body() grade: CreateGradeBody) {
-    return Container.get(GradeService).create(grade as StudentGrade);
+  public createGrade(@Body() grade: CreateGradeBody): Promise<Grade> {
+    return Container.get(GradeService).createGrade(grade);
   }
 
-  @Post('/student/nim/:nim')
-  @ResponseSchema(GradeResponse)
-  @OpenAPI({
-    description: 'Create new grade by NIM',
-    responses: {
-      '200': {
-        description: 'OK',
-      },
-      '400': {
-        description: 'Bad request',
-      },
-    },
-  })
-  public createGradeByNim(
-    @Param('nim') nim: string,
-    @Body() grade: CreateGradeByNimBody
-  ) {
-    return Container.get(GradeService).createByNim(nim, grade as StudentGrade);
-  }
+  // @Post('/student/nim/:nim')
+  // @ResponseSchema(GradeResponse)
+  // @OpenAPI({
+  //   description: 'Create new grade by NIM',
+  //   responses: {
+  //     '200': {
+  //       description: 'OK',
+  //     },
+  //     '400': {
+  //       description: 'Bad request',
+  //     },
+  //   },
+  // })
+  // public createGradeByNim(
+  //   @Param('nim') nim: string,
+  //   @Body() grade: CreateGradeByNimBody
+  // ) {
+  //   return Container.get(GradeService).createByNim(nim, grade as StudentGrade);
+  // }
 
-  @Put('/student/nim/:nim')
-  @ResponseSchema(GradeResponse)
-  @OpenAPI({
-    description: 'Update grade, allows partial update.',
-    responses: {
-      '200': {
-        description: 'OK',
-      },
-    },
-  })
-  public updateGradeByNim(
-    @Param('nim') nim: string,
-    @Body() grade: UpdateGradeBody
-  ) {
-    return Container.get(GradeService).updateByNim(nim, grade as StudentGrade);
-  }
+  // @Put('/student/nim/:nim')
+  // @ResponseSchema(GradeResponse)
+  // @OpenAPI({
+  //   description: 'Update grade, allows partial update.',
+  //   responses: {
+  //     '200': {
+  //       description: 'OK',
+  //     },
+  //   },
+  // })
+  // public updateGradeByNim(
+  //   @Param('nim') nim: string,
+  //   @Body() grade: UpdateGradeBody
+  // ) {
+  //   return Container.get(GradeService).updateByNim(nim, grade as StudentGrade);
+  // }
 
   @Put('/:id')
   @ResponseSchema(GradeResponse)
@@ -193,7 +193,7 @@ export class GradeController {
     },
   })
   public updateGrade(@Param('id') id: number, @Body() grade: UpdateGradeBody) {
-    return Container.get(GradeService).updateGrade(id, grade as StudentGrade);
+    return Container.get(GradeService).updateGrade(id, grade);
   }
 
   @Delete('/:id')

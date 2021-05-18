@@ -68,6 +68,32 @@ export class StudentService {
   }
 
   /**
+   * Update student LO by ID
+   * @param id Student ID in database
+   * @param data Student data
+   */
+  public async updateStudentLO(id: number, lo: number[]): Promise<Student> {
+    const student = await prisma.student.update({
+      where: { id },
+      data: { lok: lo },
+    });
+    return student;
+  }
+
+  /**
+   * Update student LO by ID
+   * @param id Student ID in database
+   * @param data Student data
+   */
+  public async updateStudentGPA(id: number, gpa: number): Promise<Student> {
+    const student = await prisma.student.update({
+      where: { id },
+      data: { gpa: gpa },
+    });
+    return student;
+  }
+
+  /**
    * Update student by NIM
    * @param nim Student NIM in database
    * @param data Student data
