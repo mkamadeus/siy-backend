@@ -6,10 +6,16 @@ import { StudentService } from './StudentService'; */
 import {
   RatingQuestionnaire,
   RatingQuestionnaireCreateInput,
+  RatingQuestionnaireUncheckedCreateInput,
   RatingQuestionnaireUpdateInput,
+  RatingQuestionnaireUncheckedUpdateInput,
 } from '@/models/RatingQuestionnaire';
+import { Student } from '@/models/Student';
+import { UserRole } from '@/models/User';
 import { prisma } from '@/repository/prisma';
+import { SessionService } from '@/services/SessionService';
 import { Service } from 'typedi';
+import Container from 'typedi';
 
 @Service()
 export class RatingQuestionnaireService {
@@ -59,7 +65,7 @@ export class RatingQuestionnaireService {
 
   /**
    * Create a new Rating Questionnaire.
-   * @param rq Rating Questionnaire object that is going to be created
+   * @param data Rating Questionnaire object that is going to be created
    */
   public async createRatingQuestionnaire(
     data: RatingQuestionnaireCreateInput
@@ -69,7 +75,23 @@ export class RatingQuestionnaireService {
     return rq;
   }
 
-  //TODO: Create with student and lecture known.
+  public async createRatingQuestionnaireByIds(
+    bearer: string,
+    lectureId: number,
+    data: RatingQuestionnaireUncheckedCreateInput
+  ): Promise<RatingQuestionnaire> {
+    const user = await Container.get(SessionService).getSessionData(bearer);
+    if (user.role !== UserRole.STUDENT) {
+      throw new Error('Not a student!');
+    }
+    const student = user.userData as Student;
+    data.ratings_m = Array(12).fill(0);
+    data.studentId = student.id;
+    data.lectureId = lectureId;
+    const rq = await prisma.ratingQuestionnaire.create({ data });
+    return rq;
+  }
+
   // public async createByStudentNimLecture(
   //   nim: string,
   //   lectureId: number,
@@ -95,6 +117,26 @@ export class RatingQuestionnaireService {
     lectureId: number,
     data: RatingQuestionnaireUpdateInput
   ): Promise<RatingQuestionnaire> {
+    const rq = await prisma.ratingQuestionnaire.update({
+      where: { studentId_lectureId: { studentId, lectureId } },
+      data,
+    });
+    return rq;
+  }
+
+  //TODO: Who can use this?
+  public async updateRatingQuestionnaireByIds(
+    bearer: string,
+    lectureId: number,
+    data: RatingQuestionnaireUncheckedUpdateInput
+  ): Promise<RatingQuestionnaire> {
+    const user = await Container.get(SessionService).getSessionData(bearer);
+    if (user.role !== UserRole.STUDENT) {
+      throw new Error('Not a student!');
+    }
+    const student = user.userData as Student;
+    data.ratings_m = Array(12).fill(0);
+    const studentId = student.id;
     const rq = await prisma.ratingQuestionnaire.update({
       where: { studentId_lectureId: { studentId, lectureId } },
       data,
