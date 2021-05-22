@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import {
   Body,
   Delete,
-  //Get,
+  Get,
   JsonController,
   Param,
   Post,
@@ -29,47 +29,21 @@ export class QuestionnaireController {
   //  this.questionnaireService = questionnaireService;
   //}
 
-  //@Get('/')
-  //@ResponseSchema(QuestionnaireResponse, { isArray: true })
-  //@OpenAPI({
-  //  description: 'Get all questionnaires',
-  //  responses: {
-  //    '200': {
-  //      description: 'OK',
-  //    },
-  //  },
-  //})
-  //public getAllQuestionnaires() {
-  //  return this.questionnaireService.getAll();
-  //}
-
-  //@Get('/:id')
-  //@ResponseSchema(QuestionnaireResponse)
-  //@OpenAPI({
-  //  description: 'Get one questionnaires by ID',
-  //  responses: {
-  //    '200': {
-  //      description: 'OK',
-  //    },
-  //  },
-  //})
-  //public getOneQuestionnaire(@Param('id') id: number) {
-  //  return this.questionnaireService.getOne(id);
-  //}
-
-  //@Get('/lectures/:id')
-  //@ResponseSchema(QuestionnaireResponse)
-  //@OpenAPI({
-  //  description: 'Get questionnaires by Lecture',
-  //  responses: {
-  //    '200': {
-  //      description: 'OK',
-  //    },
-  //  },
-  //})
-  //public getQuestionnairesByLecture(@Param('id') id: number) {
-  //  return this.questionnaireService.getByLectureId(id);
-  //}
+  @Get('/all/questionnaires')
+  @ResponseSchema(QuestionnaireResponse)
+  @OpenAPI({
+    description: 'Get all questionnaires',
+    responses: {
+      '200': {
+        description: 'OK',
+      },
+    },
+  })
+  public getAllQuestionnaires(): Promise<RatingQuestionnaire[]> {
+    return Container.get(
+      RatingQuestionnaireService
+    ).getAllRatingQuestionnaires();
+  }
 
   @Post('/:id/questionnaire')
   @ResponseSchema(QuestionnaireResponse)
@@ -98,34 +72,6 @@ export class QuestionnaireController {
     );
   }
 
-  //Create based on a nim and a lecture, note that the student HAS to take the lecture
-  // @Post('/:nim/rq/:id')
-  // @ResponseSchema(QuestionnaireResponse)
-  // @OpenAPI({
-  //   description:
-  //     'Create new questionnaire response from student with certain NIM for lecture with certain ID',
-  //   responses: {
-  //     '200': {
-  //       description: 'OK',
-  //     },
-  //     '400': {
-  //       description: 'Bad request',
-  //     },
-  //   },
-  // })
-
-  // public createLectureQuestionnaire(
-  //   @Param('nim') nim: string,
-  //   @Param('id') id: number,
-  //   @Body() rq: CreateQuestionnaireBody
-  // ) {
-  //   return this.questionnaireService.createByStudentNimLecture(
-  //     nim,
-  //     id,
-  //     rq as RatingQuestionnaire
-  //   );
-  // }
-
   @Put('/:id/questionnaire')
   @ResponseSchema(QuestionnaireResponse)
   @OpenAPI({
@@ -152,7 +98,7 @@ export class QuestionnaireController {
 
   //TODO: Does update/create by admin needed?
 
-  @Delete('/:id/student/:sId/questionnaire')
+  @Delete('/:id/questionnaire/student/:sId')
   @OpenAPI({
     description: 'Delete questionnaire',
     responses: {
@@ -161,7 +107,7 @@ export class QuestionnaireController {
       },
     },
   })
-  public deleteRatingQuestionnaire(
+  public deleteQuestionnaireByAdmin(
     @Param('id') lectureId: number,
     @Param('sId') studentId: number
   ): Promise<RatingQuestionnaire> {
