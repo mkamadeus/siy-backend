@@ -38,6 +38,20 @@ Below are listed several notable scripts to be used in development:
 - `yarn test` - runs integration and unit testing.
 - `yarn lint` - Use
 
+## Using With Docker
+
+Additionaly, the Dockerfile has been included in this repository. Use:
+
+```
+docker build -t <image-name>:<image-tag> .
+```
+
+and to run the image, use:
+
+```
+docker run <image-name>:<image-tag>
+```
+
 ## Additional Informations
 
 ### Contributors

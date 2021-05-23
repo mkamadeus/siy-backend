@@ -2,7 +2,7 @@ module.exports = {
   scripts: {
     default: {
       script:
-        'cross-env NODE_ENV=production ts-node-transpile-only -r tsconfig-paths/register src/app.ts',
+        'yarn schema:migrate && cross-env NODE_ENV=production ts-node-transpile-only -r tsconfig-paths/register src/app.ts',
       description: 'Run the API in production mode.',
     },
     prepare: {
