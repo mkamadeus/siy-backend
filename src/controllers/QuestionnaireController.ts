@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  HeaderParam,
 } from 'routing-controllers';
 import { RatingQuestionnaireService } from '@/services/RatingQuestionnaireService';
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
@@ -15,16 +16,17 @@ import {
   CreateQuestionnaireBody,
   UpdateQuestionnaireBody,
 } from './request/QuestionnaireRequest';
-import RatingQuestionnaire from '@/entity/RatingQuestionnaire';
+import {
+  RatingQuestionnaire,
+  RatingQuestionnaireUncheckedCreateInput,
+  RatingQuestionnaireUncheckedUpdateInput,
+} from '@/models/RatingQuestionnaire';
+import Container from 'typedi';
 
-@JsonController('/questionnaire')
+@JsonController('/lecture')
 export class QuestionnaireController {
-  constructor(private questionnaireService: RatingQuestionnaireService) {
-    this.questionnaireService = questionnaireService;
-  }
-
-  @Get('/')
-  @ResponseSchema(QuestionnaireResponse, { isArray: true })
+  @Get('/all/questionnaires')
+  @ResponseSchema(QuestionnaireResponse)
   @OpenAPI({
     description: 'Get all questionnaires',
     responses: {
@@ -33,39 +35,31 @@ export class QuestionnaireController {
       },
     },
   })
-  public getAllQuestionnaires() {
-    return this.questionnaireService.getAll();
+  public getAllQuestionnaires(): Promise<RatingQuestionnaire[]> {
+    return Container.get(
+      RatingQuestionnaireService
+    ).getAllRatingQuestionnaires();
   }
 
-  @Get('/:id')
+  @Get('/:id/questionnaires')
   @ResponseSchema(QuestionnaireResponse)
   @OpenAPI({
-    description: 'Get one questionnaires by ID',
+    description: 'Get all questionnaires from a lecture with id',
     responses: {
       '200': {
         description: 'OK',
       },
     },
   })
-  public getOneQuestionnaire(@Param('id') id: number) {
-    return this.questionnaireService.getOne(id);
+  public getLectureQuestionnaires(
+    @Param('id') lectureId: number
+  ): Promise<RatingQuestionnaire[]> {
+    return Container.get(
+      RatingQuestionnaireService
+    ).getRatingQuestionnaireByLectureId(lectureId);
   }
 
-  @Get('/lectures/:id')
-  @ResponseSchema(QuestionnaireResponse)
-  @OpenAPI({
-    description: 'Get questionnaires by Lecture',
-    responses: {
-      '200': {
-        description: 'OK',
-      },
-    },
-  })
-  public getQuestionnairesByLecture(@Param('id') id: number) {
-    return this.questionnaireService.getByLectureId(id);
-  }
-
-  @Post('/')
+  @Post('/:id/questionnaire')
   @ResponseSchema(QuestionnaireResponse)
   @OpenAPI({
     description: 'Create new questionnaire response',
@@ -78,38 +72,21 @@ export class QuestionnaireController {
       },
     },
   })
-  public createQuestionnaire(@Body() rq: CreateQuestionnaireBody) {
-    return this.questionnaireService.create(rq as RatingQuestionnaire);
-  }
-
-  //Create based on a nim and a lecture, note that the student HAS to take the lecture
-  @Post('/:nim/rq/:id')
-  @ResponseSchema(QuestionnaireResponse)
-  @OpenAPI({
-    description:
-      'Create new questionnaire response from student with certain NIM for lecture with certain ID',
-    responses: {
-      '200': {
-        description: 'OK',
-      },
-      '400': {
-        description: 'Bad request',
-      },
-    },
-  })
-  public createLectureQuestionnaire(
-    @Param('nim') nim: string,
-    @Param('id') id: number,
+  public createQuestionnaire(
+    @HeaderParam('Authorization') bearer: string,
+    @Param('id') lectureId: number,
     @Body() rq: CreateQuestionnaireBody
-  ) {
-    return this.questionnaireService.createByStudentNimLecture(
-      nim,
-      id,
-      rq as RatingQuestionnaire
+  ): Promise<RatingQuestionnaire> {
+    return Container.get(
+      RatingQuestionnaireService
+    ).createRatingQuestionnaireByStudent(
+      bearer,
+      lectureId,
+      rq as RatingQuestionnaireUncheckedCreateInput
     );
   }
 
-  @Put('/:id')
+  @Put('/:id/questionnaire')
   @ResponseSchema(QuestionnaireResponse)
   @OpenAPI({
     description: 'Update questionnaire, allows partial update',
@@ -119,14 +96,23 @@ export class QuestionnaireController {
       },
     },
   })
-  public async updateQuestionnaire(
-    @Param('id') id: number,
+  public updateQuestionnaire(
+    @HeaderParam('Authorization') bearer: string,
+    @Param('id') lectureId: number,
     @Body() rq: UpdateQuestionnaireBody
-  ) {
-    return this.questionnaireService.update(id, rq as RatingQuestionnaire);
+  ): Promise<RatingQuestionnaire> {
+    return Container.get(
+      RatingQuestionnaireService
+    ).updateRatingQuestionnaireByStudent(
+      bearer,
+      lectureId,
+      rq as RatingQuestionnaireUncheckedUpdateInput
+    );
   }
 
-  @Delete('/:id')
+  //TODO: Does update/create by admin needed?
+
+  @Delete('/:id/questionnaire/student/:sId')
   @OpenAPI({
     description: 'Delete questionnaire',
     responses: {
@@ -135,7 +121,13 @@ export class QuestionnaireController {
       },
     },
   })
-  public removeQuestionnaire(@Param('id') id: number) {
-    return this.questionnaireService.delete(id);
+  public deleteQuestionnaireByAdmin(
+    @Param('id') lectureId: number,
+    @Param('sId') studentId: number
+  ): Promise<RatingQuestionnaire> {
+    return Container.get(RatingQuestionnaireService).deleteRatingQuestionnaire(
+      studentId,
+      lectureId
+    );
   }
 }
