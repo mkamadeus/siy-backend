@@ -1,7 +1,6 @@
 import { IndexValueEnum } from '@/models/Grade';
 import { Grade, Lecture } from '@prisma/client';
 
-
 /**
  *
  * @param grades
@@ -27,7 +26,7 @@ export const calculateAverageGrade = (
   //   cumulativeSum += grade.grade ? IndexValueEnum[grade.grade] : 4.0;
   // });
 
-  return cumulativeSum / totalCredits;
+  return totalCredits > 0 ? cumulativeSum / totalCredits : 0;
 };
 
 /**
@@ -36,18 +35,18 @@ export const calculateAverageGrade = (
  * @param grade
  * @returns lo result
  */
-export const calculateGradeLO = (lecture: Lecture, grade: Grade): number[] => {
-  var result = Array(7).fill(0);
+export const calculateGradeLo = (lecture: Lecture, grade: Grade): number[] => {
+  const result = Array(7).fill(0);
 
   for (let i = 0; i < 7; i++) {
     let cumulativeSum = 0;
     let totalWeight = 0;
 
-    let finalWeight = lecture.loFinalTestWeight[i];
-    let midWeight = lecture.loMidTestWeight[i];
-    let pracWeight = lecture.loPracticumWeight[i];
-    let homeworkWeight = lecture.loHomeworkWeight[i];
-    let quizWeight = lecture.loQuizWeight[i];
+    const finalWeight = lecture.loFinalTestWeight[i];
+    const midWeight = lecture.loMidTestWeight[i];
+    const pracWeight = lecture.loPracticumWeight[i];
+    const homeworkWeight = lecture.loHomeworkWeight[i];
+    const quizWeight = lecture.loQuizWeight[i];
 
     cumulativeSum =
       grade.finalTest * finalWeight +
@@ -65,8 +64,6 @@ export const calculateGradeLO = (lecture: Lecture, grade: Grade): number[] => {
   return result;
 };
 
-
-
 /**
  *
  * @param weights array of its KMT weights
@@ -79,9 +76,9 @@ export const calculateAverageLo = (
 ): number[] => {
   if (weights.length !== grades.length) throw new Error('Length must be equal');
 
-  var cumulativeSum = Array(7).fill(0);
-  var totalKMT = Array(7).fill(0);
-  var averageLO = Array(7).fill(0);
+  const cumulativeSum = Array(7).fill(0);
+  const totalKMT = Array(7).fill(0);
+  const averageLO = Array(7).fill(0);
   for (let i = 0; i < grades.length; i++) {
     // const lecHistory = await Container.get(
     //   LectureHistoryService
@@ -99,5 +96,3 @@ export const calculateAverageLo = (
 
   return averageLO;
 };
-
-

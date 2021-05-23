@@ -1,5 +1,4 @@
 import { StudentGradeIndex } from '.prisma/client';
-import { IndexEnum } from '@/enum/IndexEnum';
 import { IsArray, IsEnum, IsNumber, IsOptional } from 'class-validator';
 
 export class CreateGradeBody {

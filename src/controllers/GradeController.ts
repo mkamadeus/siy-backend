@@ -1,5 +1,4 @@
 import 'reflect-metadata';
-import StudentGrade from '@/entity/StudentGrade';
 import { GradeService } from '@/services/GradeService';
 import {
   Body,
@@ -36,7 +35,7 @@ export class GradeController {
       },
     },
   })
-  public getAllGrades() {
+  public getAllGrades(): Promise<Grade[]> {
     return Container.get(GradeService).getAllGrades();
   }
 
@@ -50,7 +49,7 @@ export class GradeController {
       },
     },
   })
-  public getGradeByNim(@Param('nim') nim: string) {
+  public getGradeByNim(@Param('nim') nim: string): Promise<Grade[]> {
     return Container.get(GradeService).getGradesByNim(nim);
   }
 
@@ -64,7 +63,7 @@ export class GradeController {
       },
     },
   })
-  public getLoById(@Param('id') id: number) {
+  public getLoById(@Param('id') id: number): Promise<number[]> {
     return Container.get(GradeService).getLoById(id);
   }
 
@@ -78,7 +77,7 @@ export class GradeController {
       },
     },
   })
-  public getLOCumulative(@Param('nim') nim: string) {
+  public getLOCumulative(@Param('nim') nim: string): Promise<number[]> {
     return Container.get(GradeService).getCumulativeLoByNim(nim);
   }
 
@@ -96,7 +95,7 @@ export class GradeController {
     @Param('nim') nim: string,
     @Param('year') year: number,
     @Param('semester') semester: number
-  ) {
+  ): Promise<number[]> {
     return Container.get(GradeService).getSemesterLoByNIM(nim, year, semester);
   }
 
@@ -110,7 +109,7 @@ export class GradeController {
       },
     },
   })
-  public getGradeByLecture(@Param('id') id: number) {
+  public getGradeByLecture(@Param('id') id: number): Promise<Grade[]> {
     return Container.get(GradeService).getGradesByLectureId(id);
   }
 
@@ -124,7 +123,7 @@ export class GradeController {
       },
     },
   })
-  public getGradeById(@Param('id') id: number) {
+  public getGradeById(@Param('id') id: number): Promise<Grade> {
     return Container.get(GradeService).getGradeById(id);
   }
 
@@ -192,7 +191,10 @@ export class GradeController {
       },
     },
   })
-  public updateGrade(@Param('id') id: number, @Body() grade: UpdateGradeBody) {
+  public updateGrade(
+    @Param('id') id: number,
+    @Body() grade: UpdateGradeBody
+  ): Promise<Grade> {
     return Container.get(GradeService).updateGrade(id, grade);
   }
 
@@ -205,7 +207,7 @@ export class GradeController {
       },
     },
   })
-  public removeGrade(@Param('id') id: number) {
+  public removeGrade(@Param('id') id: number): Promise<Grade> {
     return Container.get(GradeService).delete(id);
   }
 }

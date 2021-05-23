@@ -22,9 +22,9 @@ import {
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 import { LectureResponse } from './response/LectureResponse';
 import {
-  CreateLectureBody,
+  // CreateLectureBody,
   GetLecturesQuery,
-  UpdateLectureBody,
+  // UpdateLectureBody,
 } from './request/LectureRequest';
 import {
   CourseAssessment,
@@ -114,7 +114,7 @@ export class LectureController {
     return students;
   }
 
-  @Get('learning-outcomes/:year/:semester')
+  @Get('/learning-outcomes/:year/:semester')
   @ResponseSchema(CourseAssessmentResponse)
   @OpenAPI({
     description: 'Get course assessment by teacher id',

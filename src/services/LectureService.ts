@@ -1,18 +1,19 @@
 import { CourseAssessment } from '@/controllers/response/CourseAssessmentResponse';
-// import { LoEntry } from '@/enum/LoEnum';
-import { LectureRating } from '@/enum/LectureRatingEnum';
 import Container, { Service } from 'typedi';
 import { CourseService } from './CourseService';
-// import { RatingQuestionnaireService } from './RatingQuestionnaireService';
 import { GradeService } from './GradeService';
 import { TeachingHistoryService } from './TeachingHistoryService';
 import { prisma } from '@/repository/prisma';
 import { Lecture } from '@prisma/client';
 import { LectureCreateInput, LectureUpdateInput } from '@/models/Lecture';
-import { calculateCourseOutcome } from '@/utils/LectureUtils';
-import { IndexValueEnum } from '@/models/Grade';
 import { RatingQuestionnaireService } from './RatingQuestionnaireService';
 import { calculateAverageRatingofAllQuestionnaires } from '@/utils/RatingQuestionnaireUtils';
+import { calculateLoAssessment } from '@/utils/LoAssessmentUtils';
+import {
+  calculateCourseAssessment,
+  calculateCourseOutcome,
+  scaleToIndex,
+} from '@/utils/CourseAssessmentUtils';
 
 @Service()
 export class LectureService {
@@ -73,22 +74,17 @@ export class LectureService {
     semester: number
   ): Promise<number[]> {
     const lectures = await this.getLectureBySemester(year, semester);
-    let sumLo = Array(7).fill(0);
-    let sumKMT = Array(7).fill(0);
+
+    const ca: number[] = [];
+    const kmtWeight = [];
+
     for (const lecture of lectures) {
-      const ca = await this.getCourseAssessmentByID(lecture.id);
-      const kmtWeight = await this.getKMT(lecture.id);
-
-      for (let i = 0; i < 7; i++) {
-        sumLo[i] += kmtWeight[i] * ca;
-        sumKMT[i] += kmtWeight[i];
-      }
+      ca.push(await this.getCourseAssessmentByID(lecture.id));
+      kmtWeight.push(await this.getKMT(lecture.id));
     }
 
-    let result = Array(7).fill(0);
-    for (let i = 0; i < 7; i++) {
-      result[i] = sumLo[i] > 0 ? sumLo[i] / sumKMT[i] : -1;
-    }
+    const result = calculateLoAssessment(ca, kmtWeight, lectures);
+
     return result;
   }
   /**
@@ -110,14 +106,10 @@ export class LectureService {
     const grades = await Container.get(GradeService).getGradesByLectureId(
       lectureId
     );
-    let totalIdx = 0;
 
-    grades.forEach((grade) => {
-      const index = IndexValueEnum[grade.grade];
-      totalIdx += index;
-    });
+    const result = calculateCourseOutcome(grades);
 
-    return totalIdx > 0 ? totalIdx / grades.length : 0;
+    return result;
 
     // const lect = this.getOne(id);
     // var kmtA = (await lect).loAKMTWeight;
@@ -171,7 +163,7 @@ export class LectureService {
     // );
   }
 
-  public async getKMT(lectureId: number) {
+  public async getKMT(lectureId: number): Promise<number[]> {
     const lecture = await this.getLectureById(lectureId);
     const listKMT = lecture.loKmtWeight;
 
@@ -182,7 +174,7 @@ export class LectureService {
    * Get Lecture Rating by Lecture
    * @param lecture Lecture
    */
-  public async getLectureRating(lecture: Lecture) {
+  public async getLectureRating(lecture: Lecture): Promise<number> {
     const questionnaires = await Container.get(
       RatingQuestionnaireService
     ).getRatingQuestionnaireByLectureId(lecture.id);
@@ -203,9 +195,7 @@ export class LectureService {
       TeachingHistoryService
     ).getTeachingHistoryByLectureId(lectureId);
     let total = 0;
-    // if (lectureId == 2) {
 
-    // }
     teachers.forEach(async (teacher) => {
       total += teacher.portfolio;
     });
@@ -217,29 +207,26 @@ export class LectureService {
    * Get Course Assessment by lecture ID
    * @param id ID of the lecture
    */
-  public async getCourseAssessmentByID(lectureId: number) {
+  public async getCourseAssessmentByID(lectureId: number): Promise<number> {
     const lecture = await this.getLectureById(lectureId);
     const courseOutcome = await this.getCourseOutcome(lectureId);
     const rating = await this.getLectureRating(lecture);
-    let portofolio = await this.getLecturePortofolioByID(lectureId);
+    const portofolio = await this.getLecturePortofolioByID(lectureId);
 
-    if (rating > 0 && portofolio > 0 && courseOutcome > 0) {
-      portofolio = this.scaleToIndex(portofolio);
-      return 0.5 * courseOutcome + 0.4 * rating + 0.1 * portofolio;
-    } else {
-      return -1;
-    }
+    return calculateCourseAssessment(courseOutcome, rating, portofolio);
   }
 
   /**
    * Get All Detailed Course Assessment
    */
-  public async getCourseAssessment() {
+  public async getCourseAssessment(): Promise<CourseAssessment[]> {
     const lectures = await this.getAllLectures();
     return await this.getDetailedCA(lectures);
   }
 
-  public async getCourseAssessmentByTeacherId(teacherId: number) {
+  public async getCourseAssessmentByTeacherId(
+    teacherId: number
+  ): Promise<CourseAssessment[]> {
     const teaches = await Container.get(
       TeachingHistoryService
     ).getTeachingHistoryByTeacherId(teacherId);
@@ -251,7 +238,7 @@ export class LectureService {
     return await this.getDetailedCA(lectures);
   }
 
-  public async getDetailedCA(lectures: Lecture[]) {
+  public async getDetailedCA(lectures: Lecture[]): Promise<CourseAssessment[]> {
     const results: CourseAssessment[] = [];
     for (const lecture of lectures) {
       const result: CourseAssessment = {
@@ -276,7 +263,7 @@ export class LectureService {
       result.code = course.name;
       result.courseOutcome = await this.getCourseOutcome(lecture.id);
       //result.questionnaires = averageRating;
-      result.portofolio = this.scaleToIndex(porto);
+      result.portofolio = scaleToIndex(porto);
       result.courseAssessment = await this.getCourseAssessmentByID(lecture.id);
 
       if (result.courseAssessment > 3) {
@@ -290,34 +277,6 @@ export class LectureService {
       results.push(result);
     }
     return results;
-  }
-
-  // utils
-  public scaleToIndex(number: number) {
-    if (number != -1) {
-      return ((number - 0) * (4 - 0)) / (100 - 0) + 0;
-    } else {
-      return -1;
-    }
-  }
-
-  public getAverageRating(rating: LectureRating) {
-    const totalRating =
-      rating.m1 +
-      rating.m2 +
-      rating.m3 +
-      rating.m4 +
-      rating.m5 +
-      rating.m6 +
-      rating.m7 +
-      rating.m8 +
-      rating.m9 +
-      rating.m10 +
-      rating.m11 +
-      rating.m12;
-    const averageRating = totalRating > 0 ? totalRating / 12 : -1;
-
-    return averageRating;
   }
 
   public async createLecture(data: LectureCreateInput): Promise<Lecture> {

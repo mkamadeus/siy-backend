@@ -1,5 +1,3 @@
-import { IndexValueEnum } from '@/enum/IndexEnum';
-import { LoEntry, LoOwner } from '@/enum/LoEnum';
 import { Grade, GradeCreateInput, GradeUpdateInput } from '@/models/Grade';
 import { Student } from '@/models/Student';
 import { AcademicYear } from '@/models/LectureHistory';
@@ -8,7 +6,7 @@ import {
   calculateAverageGrade,
   // calculateSemesterGpa,
   calculateAverageLo,
-  calculateGradeLO,
+  calculateGradeLo,
 } from '@/utils/GradeUtils';
 import {
   getMinAcademicYear,
@@ -105,7 +103,7 @@ export class GradeService {
       semester
     );
 
-    var credits = [];
+    const credits = [];
 
     for (const grade of grades) {
       const lecHistory = await Container.get(
@@ -162,7 +160,7 @@ export class GradeService {
    */
   public async getGpaByStudentId(studentId: number): Promise<number> {
     const grades = await this.getGradesByStudentId(studentId); // get all grades
-    var credits = [];
+    const credits = [];
 
     for (const grade of grades) {
       const lecHistory = await Container.get(
@@ -183,7 +181,9 @@ export class GradeService {
    * @param studentId
    * @returns
    */
-  public async getCumulativeLoByStudentId(studentId): Promise<number[]> {
+  public async getCumulativeLoByStudentId(
+    studentId: number
+  ): Promise<number[]> {
     const grades = await this.getGradesByStudentId(studentId);
 
     return await this.getAvgLo(grades);
@@ -194,7 +194,7 @@ export class GradeService {
    * @param nim Student's NIM
    * @returns Cumulative LO for the student
    */
-  public async getCumulativeLoByNim(nim: string) {
+  public async getCumulativeLoByNim(nim: string): Promise<number[]> {
     const grades = await this.getGradesByNim(nim);
 
     return await this.getAvgLo(grades);
@@ -225,7 +225,7 @@ export class GradeService {
   }
 
   public async getAvgLo(grades: Grade[]): Promise<number[]> {
-    var weights = [];
+    const weights = [];
     for (const grade of grades) {
       const lecHistory = await Container.get(
         LectureHistoryService
@@ -243,7 +243,7 @@ export class GradeService {
     ).getLectureHistoryByGradeId(grade.id);
 
     const lecture = lecHistory.lecture;
-    const lo = calculateGradeLO(lecture, grade);
+    const lo = calculateGradeLo(lecture, grade);
 
     return lo;
   }
@@ -259,7 +259,7 @@ export class GradeService {
   }
 
   // TODO: Get LO by student ID
-  public async getLoByStudentId(id): Promise<number[]> {
+  public async getLoByStudentId(id: number): Promise<number[]> {
     const lo = await this.getCumulativeLoByStudentId(id);
     return lo;
   }
@@ -280,11 +280,19 @@ export class GradeService {
 
   public async updateAll(grade: Grade): Promise<Grade> {
     // update local LO, cumulative LO, GPA
-    const updatedGrade = await this.updateLO(grade);
-    await this.updateCumulativeLO(updatedGrade);
-    await this.updateGPA(updatedGrade);
+    const lecHistory = await Container.get(
+      LectureHistoryService
+    ).getLectureHistoryByGradeId(grade.id);
 
-    return updatedGrade;
+    if (lecHistory !== null) {
+      const updatedGrade = await this.updateLo(grade);
+      await this.updateCumulativeLo(updatedGrade);
+      await this.updateGPA(updatedGrade);
+
+      return updatedGrade;
+    } else {
+      return grade;
+    }
   }
 
   /**
@@ -292,7 +300,7 @@ export class GradeService {
    * @param grade instance yang diupdate
    * @returns grade dengan LO sudah terupdate
    */
-  public async updateLO(grade: Grade): Promise<Grade> {
+  public async updateLo(grade: Grade): Promise<Grade> {
     const lo = await this.getGradeLo(grade);
 
     const updatedGrade = await prisma.grade.update({
@@ -303,7 +311,7 @@ export class GradeService {
     return updatedGrade;
   }
 
-  public async updateCumulativeLO(grade: Grade): Promise<Student> {
+  public async updateCumulativeLo(grade: Grade): Promise<Student> {
     // update LO
 
     const lecHistory = await Container.get(

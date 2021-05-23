@@ -1,4 +1,4 @@
-import { Service } from 'typedi';
+import Container, { Service } from 'typedi';
 import {
   // AcademicYear,
   LectureHistory,
@@ -7,6 +7,7 @@ import {
 } from '@/models/LectureHistory';
 import { prisma } from '@/repository/prisma';
 import { Student } from '@/models/Student';
+import { GradeService } from './GradeService';
 // import { StudentService } from './StudentService';
 
 @Service()
@@ -60,13 +61,12 @@ export class LectureHistoryService {
     return history;
   }
 
-  // TO DO : GET STUDENT LIST BY LECTURE ID
   public async getStudentListByLectureId(
     lectureId: number
   ): Promise<Student[]> {
     const lecHistories = await this.getLectureHistoryByLectureId(lectureId);
 
-    let arrStudents = [];
+    const arrStudents = [];
 
     lecHistories.forEach((lec) => {
       arrStudents.push(lec.student);
@@ -99,6 +99,7 @@ export class LectureHistoryService {
     data: LectureHistoryCreateInput
   ): Promise<LectureHistory> {
     const history = await prisma.lectureHistory.create({ data });
+
     return this.getLectureHistoryById(
       history.studentId,
       history.lectureId
@@ -120,16 +121,20 @@ export class LectureHistoryService {
       },
       data,
     });
-    return this.getLectureHistoryById(
+
+    const lecHistory = await this.getLectureHistoryById(
       history.studentId,
       history.lectureId
       // history.gradeId
     );
+
+    Container.get(GradeService).updateAll(lecHistory.grade);
+    return lecHistory;
   }
 
   public async deleteLectureHistory(
     studentId: number,
-    lectureId: number,
+    lectureId: number
   ): Promise<LectureHistory> {
     const history = await prisma.lectureHistory.delete({
       where: {
