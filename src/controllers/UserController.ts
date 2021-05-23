@@ -1,7 +1,7 @@
-import User from '@/entity/User';
+import { User } from '@/models/User';
 import { UserService } from '@/services/UserService';
 import {
-  Authorized,
+  // Authorized,
   Body,
   Get,
   JsonController,
@@ -29,7 +29,7 @@ export class UserController {
       },
     },
   })
-  public async getAllUsers() {
+  public async getAllUsers(): Promise<User[]> {
     return await this.userService.getAllUsers();
   }
 
@@ -44,7 +44,7 @@ export class UserController {
       },
     },
   })
-  public async getUserById(@Param('id') id: number) {
+  public async getUserById(@Param('id') id: number): Promise<User> {
     return await this.userService.getUserById(id);
   }
 
@@ -59,7 +59,7 @@ export class UserController {
       },
     },
   })
-  public async createUser(@Body() user: CreateUserBody) {
+  public async createUser(@Body() user: CreateUserBody): Promise<User> {
     return await this.userService.createUser(user as User);
   }
 }

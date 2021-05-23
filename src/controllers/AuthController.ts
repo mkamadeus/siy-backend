@@ -1,3 +1,4 @@
+import { Token } from '@/models/Auth';
 import { AuthService } from '@/services/AuthService';
 import { Body, JsonController, Param, Post, Put } from 'routing-controllers';
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
@@ -23,7 +24,7 @@ export class AuthController {
       },
     },
   })
-  public async login(@Body() credentials: LoginBody) {
+  public async login(@Body() credentials: LoginBody): Promise<Token> {
     return await this.authService.login(
       credentials.username,
       credentials.password
@@ -43,7 +44,7 @@ export class AuthController {
       },
     },
   })
-  public async refreshToken(@Body() token: RefreshBody) {
+  public async refreshToken(@Body() token: RefreshBody): Promise<Token> {
     return await this.authService.refreshToken(token.refreshToken);
   }
 
@@ -57,7 +58,9 @@ export class AuthController {
       },
     },
   })
-  public async invalidateUser(@Param('username') username: string) {
+  public async invalidateUser(
+    @Param('username') username: string
+  ): Promise<void> {
     return await this.authService.invalidateUser(username);
   }
 }

@@ -56,7 +56,7 @@ export class QuestionController {
       },
     },
   })
-  public getAllQuestions() {
+  public getAllQuestions(): Promise<Question[]> {
     return this.questionService.getAll();
   }
 
@@ -70,7 +70,7 @@ export class QuestionController {
       },
     },
   })
-  public getQuestionByID(@Param('id') id: number) {
+  public getQuestionByID(@Param('id') id: number): Promise<Question> {
     return this.questionService.getOne(id);
   }
 
@@ -84,7 +84,9 @@ export class QuestionController {
       },
     },
   })
-  public getQuestionsByAnswertype(@Param('answerType') answerType: string) {
+  public getQuestionsByAnswertype(
+    @Param('answerType') answerType: string
+  ): Promise<Question[]> {
     return this.questionService.getByAnswerType(answerType);
   }
 
@@ -101,7 +103,9 @@ export class QuestionController {
       },
     },
   })
-  public createQuestion(@Body() question: CreateQuestionBody) {
+  public createQuestion(
+    @Body() question: CreateQuestionBody
+  ): Promise<Question> {
     return this.questionService.create(question as Question);
   }
 
@@ -118,7 +122,7 @@ export class QuestionController {
   public updateQuestion(
     @Param('id') id: number,
     @Body() question: UpdateQuestionBody
-  ) {
+  ): Promise<Question> {
     return this.questionService.update(id, question as Question);
   }
 
@@ -131,7 +135,7 @@ export class QuestionController {
       },
     },
   })
-  public deleteQuestion(@Param('id') id: number) {
-    this.questionService.delete(id);
+  public deleteQuestion(@Param('id') id: number): Promise<void> {
+    return this.questionService.delete(id);
   }
 }

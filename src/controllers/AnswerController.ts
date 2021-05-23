@@ -109,7 +109,7 @@ export class AnswerController {
       },
     },
   })
-  public getAllAnswers() {
+  public getAllAnswers(): Promise<Answer[]> {
     return this.answerService.getAll();
   }
 
@@ -123,7 +123,7 @@ export class AnswerController {
       },
     },
   })
-  public getAnswerByID(@Param('id') id: number) {
+  public getAnswerByID(@Param('id') id: number): Promise<Answer> {
     return this.answerService.getOne(id);
   }
 
@@ -137,7 +137,7 @@ export class AnswerController {
       },
     },
   })
-  public getFormAnswers(@Param('id') id: number) {
+  public getFormAnswers(@Param('id') id: number): Promise<Answer[]> {
     return this.answerService.getFormAnswers(id);
   }
 
@@ -151,7 +151,7 @@ export class AnswerController {
       },
     },
   })
-  public getCourseAnswers(@Param('code') code: string) {
+  public getCourseAnswers(@Param('code') code: string): Promise<Answer[]> {
     return this.answerService.getCourseAnswers(code);
   }
 
@@ -168,7 +168,7 @@ export class AnswerController {
   public getCourseFormAnswers(
     @Param('code') code: string,
     @Param('formId') formId: number
-  ) {
+  ): Promise<Answer[]> {
     return this.answerService.getCourseFormAnswers(code, formId);
   }
 
@@ -185,7 +185,7 @@ export class AnswerController {
       },
     },
   })
-  public createAnswer(@Body() answer: CreateAnswerBody) {
+  public createAnswer(@Body() answer: CreateAnswerBody): Promise<Answer> {
     return this.answerService.create(answer as Answer);
   }
 
@@ -202,7 +202,7 @@ export class AnswerController {
   public updateAnswer(
     @Param('id') id: number,
     @Body() answer: UpdateAnswerBody
-  ) {
+  ): Promise<Answer> {
     return this.answerService.update(id, answer as Answer);
   }
 
@@ -215,7 +215,7 @@ export class AnswerController {
       },
     },
   })
-  public deleteAnswer(@Param('id') id: number) {
-    this.answerService.delete(id);
+  public deleteAnswer(@Param('id') id: number): Promise<void> {
+    return this.answerService.delete(id);
   }
 }

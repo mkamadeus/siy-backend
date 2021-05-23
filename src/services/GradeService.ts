@@ -375,7 +375,7 @@ export class GradeService {
     year: number,
     semester: number,
     file: Express.Multer.File
-  ) {
+  ): Promise<{ errors: Error[] }> {
     const fileContent = (
       await Container.get(UploadService).parseExcel(file.filename, 3)
     ).slice(1);
@@ -410,7 +410,6 @@ export class GradeService {
         errorArray.push((err as Error).message);
       }
     }
-
     return { errors: errorArray };
   }
 
