@@ -358,7 +358,7 @@ export class GradeService {
   public async createByNim(nim: string, studentGrade: Grade): Promise<Grade> {
     try {
       const student = await Container.get(StudentService).getStudentByNim(nim);
-      const result = await prisma.grade.save(
+      const result = await prisma.grade.create(
         plainToClass(Grade, {
           studentId: student.id,
           ...studentGrade,
@@ -410,6 +410,7 @@ export class GradeService {
         errorArray.push((err as Error).message);
       }
     }
+
     return { errors: errorArray };
   }
 
@@ -425,7 +426,7 @@ export class GradeService {
     return grade;
   }
 
-  // public async updateByNim(
+  //  public async updateByNim(
   //   nim: string,
   //   data: GradeUpdateInput
   // ): Promise<Grade> {
