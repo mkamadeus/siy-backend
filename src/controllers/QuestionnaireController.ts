@@ -25,10 +25,6 @@ import Container from 'typedi';
 
 @JsonController('/lecture')
 export class QuestionnaireController {
-  //constructor(private questionnaireService: RatingQuestionnaireService) {
-  //  this.questionnaireService = questionnaireService;
-  //}
-
   @Get('/all/questionnaires')
   @ResponseSchema(QuestionnaireResponse)
   @OpenAPI({
@@ -43,6 +39,24 @@ export class QuestionnaireController {
     return Container.get(
       RatingQuestionnaireService
     ).getAllRatingQuestionnaires();
+  }
+
+  @Get('/:id/questionnaires')
+  @ResponseSchema(QuestionnaireResponse)
+  @OpenAPI({
+    description: 'Get all questionnaires from a lecture with id',
+    responses: {
+      '200': {
+        description: 'OK',
+      },
+    },
+  })
+  public getLectureQuestionnaires(
+    @Param('id') lectureId: number
+  ): Promise<RatingQuestionnaire[]> {
+    return Container.get(
+      RatingQuestionnaireService
+    ).getRatingQuestionnaireByLectureId(lectureId);
   }
 
   @Post('/:id/questionnaire')
@@ -65,7 +79,7 @@ export class QuestionnaireController {
   ): Promise<RatingQuestionnaire> {
     return Container.get(
       RatingQuestionnaireService
-    ).createRatingQuestionnaireByIds(
+    ).createRatingQuestionnaireByStudent(
       bearer,
       lectureId,
       rq as RatingQuestionnaireUncheckedCreateInput
@@ -89,7 +103,7 @@ export class QuestionnaireController {
   ): Promise<RatingQuestionnaire> {
     return Container.get(
       RatingQuestionnaireService
-    ).updateRatingQuestionnaireByIds(
+    ).updateRatingQuestionnaireByStudent(
       bearer,
       lectureId,
       rq as RatingQuestionnaireUncheckedUpdateInput

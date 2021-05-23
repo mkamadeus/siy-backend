@@ -1,8 +1,3 @@
-/* import RatingQuestionnaire from '@/entity/RatingQuestionnaire';
-import { plainToClass } from 'class-transformer';
-import Container, { Service } from 'typedi';
-import { Repository, getRepository } from 'typeorm';
-import { StudentService } from './StudentService'; */
 import {
   RatingQuestionnaire,
   RatingQuestionnaireCreateInput,
@@ -70,12 +65,11 @@ export class RatingQuestionnaireService {
   public async createRatingQuestionnaire(
     data: RatingQuestionnaireCreateInput
   ): Promise<RatingQuestionnaire> {
-    data.ratings_m = Array(12).fill(0);
     const rq = await prisma.ratingQuestionnaire.create({ data });
     return rq;
   }
 
-  public async createRatingQuestionnaireByIds(
+  public async createRatingQuestionnaireByStudent(
     bearer: string,
     lectureId: number,
     data: RatingQuestionnaireUncheckedCreateInput
@@ -85,32 +79,11 @@ export class RatingQuestionnaireService {
       throw new Error('Not a student!');
     }
     const student = user.userData as Student;
-    data.ratings_m = Array(12).fill(0);
     data.studentId = student.id;
     data.lectureId = lectureId;
     const rq = await prisma.ratingQuestionnaire.create({ data });
     return rq;
   }
-
-  // public async createByStudentNimLecture(
-  //   nim: string,
-  //   lectureId: number,
-  //   rq: RatingQuestionnaire
-  // ): Promise<RatingQuestionnaire> {
-  //   try {
-  //     const student = await Container.get(StudentService).getStudentByNim(nim);
-  //     const result = await this.ratingQuestionnaireRepository.save(
-  //       plainToClass(RatingQuestionnaire, {
-  //         studentId: student.id,
-  //         lectureId: lectureId,
-  //         ...rq,
-  //       })
-  //     );
-  //     return result;
-  //   } catch (err) {
-  //     throw new EvalError(`Error on questionnaire ${nim}: ${err.message}`);
-  //   }
-  // }
 
   public async updateRatingQuestionnaire(
     studentId: number,
@@ -124,8 +97,7 @@ export class RatingQuestionnaireService {
     return rq;
   }
 
-  //TODO: Who can use this?
-  public async updateRatingQuestionnaireByIds(
+  public async updateRatingQuestionnaireByStudent(
     bearer: string,
     lectureId: number,
     data: RatingQuestionnaireUncheckedUpdateInput
@@ -135,7 +107,6 @@ export class RatingQuestionnaireService {
       throw new Error('Not a student!');
     }
     const student = user.userData as Student;
-    data.ratings_m = Array(12).fill(0);
     const studentId = student.id;
     const rq = await prisma.ratingQuestionnaire.update({
       where: { studentId_lectureId: { studentId, lectureId } },
