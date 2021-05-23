@@ -1,26 +1,43 @@
 import 'reflect-metadata';
-import Lecture from '@/entity/Lecture';
+import {
+  Lecture,
+  LectureCreateInput,
+  LectureUpdateInput,
+} from '@/models/Lecture';
 import { LectureService } from '@/services/LectureService';
+import { GradeService } from '@/services/GradeService';
 import {
   Body,
+  BodyParam,
   Delete,
   Get,
   JsonController,
   Param,
   Post,
   Put,
+  QueryParams,
+  UploadedFile,
+  UseBefore,
 } from 'routing-controllers';
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 import { LectureResponse } from './response/LectureResponse';
-import { CreateLectureBody, UpdateLectureBody } from './request/LectureRequest';
-import { CourseAssessmentResponse } from './response/CourseAssessmentResponse';
+import {
+  CreateLectureBody,
+  GetLecturesQuery,
+  UpdateLectureBody,
+} from './request/LectureRequest';
+import {
+  CourseAssessment,
+  CourseAssessmentResponse,
+} from './response/CourseAssessmentResponse';
+import Container from 'typedi';
+import { LectureHistoryService } from '@/services/LectureHistoryService';
+import { Student } from '@/models/Student';
+import express from 'express';
+import { fileUploadOptions } from '@/services/UploadService';
 
 @JsonController('/lectures')
 export class LectureController {
-  constructor(private lectureService: LectureService) {
-    this.lectureService = lectureService;
-  }
-
   @Get('/')
   @ResponseSchema(LectureResponse, { isArray: true })
   @OpenAPI({
@@ -31,123 +48,36 @@ export class LectureController {
       },
     },
   })
-  public getAllLectures() {
-    return this.lectureService.getAllLectures();
+  public async getAllLectures(): Promise<Lecture[]> {
+    return Container.get(LectureService).getAllLectures();
   }
 
-  @Get('/course/:id')
-  @ResponseSchema(LectureResponse)
+  @Get('/query/')
+  @ResponseSchema(LectureResponse, { isArray: true })
   @OpenAPI({
-    description: 'Get Lecture by course',
+    description: 'Get all Lectures',
     responses: {
       '200': {
         description: 'OK',
       },
     },
   })
-  public getLectureByCourse(@Param('id') id: number) {
-    return this.lectureService.getLectureByCourse(id);
-  }
+  public async getAllLecturesByQuery(
+    @QueryParams() query: GetLecturesQuery
+  ): Promise<Lecture[]> {
+    const { year, semester } = query;
 
-  @Get('/year/:year')
-  @ResponseSchema(LectureResponse)
-  @OpenAPI({
-    description: 'Get Lecture by year',
-    responses: {
-      '200': {
-        description: 'OK',
-      },
-    },
-  })
-  public getLectureByYear(@Param('year') year: number) {
-    return this.lectureService.getLectureByYear(year);
-  }
-
-  @Get('/year/:year/:semester')
-  @ResponseSchema(LectureResponse)
-  @OpenAPI({
-    description: 'Get Lecture by year and semester',
-    responses: {
-      '200': {
-        description: 'OK',
-      },
-    },
-  })
-  public getLectureByYearSemester(
-    @Param('year') year: number,
-    @Param('semester') semester: number
-  ) {
-    return this.lectureService.getLectureByYearSemester(year, semester);
-  }
-
-  @Get('/co/:id/:lo')
-  @ResponseSchema(LectureResponse)
-  @OpenAPI({
-    description: 'Get course outcome per LO by lecture id',
-    responses: {
-      '200': {
-        description: 'OK',
-      },
-    },
-  })
-  public getCOperLO(@Param('id') id: number, @Param('lo') lo: string) {
-    return this.lectureService.getCourseOutcomeLO(id, lo);
-  }
-
-  @Get('/co/:id')
-  @ResponseSchema(LectureResponse)
-  @OpenAPI({
-    description: 'Get course outcome by lecture id',
-    responses: {
-      '200': {
-        description: 'OK',
-      },
-    },
-  })
-  public getCO(@Param('id') id: number) {
-    return this.lectureService.getCourseOutcome(id);
-  }
-
-  @Get('/ca/teacher/:id')
-  @ResponseSchema(CourseAssessmentResponse)
-  @OpenAPI({
-    description: 'Get course assessment by teacher id',
-    responses: {
-      '200': {
-        description: 'OK',
-      },
-    },
-  })
-  public getTeacherCA(@Param('id') id: number) {
-    return this.lectureService.getCourseAssessmentByTeacherId(id);
-  }
-
-  @Get('/ca/:id')
-  @ResponseSchema(LectureResponse)
-  @OpenAPI({
-    description: 'Get course assessment by lecture id',
-    responses: {
-      '200': {
-        description: 'OK',
-      },
-    },
-  })
-  public getCA(@Param('id') id: number) {
-    return this.lectureService.getCourseAssessmentByID(id);
-  }
-
-  @Get('/ca')
-  @ResponseSchema(CourseAssessmentResponse)
-  @OpenAPI({
-    description: 'Get all detailed course assessment',
-    responses: {
-      '200': {
-        description: 'OK',
-      },
-    },
-  })
-  public getAllCA() {
-    return this.lectureService.getCourseAssessment();
+    if (year && semester) {
+      return await Container.get(LectureService).getLectureBySemester(
+        year,
+        semester
+      );
+    } else if (year && !semester) {
+      return await Container.get(LectureService).getLectureByYear(year);
+    } else if (!year && !semester) {
+      return await Container.get(LectureService).getAllLectures();
+    }
+    throw new Error('Year must exist if semester exist');
   }
 
   @Get('/:id')
@@ -160,8 +90,91 @@ export class LectureController {
       },
     },
   })
-  public getOneLecture(@Param('id') id: number) {
-    return this.lectureService.getLectureById(id);
+  public async getLectureById(@Param('id') id: number): Promise<Lecture> {
+    return await Container.get(LectureService).getLectureById(id);
+  }
+
+  @Get('/:id/students')
+  @ResponseSchema(LectureResponse)
+  @OpenAPI({
+    description: 'Get one Lecture',
+    responses: {
+      '200': {
+        description: 'OK',
+      },
+    },
+  })
+  public async getStudentsByLectureId(
+    @Param('id') id: number
+  ): Promise<Student[]> {
+    const history = await Container.get(
+      LectureHistoryService
+    ).getLectureHistoryByLectureId(id);
+    const students = history.map((h) => h.student);
+    return students;
+  }
+
+  @Get('learning-outcomes/:year/:semester')
+  @ResponseSchema(CourseAssessmentResponse)
+  @OpenAPI({
+    description: 'Get course assessment by teacher id',
+    responses: {
+      '200': {
+        description: 'OK',
+      },
+    },
+  })
+  public async getLearningOutcomeBySemester(
+    @Param('year') year: number,
+    @Param('semester') semester: number
+  ): Promise<number[]> {
+    return await Container.get(LectureService).getLoAssessmentbySemester(
+      year,
+      semester
+    );
+  }
+
+  // TODO: Course Assessment
+  @Get('/:id/course-assessment')
+  @ResponseSchema(CourseAssessmentResponse)
+  @OpenAPI({
+    description: 'Get course assessment by teacher id',
+    responses: {
+      '200': {
+        description: 'OK',
+      },
+    },
+  })
+  public async getCourseAssessmentByLectureId(
+    @Param('id') id: number
+  ): Promise<number> {
+    return await Container.get(LectureService).getCourseAssessmentByID(id);
+  }
+
+  // TODO: Course Assessment
+  @Get('/course-assessment/:year/:semester')
+  @ResponseSchema(CourseAssessmentResponse)
+  @OpenAPI({
+    description: 'Get course assessment by teacher id',
+    responses: {
+      '200': {
+        description: 'OK',
+      },
+    },
+  })
+  public async getCourseAssessment(
+    @Param('year') year: number,
+    @Param('semester') semester: number
+  ): Promise<CourseAssessment[]> {
+    const lectures = await Container.get(LectureService).getLectureBySemester(
+      year,
+      semester
+    );
+    const detailedCA = await Container.get(LectureService).getDetailedCA(
+      lectures
+    );
+
+    return detailedCA;
   }
 
   @Post('/')
@@ -177,8 +190,36 @@ export class LectureController {
       },
     },
   })
-  public createLecture(@Body() lecture: CreateLectureBody) {
-    return this.lectureService.createLecture(lecture as Lecture);
+  public createLecture(@Body() lecture: LectureCreateInput): Promise<Lecture> {
+    return Container.get(LectureService).createLecture(lecture);
+  }
+
+  @Post('/:id/grades')
+  @UseBefore(express.urlencoded({ extended: true }))
+  @OpenAPI({
+    description:
+      'Upload grade using Excel file. Use form data and insert the file using file field.',
+    responses: {
+      '200': {
+        description: 'OK',
+      },
+    },
+  })
+  public async uploadGrade(
+    @UploadedFile('file', { required: true, options: fileUploadOptions() })
+    file: Express.Multer.File,
+    @Param('id') id: number,
+    @BodyParam('year') year: number,
+    @BodyParam('semester') semester: number
+  ): Promise<{ errors: Error[] }> {
+    if (!id || !year || !semester) throw new Error('Provide necessary info.');
+    const result = Container.get(GradeService).createBulk(
+      id,
+      year,
+      semester,
+      file
+    );
+    return result;
   }
 
   @Put('/:id')
@@ -193,9 +234,12 @@ export class LectureController {
   })
   public async updateLecture(
     @Param('id') id: number,
-    @Body() lecture: UpdateLectureBody
-  ) {
-    return await this.lectureService.updateLecture(id, lecture as Lecture);
+    @Body() lecture: LectureUpdateInput
+  ): Promise<Lecture> {
+    return await Container.get(LectureService).updateLecture(
+      id,
+      lecture as Lecture
+    );
   }
 
   @Delete('/:id')
@@ -207,7 +251,7 @@ export class LectureController {
       },
     },
   })
-  public removeLecture(@Param('id') id: number) {
-    return this.lectureService.deleteLecture(id);
+  public async removeLecture(@Param('id') id: number): Promise<Lecture> {
+    return await Container.get(LectureService).deleteLecture(id);
   }
 }

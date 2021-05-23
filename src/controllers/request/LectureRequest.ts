@@ -24,3 +24,13 @@ export class UpdateLectureBody {
   @IsOptional()
   public year: number;
 }
+
+export class GetLecturesQuery {
+  @IsNumber()
+  @IsOptional()
+  public year?: number;
+
+  @IsNumber()
+  @IsOptional()
+  public semester?: number;
+}

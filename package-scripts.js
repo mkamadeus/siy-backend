@@ -53,7 +53,7 @@ module.exports = {
       },
       fix: {
         script:
-          'prettier --config .prettierrc "src/**/*.ts" --write && eslint . --ext .ts --fix --max-warnings=0',
+          'prettier --config .prettierrc "src/**/*.ts" --write && eslint . --ext .ts --fix',
         description: 'Fix linting errors in the project.',
       },
     },

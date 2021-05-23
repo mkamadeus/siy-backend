@@ -2,7 +2,7 @@ import { Grade } from '.prisma/client';
 import {
   calculateSemesterGpa,
   calculateCumulativeLo,
-  calculateGpa,
+  calculateAverageGrade,
   calculateSemesterLo,
 } from '@/utils/GradeUtils';
 import { expect } from 'chai';
@@ -11,7 +11,7 @@ describe('Grade utils test', () => {
   describe('General test', () => {
     const grades = [4.0, 3.5, 3.75];
     it('should average correctly', () => {
-      const result = calculateGpa(grades);
+      const result = calculateAverageGrade(grades);
       expect(result).to.be.eq(3.75);
     });
   });

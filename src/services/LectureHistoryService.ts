@@ -1,11 +1,13 @@
 import { Service } from 'typedi';
 import {
-  AcademicYear,
+  // AcademicYear,
   LectureHistory,
   LectureHistoryCreateInput,
   LectureHistoryUpdateInput,
 } from '@/models/LectureHistory';
 import { prisma } from '@/repository/prisma';
+import { Student } from '@/models/Student';
+// import { StudentService } from './StudentService';
 
 @Service()
 export class LectureHistoryService {
@@ -18,12 +20,12 @@ export class LectureHistoryService {
 
   public async getLectureHistoryById(
     studentId: number,
-    lectureId: number,
-    gradeId: number
+    lectureId: number
+    // gradeId: number
   ): Promise<LectureHistory> {
     const history = await prisma.lectureHistory.findFirst({
       include: { lecture: true, student: true, grade: true },
-      where: { lectureId, studentId, gradeId },
+      where: { lectureId, studentId },
     });
     return history;
   }
@@ -46,6 +48,34 @@ export class LectureHistoryService {
       where: { lectureId },
     });
     return history;
+  }
+
+  public async getLectureHistoryByGradeId(
+    gradeId: number
+  ): Promise<LectureHistory> {
+    const history = await prisma.lectureHistory.findFirst({
+      include: { lecture: true, student: true, grade: true },
+      where: { gradeId },
+    });
+    return history;
+  }
+
+  // TO DO : GET STUDENT LIST BY LECTURE ID
+  public async getStudentListByLectureId(
+    lectureId: number
+  ): Promise<Student[]> {
+    const lecHistories = await this.getLectureHistoryByLectureId(lectureId);
+
+    let arrStudents = [];
+
+    lecHistories.forEach((lec) => {
+      arrStudents.push(lec.student);
+    });
+
+    // uncomment for debugging
+    // console.log(arrStudents);
+
+    return arrStudents;
   }
 
   // public async getLectureHistoryBetweenAcademicYear(
@@ -71,52 +101,49 @@ export class LectureHistoryService {
     const history = await prisma.lectureHistory.create({ data });
     return this.getLectureHistoryById(
       history.studentId,
-      history.lectureId,
-      history.gradeId
+      history.lectureId
+      // history.gradeId
     );
   }
 
   public async updateLectureHistory(
     studentId: number,
     lectureId: number,
-    gradeId: number,
     data: LectureHistoryUpdateInput
   ): Promise<LectureHistory> {
     const history = await prisma.lectureHistory.update({
       where: {
-        studentId_lectureId_gradeId: {
+        studentId_lectureId: {
           studentId,
           lectureId,
-          gradeId,
         },
       },
       data,
     });
     return this.getLectureHistoryById(
       history.studentId,
-      history.lectureId,
-      history.gradeId
+      history.lectureId
+      // history.gradeId
     );
   }
 
   public async deleteLectureHistory(
     studentId: number,
     lectureId: number,
-    gradeId: number
   ): Promise<LectureHistory> {
     const history = await prisma.lectureHistory.delete({
       where: {
-        studentId_lectureId_gradeId: {
+        studentId_lectureId: {
           studentId,
           lectureId,
-          gradeId,
+          // gradeId,
         },
       },
     });
     return this.getLectureHistoryById(
       history.studentId,
-      history.lectureId,
-      history.gradeId
+      history.lectureId
+      // history.gradeId
     );
   }
 }

@@ -1,17 +1,18 @@
 import { IndexValueEnum } from '@/enum/IndexEnum';
 import { LoEntry, LoOwner } from '@/enum/LoEnum';
-import { Grade } from '@/models/Grade';
+import { Grade, GradeCreateInput, GradeUpdateInput } from '@/models/Grade';
+import { Student } from '@/models/Student';
 import { AcademicYear } from '@/models/LectureHistory';
 import { prisma } from '@/repository/prisma';
 import {
-  calculateGpa,
-  calculateSemesterGpa,
-  calculateSemesterLo,
+  calculateAverageGrade,
+  // calculateSemesterGpa,
+  calculateAverageLo,
+  calculateGradeLO,
 } from '@/utils/GradeUtils';
 import {
   getMinAcademicYear,
   getMaxAcademicYear,
-  getAcademicYear,
   isAcademicYearBetween,
   incrementAcademicYear,
 } from '@/utils/LectureHistoryUtils';
@@ -19,7 +20,7 @@ import { plainToClass } from 'class-transformer';
 import Container, { Service } from 'typedi';
 import { CourseService } from './CourseService';
 import { LectureHistoryService } from './LectureHistoryService';
-import { LectureService } from './LectureService';
+// import { LectureService } from './LectureService';
 import { StudentService } from './StudentService';
 import { UploadService } from './UploadService';
 
@@ -103,7 +104,20 @@ export class GradeService {
       year,
       semester
     );
-    const semesterGpa = calculateSemesterGpa(grades);
+
+    var credits = [];
+
+    for (const grade of grades) {
+      const lecHistory = await Container.get(
+        LectureHistoryService
+      ).getLectureHistoryByGradeId(grade.id);
+      const course = await Container.get(CourseService).getCourseById(
+        lecHistory.lecture.courseId
+      );
+      credits.push(course.credits);
+    }
+
+    const semesterGpa = calculateAverageGrade(credits, grades);
     return semesterGpa;
   }
 
@@ -147,9 +161,53 @@ export class GradeService {
    * @param nim NIM of the student
    */
   public async getGpaByStudentId(studentId: number): Promise<number> {
-    const semesterGpas = await this.getAllSemesterGpaByStudentId(studentId);
-    const gpa = calculateGpa(semesterGpas);
+    const grades = await this.getGradesByStudentId(studentId); // get all grades
+    var credits = [];
+
+    for (const grade of grades) {
+      const lecHistory = await Container.get(
+        LectureHistoryService
+      ).getLectureHistoryByGradeId(grade.id);
+      const course = await Container.get(CourseService).getCourseById(
+        lecHistory.lecture.courseId
+      );
+      credits.push(course.credits);
+    }
+
+    const gpa = calculateAverageGrade(credits, grades);
     return gpa;
+  }
+
+  /**
+   *
+   * @param studentId
+   * @returns
+   */
+  public async getCumulativeLoByStudentId(studentId): Promise<number[]> {
+    const grades = await this.getGradesByStudentId(studentId);
+
+    return await this.getAvgLo(grades);
+  }
+
+  /**
+   *
+   * @param nim Student's NIM
+   * @returns Cumulative LO for the student
+   */
+  public async getCumulativeLoByNim(nim: string) {
+    const grades = await this.getGradesByNim(nim);
+
+    return await this.getAvgLo(grades);
+  }
+
+  public async getSemesterLoByNIM(
+    nim: string,
+    year: number,
+    semester: number
+  ): Promise<number[]> {
+    const grades = await this.getGradesByNimPerSemester(nim, year, semester);
+
+    return await this.getAvgLo(grades);
   }
 
   public async getSemesterLoByStudentId(
@@ -162,149 +220,32 @@ export class GradeService {
       year,
       semester
     );
-    const semesterLo = calculateSemesterLo(grades);
-    return semesterLo;
+
+    return await this.getAvgLo(grades);
   }
 
-  // TODO: Get LO by student ID
-  public async getLoByStudentId(): Promise<number[]> {
-    return [];
-    // const totalLo: LoEntry = {
-    //   loA: 0,
-    //   loB: 0,
-    //   loC: 0,
-    //   loD: 0,
-    //   loE: 0,
-    //   loF: 0,
-    //   loG: 0,
-    // };
+  public async getAvgLo(grades: Grade[]): Promise<number[]> {
+    var weights = [];
+    for (const grade of grades) {
+      const lecHistory = await Container.get(
+        LectureHistoryService
+      ).getLectureHistoryByGradeId(grade.id);
+      const kmtWeight = lecHistory.lecture.loKmtWeight;
+      weights.push(kmtWeight);
+    }
+    const lo = calculateAverageLo(weights, grades);
+    return lo;
+  }
 
-    // const lecture = await Container.get(LectureService).getLectureById(
-    //   grade.lectureId
-    // );
-    // const loATotalWeight =
-    //   lecture.loAMidWeight +
-    //   lecture.loAQuizWeight +
-    //   lecture.loAFinalWeight +
-    //   lecture.loAPracticumWeight +
-    //   lecture.loAHomeworkWeight;
-    // const loBTotalWeight =
-    //   lecture.loBMidWeight +
-    //   lecture.loBQuizWeight +
-    //   lecture.loBFinalWeight +
-    //   lecture.loBPracticumWeight +
-    //   lecture.loBHomeworkWeight;
-    // const loCTotalWeight =
-    //   lecture.loCMidWeight +
-    //   lecture.loCQuizWeight +
-    //   lecture.loCFinalWeight +
-    //   lecture.loCPracticumWeight +
-    //   lecture.loCHomeworkWeight;
-    // const loDTotalWeight =
-    //   lecture.loDMidWeight +
-    //   lecture.loDQuizWeight +
-    //   lecture.loDFinalWeight +
-    //   lecture.loDPracticumWeight +
-    //   lecture.loDHomeworkWeight;
-    // const loETotalWeight =
-    //   lecture.loEMidWeight +
-    //   lecture.loEQuizWeight +
-    //   lecture.loEFinalWeight +
-    //   lecture.loEPracticumWeight +
-    //   lecture.loEHomeworkWeight;
-    // const loFTotalWeight =
-    //   lecture.loFMidWeight +
-    //   lecture.loFQuizWeight +
-    //   lecture.loFFinalWeight +
-    //   lecture.loFPracticumWeight +
-    //   lecture.loFHomeworkWeight;
-    // const loGTotalWeight =
-    //   lecture.loGMidWeight +
-    //   lecture.loGQuizWeight +
-    //   lecture.loGFinalWeight +
-    //   lecture.loGPracticumWeight +
-    //   lecture.loGHomeworkWeight;
-    // totalLo.loA =
-    //   loATotalWeight > 0
-    //     ? ((grade.midTest * lecture.loAMidWeight +
-    //         grade.quiz * lecture.loAQuizWeight +
-    //         grade.finalTest * lecture.loAFinalWeight +
-    //         grade.practicum * lecture.loAPracticumWeight +
-    //         grade.homework * lecture.loAHomeworkWeight) *
-    //         4) /
-    //       (loATotalWeight * 100)
-    //     : 0;
-    // totalLo.loB =
-    //   loBTotalWeight > 0
-    //     ? ((grade.midTest * lecture.loBMidWeight +
-    //         grade.quiz * lecture.loBQuizWeight +
-    //         grade.finalTest * lecture.loBFinalWeight +
-    //         grade.practicum * lecture.loBPracticumWeight +
-    //         grade.homework * lecture.loBHomeworkWeight) *
-    //         4) /
-    //       (loBTotalWeight * 100)
-    //     : 0;
-    // totalLo.loC =
-    //   loCTotalWeight > 0
-    //     ? ((grade.midTest * lecture.loCMidWeight +
-    //         grade.quiz * lecture.loCQuizWeight +
-    //         grade.finalTest * lecture.loCFinalWeight +
-    //         grade.practicum * lecture.loCPracticumWeight +
-    //         grade.homework * lecture.loCHomeworkWeight) *
-    //         4) /
-    //       (loCTotalWeight * 100)
-    //     : 0;
-    // totalLo.loD =
-    //   loDTotalWeight > 0
-    //     ? ((grade.midTest * lecture.loDMidWeight +
-    //         grade.quiz * lecture.loDQuizWeight +
-    //         grade.finalTest * lecture.loDFinalWeight +
-    //         grade.practicum * lecture.loDPracticumWeight +
-    //         grade.homework * lecture.loDHomeworkWeight) *
-    //         4) /
-    //       (loDTotalWeight * 100)
-    //     : 0;
-    // totalLo.loE =
-    //   loETotalWeight > 0
-    //     ? ((grade.midTest * lecture.loEMidWeight +
-    //         grade.quiz * lecture.loEQuizWeight +
-    //         grade.finalTest * lecture.loEFinalWeight +
-    //         grade.practicum * lecture.loEPracticumWeight +
-    //         grade.homework * lecture.loEHomeworkWeight) *
-    //         4) /
-    //       (loETotalWeight * 100)
-    //     : 0;
-    // totalLo.loF =
-    //   loFTotalWeight > 0
-    //     ? ((grade.midTest * lecture.loFMidWeight +
-    //         grade.quiz * lecture.loFQuizWeight +
-    //         grade.finalTest * lecture.loFFinalWeight +
-    //         grade.practicum * lecture.loFPracticumWeight +
-    //         grade.homework * lecture.loFHomeworkWeight) *
-    //         4) /
-    //       (loFTotalWeight * 100)
-    //     : 0;
-    // totalLo.loG =
-    //   loGTotalWeight > 0
-    //     ? ((grade.midTest * lecture.loGMidWeight +
-    //         grade.quiz * lecture.loGQuizWeight +
-    //         grade.finalTest * lecture.loGFinalWeight +
-    //         grade.practicum * lecture.loGPracticumWeight +
-    //         grade.homework * lecture.loGHomeworkWeight) *
-    //         4) /
-    //       (loGTotalWeight * 100)
-    //     : 0;
+  public async getGradeLo(grade: Grade): Promise<number[]> {
+    const lecHistory = await Container.get(
+      LectureHistoryService
+    ).getLectureHistoryByGradeId(grade.id);
 
-    // grade.loA = totalLo.loA;
-    // grade.loB = totalLo.loB;
-    // grade.loC = totalLo.loC;
-    // grade.loD = totalLo.loD;
-    // grade.loE = totalLo.loE;
-    // grade.loF = totalLo.loF;
-    // grade.loG = totalLo.loG;
+    const lecture = lecHistory.lecture;
+    const lo = calculateGradeLO(lecture, grade);
 
-    // await prisma.grade.update(grade.id, grade);
-    // return totalLo;
+    return lo;
   }
 
   /**
@@ -312,92 +253,98 @@ export class GradeService {
    * @param id Grade ID
    * @returns LO after being calculated
    */
-  public async getLoById(id: number): number[] {
+  public async getLoById(id: number): Promise<number[]> {
     const grade = await this.getGradeById(id);
-    return await this.getLo(grade);
+    return await this.getGradeLo(grade);
   }
 
-  public async getLoByLectureId(lectureId: number) {
-    const grades = await this.getGradesByLectureId(lectureId);
-    const loWithOwners: LoOwner[] = await Promise.all(
-      grades.map(async (grade) => {
-        const los = await this.getLoById(grade.id);
-        return {
-          gradeId: grade.id,
-          los,
-        };
-      })
-    );
-    return loWithOwners;
+  // TODO: Get LO by student ID
+  public async getLoByStudentId(id): Promise<number[]> {
+    const lo = await this.getCumulativeLoByStudentId(id);
+    return lo;
+  }
+
+  // public async getLoByLectureId(lectureId: number) {
+  //   const grades = await this.getGradesByLectureId(lectureId);
+  //   const loWithOwners: LoOwner[] = await Promise.all(
+  //     grades.map(async (grade) => {
+  //       const los = await this.getLoById(grade.id);
+  //       return {
+  //         gradeId: grade.id,
+  //         los,
+  //       };
+  //     })
+  //   );
+  //   return loWithOwners;
+  // }
+
+  public async updateAll(grade: Grade): Promise<Grade> {
+    // update local LO, cumulative LO, GPA
+    const updatedGrade = await this.updateLO(grade);
+    await this.updateCumulativeLO(updatedGrade);
+    await this.updateGPA(updatedGrade);
+
+    return updatedGrade;
   }
 
   /**
-   *
-   * @param nim Student's NIM
-   * @returns Cumulative LO for the student
+   * Menyesuaikan nilai LO dengan inputan instance grade
+   * @param grade instance yang diupdate
+   * @returns grade dengan LO sudah terupdate
    */
-  public async getCumulativeLoByNim(nim: string) {
-    const grades = await this.getGradesByNim(nim);
+  public async updateLO(grade: Grade): Promise<Grade> {
+    const lo = await this.getGradeLo(grade);
 
-    return await this.getCumulativeSum(grades);
+    const updatedGrade = await prisma.grade.update({
+      where: { id: grade.id },
+      data: { lo: lo },
+    });
+
+    return updatedGrade;
   }
 
-  public async getLOPerSemester(nim: string, year: number, semester: number) {
-    const grades = await this.getGradesByNimPerSemester(nim, year, semester);
+  public async updateCumulativeLO(grade: Grade): Promise<Student> {
+    // update LO
 
-    return await this.getCumulativeSum(grades);
+    const lecHistory = await Container.get(
+      LectureHistoryService
+    ).getLectureHistoryByGradeId(grade.id);
+
+    const student = lecHistory.student;
+
+    const lo = await this.getCumulativeLoByStudentId(student.id);
+    const updatedStudent = Container.get(StudentService).updateStudentLO(
+      student.id,
+      lo
+    );
+    // await prisma.student.update({
+    //   where: { id: student.id },
+    //   data: { lok: lo },
+    // });
+
+    return updatedStudent;
   }
 
-  public async getCumulativeSum(grades: Grade[]) {
-    let cumulativeSum: LoEntry = {
-      loA: 0,
-      loB: 0,
-      loC: 0,
-      loD: 0,
-      loE: 0,
-      loF: 0,
-      loG: 0,
-    };
+  public async updateGPA(grade: Grade): Promise<Student> {
+    const lecHistory = await Container.get(
+      LectureHistoryService
+    ).getLectureHistoryByGradeId(grade.id);
 
-    const totalWeight: LoEntry = {
-      loA: 0,
-      loB: 0,
-      loC: 0,
-      loD: 0,
-      loE: 0,
-      loF: 0,
-      loG: 0,
-    };
+    const student = lecHistory.student;
 
-    for (const grade of grades) {
-      const loList = await this.getLo(grade);
-      const kmtList = await Container.get(LectureService).getKMT(
-        grade.lectureId
-      );
-      if (cumulativeSum) {
-        for (const key in cumulativeSum) {
-          cumulativeSum[key] += loList[key] * kmtList[key];
-          totalWeight[key] += kmtList[key];
-        }
-      } else {
-        cumulativeSum = loList;
-      }
-    }
-
-    for (const key in cumulativeSum) {
-      if (totalWeight[key] == 0) {
-        cumulativeSum[key] = 0;
-      } else {
-        cumulativeSum[key] /= totalWeight[key];
-      }
-    }
-
-    return cumulativeSum;
+    const gpa = await this.getGpaByStudentId(student.id);
+    const updatedStudent = Container.get(StudentService).updateStudentGPA(
+      student.id,
+      gpa
+    );
+    return updatedStudent;
   }
 
-  public async create(studentGrade: Grade): Promise<Grade> {
-    const result = await prisma.grade.save(studentGrade);
-    return this.updateLO(result);
+  public async createGrade(data: GradeCreateInput): Promise<Grade> {
+    const result = await prisma.grade.create({ data });
+    const updatedGrade = await this.updateAll(result);
+
+    return updatedGrade;
   }
 
   public async createByNim(nim: string, studentGrade: Grade): Promise<Grade> {
@@ -450,7 +397,7 @@ export class GradeService {
           semester,
           ...gradeArray[i],
         };
-        await this.createByNim(nimArray[i], body as Grade);
+        await this.createByNim(nimArray[i], body);
       } catch (err) {
         errorArray.push((err as Error).message);
       }
@@ -459,47 +406,28 @@ export class GradeService {
     return { errors: errorArray };
   }
 
-  public async updateGrade(
-    id: number,
-    studentGrade: Partial<Grade>
-  ): Promise<Grade> {
-    studentGrade.id = id;
-    // await prisma.grade.update(
-    //   studentGrade.id,
-    //   plainToClass(Grade, { id: studentGrade.id, ...studentGrade })
-    // );
-    await prisma.grade.save(plainToClass(Grade, studentGrade));
+  public async updateGrade(id: number, data: GradeUpdateInput): Promise<Grade> {
+    await prisma.grade.update({ where: { id }, data });
     const grade = await this.getGradeById(id);
-    return await this.updateLO(grade);
+
+    return await this.updateAll(grade);
   }
 
-  public async updateLO(grade: Grade): Promise<Grade> {
-    // update LO
-    // const grade = await Container.get(GradeService).getOne(this.id);
-    const student = await Container.get(StudentService).getStudentById(
-      grade.studentId
-    );
-    const lo = await Container.get(GradeService).getCumulativeLoByNim(
-      student.nim
-    );
-
-    await Container.get(StudentService).updateStudent(student.id, { ...lo });
-
-    return this.getGradeById(grade.id);
+  public async delete(id: number): Promise<Grade> {
+    const grade = await prisma.grade.delete({ where: { id } });
+    return grade;
   }
 
-  public async updateByNim(nim: string, studentGrade: Grade): Promise<Grade> {
-    const student = await Container.get(StudentService).getStudentByNim(nim);
+  // public async updateByNim(
+  //   nim: string,
+  //   data: GradeUpdateInput
+  // ): Promise<Grade> {
+  //   const student = await Container.get(StudentService).getStudentByNim(nim);
 
-    await prisma.grade.update(
-      student.id,
-      plainToClass(Grade, { studentId: student.id, ...studentGrade })
-    );
-    return this.getGradeById(student.id);
-  }
-
-  public async delete(id: number): Promise<void> {
-    await prisma.grade.delete(id);
-    return;
-  }
+  //   await prisma.grade.update(
+  //     student.id,
+  //     plainToClass(Grade, { studentId: student.id, ...studentGrade })
+  //   );
+  //   return this.getGradeById(student.id);
+  // }
 }
