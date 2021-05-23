@@ -84,7 +84,7 @@ describe('Grade utils test', () => {
 
     it('Calculate grade LO', () => {
       const result = calculateGradeLo(lecture, grade);
-      expect(result).to.eql([67, 68.4, 53, 60, 60, 0, 60]);
+      expect(result).to.eql([2.68, 2.736, 2.12, 2.4, 2.4, 0, 2.4]);
     });
 
     const weights = [

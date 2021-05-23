@@ -4,7 +4,6 @@ import { AcademicYear } from '@/models/LectureHistory';
 import { prisma } from '@/repository/prisma';
 import {
   calculateAverageGrade,
-  // calculateSemesterGpa,
   calculateAverageLo,
   calculateGradeLo,
 } from '@/utils/GradeUtils';
@@ -14,13 +13,13 @@ import {
   isAcademicYearBetween,
   incrementAcademicYear,
 } from '@/utils/LectureHistoryUtils';
-import { plainToClass } from 'class-transformer';
+// import { plainToClass } from 'class-transformer';
 import Container, { Service } from 'typedi';
 import { CourseService } from './CourseService';
 import { LectureHistoryService } from './LectureHistoryService';
-// import { LectureService } from './LectureService';
 import { StudentService } from './StudentService';
 import { UploadService } from './UploadService';
+import { StudentGradeIndex } from '@prisma/client';
 
 @Service()
 export class GradeService {
@@ -86,6 +85,19 @@ export class GradeService {
   ): Promise<Grade[]> {
     const student = await Container.get(StudentService).getStudentByNim(nim);
     return this.getGradesByStudentIdPerSemester(student.id, year, semester);
+  }
+
+  public async getGradeByStudentLectureId(
+    studentId: number,
+    lectureId: number
+    // year: number,
+    // semester: number
+  ): Promise<Grade> {
+    const lecHistory = await Container.get(
+      LectureHistoryService
+    ).getLectureHistoryById(studentId, lectureId);
+    const grade = await this.getGradeById(lecHistory.gradeId);
+    return grade;
   }
 
   /**
@@ -355,20 +367,20 @@ export class GradeService {
     return updatedGrade;
   }
 
-  public async createByNim(nim: string, studentGrade: Grade): Promise<Grade> {
-    try {
-      const student = await Container.get(StudentService).getStudentByNim(nim);
-      const result = await prisma.grade.create(
-        plainToClass(Grade, {
-          studentId: student.id,
-          ...studentGrade,
-        })
-      );
-      return result;
-    } catch (err) {
-      throw new EvalError(`Error on ${nim}: ${err.message}`);
-    }
-  }
+  // public async createByNim(nim: string, studentGrade: Grade): Promise<Grade> {
+  // try {
+  //   const student = await Container.get(StudentService).getStudentByNim(nim);
+  //   const result = await prisma.grade.create(
+  //     plainToClass(Grade, {
+  //       studentId: student.id,
+  //       ...studentGrade,
+  //     })
+  //   );
+  //   return result;
+  // } catch (err) {
+  //   throw new EvalError(`Error on ${nim}: ${err.message}`);
+  // }
+  // }
 
   public async createBulk(
     lectureId: number,
@@ -384,12 +396,12 @@ export class GradeService {
     const gradeArray = fileContent.map((row) => {
       const grades = row.slice(2);
       return {
-        finalTest: parseFloat(grades[0].toString()),
-        midTest: parseFloat(grades[1].toString()),
+        midTest: parseFloat(grades[0].toString()),
+        finalTest: parseFloat(grades[1].toString()),
         practicum: parseFloat(grades[2].toString()),
-        homework: parseFloat(grades[3].toString()),
-        quiz: parseFloat(grades[4].toString()),
-        index: grades[6].toString(),
+        quiz: parseFloat(grades[3].toString()),
+        homework: parseFloat(grades[4].toString()),
+        grade: StudentGradeIndex[grades[6].toString()],
       };
     });
 
@@ -400,12 +412,30 @@ export class GradeService {
     for (let i = 0; i < nimArray.length; i++) {
       try {
         const body = {
-          lectureId,
-          year,
-          semester,
           ...gradeArray[i],
         };
-        await this.createByNim(nimArray[i], body);
+
+        const student = await Container.get(StudentService).getStudentByNim(
+          nimArray[i]
+        );
+        const grade = await this.getGradeByStudentLectureId(
+          student.id,
+          lectureId
+        );
+
+        if (grade === null) {
+          // create new grade
+          await this.createGrade(body);
+          // assign grade id to lecture history
+          await Container.get(LectureHistoryService).updateLectureHistory(
+            student.id,
+            lectureId,
+            body
+          );
+        } else {
+          // update grade
+          this.updateGrade(grade.id, body);
+        }
       } catch (err) {
         errorArray.push((err as Error).message);
       }

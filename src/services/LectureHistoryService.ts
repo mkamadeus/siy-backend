@@ -1,14 +1,11 @@
 import Container, { Service } from 'typedi';
 import {
-  // AcademicYear,
   LectureHistory,
   LectureHistoryCreateInput,
   LectureHistoryUpdateInput,
 } from '@/models/LectureHistory';
 import { prisma } from '@/repository/prisma';
-import { Student } from '@/models/Student';
 import { GradeService } from './GradeService';
-// import { StudentService } from './StudentService';
 
 @Service()
 export class LectureHistoryService {
@@ -22,7 +19,6 @@ export class LectureHistoryService {
   public async getLectureHistoryById(
     studentId: number,
     lectureId: number
-    // gradeId: number
   ): Promise<LectureHistory> {
     const history = await prisma.lectureHistory.findFirst({
       include: { lecture: true, student: true, grade: true },
@@ -61,23 +57,6 @@ export class LectureHistoryService {
     return history;
   }
 
-  public async getStudentListByLectureId(
-    lectureId: number
-  ): Promise<Student[]> {
-    const lecHistories = await this.getLectureHistoryByLectureId(lectureId);
-
-    const arrStudents = [];
-
-    lecHistories.forEach((lec) => {
-      arrStudents.push(lec.student);
-    });
-
-    // uncomment for debugging
-    // console.log(arrStudents);
-
-    return arrStudents;
-  }
-
   // public async getLectureHistoryBetweenAcademicYear(
   //   minYear: AcademicYear,
   //   maxYear: AcademicYear
@@ -100,11 +79,7 @@ export class LectureHistoryService {
   ): Promise<LectureHistory> {
     const history = await prisma.lectureHistory.create({ data });
 
-    return this.getLectureHistoryById(
-      history.studentId,
-      history.lectureId
-      // history.gradeId
-    );
+    return this.getLectureHistoryById(history.studentId, history.lectureId);
   }
 
   public async updateLectureHistory(
@@ -125,7 +100,6 @@ export class LectureHistoryService {
     const lecHistory = await this.getLectureHistoryById(
       history.studentId,
       history.lectureId
-      // history.gradeId
     );
 
     Container.get(GradeService).updateAll(lecHistory.grade);
@@ -141,14 +115,9 @@ export class LectureHistoryService {
         studentId_lectureId: {
           studentId,
           lectureId,
-          // gradeId,
         },
       },
     });
-    return this.getLectureHistoryById(
-      history.studentId,
-      history.lectureId
-      // history.gradeId
-    );
+    return this.getLectureHistoryById(history.studentId, history.lectureId);
   }
 }
