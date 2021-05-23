@@ -57,3 +57,11 @@ Below flowchart is showing the flow of calculating LO, CO, CA, and many more.
 ![](./diagrams/lo_assessment.drawio.svg)
 
 ![](./diagrams/lo_supplement.drawio.svg)
+
+## How to use
+
+### First time? Install it first with command:
+`yarn install`
+
+### Then open the directory of the project, and enter command:
+`yarn start`
