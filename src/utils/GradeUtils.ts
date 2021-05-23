@@ -1,9 +1,6 @@
 import { IndexValueEnum } from '@/models/Grade';
-import { CourseService } from '@/services/CourseService';
-import { LectureHistoryService } from '@/services/LectureHistoryService';
-import { LectureService } from '@/services/LectureService';
 import { Grade, Lecture } from '@prisma/client';
-import Container from 'typedi';
+
 
 /**
  *
@@ -116,12 +113,4 @@ export const calculateAverageLo = (
   return averageLO;
 };
 
-export const calculateCumulativeLo = (semesterLos: number[][]): number[] => {
-  const cumulativeSum = Array(7).fill(0);
-  semesterLos.forEach((lo) => {
-    for (let i = 0; i < 7; i++) {
-      cumulativeSum[i] += lo[i];
-    }
-  });
-  return cumulativeSum.map((s) => s / semesterLos.length);
-};
+

@@ -20,7 +20,7 @@ import { plainToClass } from 'class-transformer';
 import Container, { Service } from 'typedi';
 import { CourseService } from './CourseService';
 import { LectureHistoryService } from './LectureHistoryService';
-import { LectureService } from './LectureService';
+// import { LectureService } from './LectureService';
 import { StudentService } from './StudentService';
 import { UploadService } from './UploadService';
 

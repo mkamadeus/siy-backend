@@ -9,12 +9,6 @@ export type LectureHistory = Prisma.LectureHistory & {
   grade: Grade;
 };
 
-export type LectureHistoryJoin = Prisma.LectureHistory & {
-  lecture: Lecture;
-  student: Student;
-  grade: Grade;
-};
-
 export type LectureHistoryCreateInput = Prisma.Prisma.LectureHistoryCreateInput;
 
 export type LectureHistoryUpdateInput = Prisma.Prisma.LectureHistoryUpdateInput;
