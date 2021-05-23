@@ -19,8 +19,7 @@ import { LectureHistoryResponse } from './response/LectureHistoryResponse';
 
 import Container from 'typedi';
 
-
-@JsonController('/lectures')
+@JsonController('/lecture-history')
 export class LectureHistoryController {
   @Get('/')
   @ResponseSchema(LectureHistoryResponse, { isArray: true })
