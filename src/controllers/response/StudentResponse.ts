@@ -1,6 +1,4 @@
-// import { Type } from 'class-transformer';
 import { IsNumber, IsString } from 'class-validator';
-// import { GradeResponse } from './StudentGradeResponse';
 
 export class StudentResponse {
   @IsNumber()

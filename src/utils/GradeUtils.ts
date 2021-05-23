@@ -22,10 +22,6 @@ export const calculateAverageGrade = (
     totalCredits += credits[i];
   }
 
-  // grades.forEach((grade) => {
-  //   cumulativeSum += grade.grade ? IndexValueEnum[grade.grade] : 4.0;
-  // });
-
   return totalCredits > 0 ? cumulativeSum / totalCredits : 0;
 };
 
@@ -81,9 +77,6 @@ export const calculateAverageLo = (
   const totalKMT = Array(7).fill(0);
   const averageLO = Array(7).fill(0);
   for (let i = 0; i < grades.length; i++) {
-    // const lecHistory = await Container.get(
-    //   LectureHistoryService
-    // ).getLectureHistoryByGradeId(grade.id);
     const loKmtWeight = weights[i];
     for (let j = 0; j < 7; j++) {
       cumulativeSum[j] += grades[i].lo[j] * loKmtWeight[j];

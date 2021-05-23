@@ -118,7 +118,6 @@ export class TeachingHistoryController {
     );
   }
 
-  //TODO: Is this necessary?
   // @Authorized([UserRole.ADMIN, UserRole.TEACHER])
   @Put('/teachers/:tid/lectures/:lid')
   @ResponseSchema(TeachingHistoryResponse)

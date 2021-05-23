@@ -367,21 +367,6 @@ export class GradeService {
     return updatedGrade;
   }
 
-  // public async createByNim(nim: string, studentGrade: Grade): Promise<Grade> {
-  // try {
-  //   const student = await Container.get(StudentService).getStudentByNim(nim);
-  //   const result = await prisma.grade.create(
-  //     plainToClass(Grade, {
-  //       studentId: student.id,
-  //       ...studentGrade,
-  //     })
-  //   );
-  //   return result;
-  // } catch (err) {
-  //   throw new EvalError(`Error on ${nim}: ${err.message}`);
-  // }
-  // }
-
   public async createBulk(
     lectureId: number,
     year: number,
@@ -456,6 +441,8 @@ export class GradeService {
     return grade;
   }
 
+  // TO DO: create & update one grade by nim, lectureId, or year semester
+
   //  public async updateByNim(
   //   nim: string,
   //   data: GradeUpdateInput
@@ -467,5 +454,20 @@ export class GradeService {
   //     plainToClass(Grade, { studentId: student.id, ...studentGrade })
   //   );
   //   return this.getGradeById(student.id);
+  // }
+
+  // public async createByNim(nim: string, studentGrade: Grade): Promise<Grade> {
+  // try {
+  //   const student = await Container.get(StudentService).getStudentByNim(nim);
+  //   const result = await prisma.grade.create(
+  //     plainToClass(Grade, {
+  //       studentId: student.id,
+  //       ...studentGrade,
+  //     })
+  //   );
+  //   return result;
+  // } catch (err) {
+  //   throw new EvalError(`Error on ${nim}: ${err.message}`);
+  // }
   // }
 }

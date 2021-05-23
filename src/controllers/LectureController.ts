@@ -21,11 +21,7 @@ import {
 } from 'routing-controllers';
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 import { LectureResponse } from './response/LectureResponse';
-import {
-  // CreateLectureBody,
-  GetLecturesQuery,
-  // UpdateLectureBody,
-} from './request/LectureRequest';
+import { GetLecturesQuery } from './request/LectureRequest';
 import {
   CourseAssessment,
   CourseAssessmentResponse,
@@ -134,7 +130,6 @@ export class LectureController {
     );
   }
 
-  // TODO: Course Assessment
   @Get('/:id/course-assessment')
   @ResponseSchema(CourseAssessmentResponse)
   @OpenAPI({
@@ -151,7 +146,6 @@ export class LectureController {
     return await Container.get(LectureService).getCourseAssessmentByID(id);
   }
 
-  // TODO: Course Assessment
   @Get('/course-assessment/:year/:semester')
   @ResponseSchema(CourseAssessmentResponse)
   @OpenAPI({

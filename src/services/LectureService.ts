@@ -111,6 +111,7 @@ export class LectureService {
 
     return result;
 
+    // Uncomment for course outcome calculation per LO
     // const lect = this.getOne(id);
     // var kmtA = (await lect).loAKMTWeight;
     // if (kmtA == null) {
@@ -255,14 +256,18 @@ export class LectureService {
       const course = await Container.get(CourseService).getCourseById(
         lecture.courseId
       );
-      //const rating = await this.getLectureRating(lecture);
-      //const averageRating = this.getAverageRating(rating);
+      const questionnaires = await Container.get(
+        RatingQuestionnaireService
+      ).getRatingQuestionnaireByLectureId(lecture.id);
+      const averageRating = calculateAverageRatingofAllQuestionnaires(
+        questionnaires
+      );
       const porto = await this.getLecturePortofolioByID(lecture.id);
 
       result.id = lecture.id;
       result.code = course.name;
       result.courseOutcome = await this.getCourseOutcome(lecture.id);
-      //result.questionnaires = averageRating;
+      result.questionnaires = averageRating;
       result.portofolio = scaleToIndex(porto);
       result.courseAssessment = await this.getCourseAssessmentByID(lecture.id);
 

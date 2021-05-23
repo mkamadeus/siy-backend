@@ -57,23 +57,6 @@ export class LectureHistoryService {
     return history;
   }
 
-  // public async getLectureHistoryBetweenAcademicYear(
-  //   minYear: AcademicYear,
-  //   maxYear: AcademicYear
-  // ): Promise<LectureHistory[]> {
-  //   const histories = this.getLectureHistoryByStudentId(studentId);
-
-  //   const minAcademicYear = getMinAcademicYear(histories);
-  //   const maxAcademicYear = getMaxAcademicYear(histories);
-
-  //   const grades = histories
-  //     .filter((history) => {
-  //       const year = getAcademicYear(history);
-  //       return isAcademicYearBetween(year, minAcademicYear, maxAcademicYear);
-  //     })
-  //     .map((history) => history.grade);
-  // }
-
   public async createLectureHistory(
     data: LectureHistoryCreateInput
   ): Promise<LectureHistory> {
@@ -120,4 +103,21 @@ export class LectureHistoryService {
     });
     return this.getLectureHistoryById(history.studentId, history.lectureId);
   }
+
+  // public async getLectureHistoryBetweenAcademicYear(
+  //   minYear: AcademicYear,
+  //   maxYear: AcademicYear
+  // ): Promise<LectureHistory[]> {
+  //   const histories = this.getLectureHistoryByStudentId(studentId);
+
+  //   const minAcademicYear = getMinAcademicYear(histories);
+  //   const maxAcademicYear = getMaxAcademicYear(histories);
+
+  //   const grades = histories
+  //     .filter((history) => {
+  //       const year = getAcademicYear(history);
+  //       return isAcademicYearBetween(year, minAcademicYear, maxAcademicYear);
+  //     })
+  //     .map((history) => history.grade);
+  // }
 }
