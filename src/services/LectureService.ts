@@ -11,8 +11,8 @@ import { Lecture } from '@prisma/client';
 import { LectureCreateInput, LectureUpdateInput } from '@/models/Lecture';
 import { calculateCourseOutcome } from '@/utils/LectureUtils';
 import { IndexValueEnum } from '@/models/Grade';
-import { calculateAverageLo } from '@/utils/GradeUtils';
-import { mapLang } from 'redoc';
+import { RatingQuestionnaireService } from './RatingQuestionnaireService';
+import { calculateAverageRatingofAllQuestionnaires } from '@/utils/RatingQuestionnaireUtils';
 
 @Service()
 export class LectureService {
@@ -96,11 +96,11 @@ export class LectureService {
    * @param id ID of the lecture
    * @param lo type of lo
    */
-  public async getCourseOutcomeLo(id: number): Promise<number[]> {
-    const grades = await Container.get(GradeService).getGradesByLectureId(id);
-    const lo = calculateCourseOutcome(grades);
-    return lo;
-  }
+  // public async getCourseOutcomeLo(id: number): Promise<number[]> {
+  //   const grades = await Container.get(GradeService).getGradesByLectureId(id);
+  //   const lo = calculateCourseOutcome(grades);
+  //   return lo;
+  // }
 
   /**
    * Get Course Outcome by lecture ID
@@ -178,62 +178,21 @@ export class LectureService {
     return listKMT;
   }
 
-  // TO DO: get rating from rating service
-  // /**
-  //  * Get Lecture Rating by Lecture
-  //  * @param lecture Lecture
-  //  */
-  // public async getLectureRating(lecture: Lecture) {
-  //   const questionnaires = await Container.get(
-  //     RatingQuestionnaireService
-  //   ).getByLectureId(lecture.id);
-  //   const totalRating: LectureRating = {
-  //     m1: 0,
-  //     m2: 0,
-  //     m3: 0,
-  //     m4: 0,
-  //     m5: 0,
-  //     m6: 0,
-  //     m7: 0,
-  //     m8: 0,
-  //     m9: 0,
-  //     m10: 0,
-  //     m11: 0,
-  //     m12: 0,
-  //   };
-  //   const countQuestionnaire = questionnaires.length;
-  //   questionnaires.forEach((rate) => {
-  //     totalRating.m1 += rate.ratingM_1;
-  //     totalRating.m2 += rate.ratingM_2;
-  //     totalRating.m3 += rate.ratingM_3;
-  //     totalRating.m4 += rate.ratingM_4;
-  //     totalRating.m5 += rate.ratingM_5;
-  //     totalRating.m6 += rate.ratingM_6;
-  //     totalRating.m7 += rate.ratingM_7;
-  //     totalRating.m8 += rate.ratingM_8;
-  //     totalRating.m9 += rate.ratingM_9;
-  //     totalRating.m10 += rate.ratingM_10;
-  //     totalRating.m11 += rate.ratingM_11;
-  //     totalRating.m12 += rate.ratingM_12;
-  //   });
+  /**
+   * Get Lecture Rating by Lecture
+   * @param lecture Lecture
+   */
+  public async getLectureRating(lecture: Lecture) {
+    const questionnaires = await Container.get(
+      RatingQuestionnaireService
+    ).getRatingQuestionnaireByLectureId(lecture.id);
 
-  //   const averageRating: LectureRating = {
-  //     m1: totalRating.m1 / countQuestionnaire,
-  //     m2: totalRating.m1 / countQuestionnaire,
-  //     m3: totalRating.m1 / countQuestionnaire,
-  //     m4: totalRating.m1 / countQuestionnaire,
-  //     m5: totalRating.m1 / countQuestionnaire,
-  //     m6: totalRating.m1 / countQuestionnaire,
-  //     m7: totalRating.m1 / countQuestionnaire,
-  //     m8: totalRating.m1 / countQuestionnaire,
-  //     m9: totalRating.m1 / countQuestionnaire,
-  //     m10: totalRating.m1 / countQuestionnaire,
-  //     m11: totalRating.m1 / countQuestionnaire,
-  //     m12: totalRating.m1 / countQuestionnaire,
-  //   };
+    const averageRating = calculateAverageRatingofAllQuestionnaires(
+      questionnaires
+    );
 
-  //   return averageRating;
-  // }
+    return averageRating;
+  }
 
   /**
    * Get Lecture Portofolio by lecture ID
@@ -261,14 +220,12 @@ export class LectureService {
   public async getCourseAssessmentByID(lectureId: number) {
     const lecture = await this.getLectureById(lectureId);
     const courseOutcome = await this.getCourseOutcome(lectureId);
-    //const rating = await this.getLectureRating(lecture);
+    const rating = await this.getLectureRating(lecture);
     let portofolio = await this.getLecturePortofolioByID(lectureId);
 
-    //const averageRating = this.getAverageRating(rating);
-
-    if (averageRating > 0 && portofolio > 0 && courseOutcome > 0) {
+    if (rating > 0 && portofolio > 0 && courseOutcome > 0) {
       portofolio = this.scaleToIndex(portofolio);
-      return 0.5 * courseOutcome + 0.4 * averageRating + 0.1 * portofolio;
+      return 0.5 * courseOutcome + 0.4 * rating + 0.1 * portofolio;
     } else {
       return -1;
     }

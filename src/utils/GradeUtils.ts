@@ -65,20 +65,7 @@ export const calculateGradeLO = (lecture: Lecture, grade: Grade): number[] => {
   return result;
 };
 
-// export const calculateGpa = (semesterGpas: number[]): number => {
-//   const total = 0;
 
-//   //   const lecHistory = await Container.get(
-//   //     LectureHistoryService
-//   //   ).getLectureHistoryByGradeId(grade.id);
-//   //   lecHistory.lecture.
-
-//   //   // lectures.push(await this.getLectureById(teach.lectureId));
-//   // }
-
-//     semesterGpas.reduce((sum, gpa) => (sum += gpa)) / semesterGpas.length;
-//   return total;
-// };
 
 /**
  *

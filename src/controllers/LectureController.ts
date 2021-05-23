@@ -26,7 +26,10 @@ import {
   GetLecturesQuery,
   UpdateLectureBody,
 } from './request/LectureRequest';
-import { CourseAssessmentResponse } from './response/CourseAssessmentResponse';
+import {
+  CourseAssessment,
+  CourseAssessmentResponse,
+} from './response/CourseAssessmentResponse';
 import Container from 'typedi';
 import { LectureHistoryService } from '@/services/LectureHistoryService';
 import { Student } from '@/models/Student';
@@ -45,7 +48,21 @@ export class LectureController {
       },
     },
   })
-  public async getAllLectures(
+  public async getAllLectures(): Promise<Lecture[]> {
+    return Container.get(LectureService).getAllLectures();
+  }
+
+  @Get('/query/')
+  @ResponseSchema(LectureResponse, { isArray: true })
+  @OpenAPI({
+    description: 'Get all Lectures',
+    responses: {
+      '200': {
+        description: 'OK',
+      },
+    },
+  })
+  public async getAllLecturesByQuery(
     @QueryParams() query: GetLecturesQuery
   ): Promise<Lecture[]> {
     const { year, semester } = query;
@@ -97,6 +114,26 @@ export class LectureController {
     return students;
   }
 
+  @Get('learning-outcomes/:year/:semester')
+  @ResponseSchema(CourseAssessmentResponse)
+  @OpenAPI({
+    description: 'Get course assessment by teacher id',
+    responses: {
+      '200': {
+        description: 'OK',
+      },
+    },
+  })
+  public async getLearningOutcomeBySemester(
+    @Param('year') year: number,
+    @Param('semester') semester: number
+  ): Promise<number[]> {
+    return await Container.get(LectureService).getLoAssessmentbySemester(
+      year,
+      semester
+    );
+  }
+
   // TODO: Course Assessment
   @Get('/:id/course-assessment')
   @ResponseSchema(CourseAssessmentResponse)
@@ -111,7 +148,33 @@ export class LectureController {
   public async getCourseAssessmentByLectureId(
     @Param('id') id: number
   ): Promise<number> {
-    return 0;
+    return await Container.get(LectureService).getCourseAssessmentByID(id);
+  }
+
+  // TODO: Course Assessment
+  @Get('/course-assessment/:year/:semester')
+  @ResponseSchema(CourseAssessmentResponse)
+  @OpenAPI({
+    description: 'Get course assessment by teacher id',
+    responses: {
+      '200': {
+        description: 'OK',
+      },
+    },
+  })
+  public async getCourseAssessment(
+    @Param('year') year: number,
+    @Param('semester') semester: number
+  ): Promise<CourseAssessment[]> {
+    const lectures = await Container.get(LectureService).getLectureBySemester(
+      year,
+      semester
+    );
+    const detailedCA = await Container.get(LectureService).getDetailedCA(
+      lectures
+    );
+
+    return detailedCA;
   }
 
   @Post('/')
