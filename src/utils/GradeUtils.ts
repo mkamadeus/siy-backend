@@ -59,6 +59,7 @@ export const calculateGradeLo = (lecture: Lecture, grade: Grade): number[] => {
       finalWeight + midWeight + pracWeight + homeworkWeight + quizWeight;
 
     result[i] = totalWeight > 0 ? cumulativeSum / totalWeight : 0;
+    result[i] = scaleToIndex(result[i]);
   }
 
   return result;
@@ -95,4 +96,12 @@ export const calculateAverageLo = (
   }
 
   return averageLO;
+};
+
+export const scaleToIndex = (number: number): number => {
+  if (number != -1) {
+    return (number * 4) / 100;
+  } else {
+    return -1;
+  }
 };
