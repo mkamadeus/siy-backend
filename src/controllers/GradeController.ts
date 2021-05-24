@@ -1,28 +1,27 @@
 import 'reflect-metadata';
-import StudentGrade from '@/entity/StudentGrade';
 import { GradeService } from '@/services/GradeService';
 import {
   Body,
-  // BodyParam,
+  BodyParam,
   Delete,
   Get,
   JsonController,
   Param,
   Post,
   Put,
-  // UploadedFile,
-  // UseBefore,
+  UploadedFile,
+  UseBefore,
 } from 'routing-controllers';
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
-// import { fileUploadOptions } from '@/services/UploadService';
 import { GradeResponse } from './response/StudentGradeResponse';
 import {
   CreateGradeBody,
   UpdateGradeBody,
 } from './request/StudentGradeRequest';
-// import express from 'express';
 import Container from 'typedi';
 import { Grade } from '@/models/Grade';
+import express from 'express';
+import { fileUploadOptions } from '@/services/UploadService';
 
 @JsonController('/grades')
 export class GradeController {
@@ -36,7 +35,7 @@ export class GradeController {
       },
     },
   })
-  public getAllGrades() {
+  public getAllGrades(): Promise<Grade[]> {
     return Container.get(GradeService).getAllGrades();
   }
 
@@ -50,7 +49,7 @@ export class GradeController {
       },
     },
   })
-  public getGradeByNim(@Param('nim') nim: string) {
+  public getGradeByNim(@Param('nim') nim: string): Promise<Grade[]> {
     return Container.get(GradeService).getGradesByNim(nim);
   }
 
@@ -64,7 +63,7 @@ export class GradeController {
       },
     },
   })
-  public getLoById(@Param('id') id: number) {
+  public getLoById(@Param('id') id: number): Promise<number[]> {
     return Container.get(GradeService).getLoById(id);
   }
 
@@ -78,7 +77,7 @@ export class GradeController {
       },
     },
   })
-  public getLOCumulative(@Param('nim') nim: string) {
+  public getLOCumulative(@Param('nim') nim: string): Promise<number[]> {
     return Container.get(GradeService).getCumulativeLoByNim(nim);
   }
 
@@ -96,7 +95,7 @@ export class GradeController {
     @Param('nim') nim: string,
     @Param('year') year: number,
     @Param('semester') semester: number
-  ) {
+  ): Promise<number[]> {
     return Container.get(GradeService).getSemesterLoByNIM(nim, year, semester);
   }
 
@@ -110,7 +109,7 @@ export class GradeController {
       },
     },
   })
-  public getGradeByLecture(@Param('id') id: number) {
+  public getGradeByLecture(@Param('id') id: number): Promise<Grade[]> {
     return Container.get(GradeService).getGradesByLectureId(id);
   }
 
@@ -124,7 +123,7 @@ export class GradeController {
       },
     },
   })
-  public getGradeById(@Param('id') id: number) {
+  public getGradeById(@Param('id') id: number): Promise<Grade> {
     return Container.get(GradeService).getGradeById(id);
   }
 
@@ -182,6 +181,37 @@ export class GradeController {
   //   return Container.get(GradeService).updateByNim(nim, grade as StudentGrade);
   // }
 
+  @Post('/upload')
+  @UseBefore(express.urlencoded({ extended: true }))
+  @OpenAPI({
+    description:
+      'Upload grade using Excel file. Use form data and insert the file using file field.',
+    responses: {
+      '200': {
+        description: 'OK',
+      },
+    },
+  })
+  public async uploadGrade(
+    @UploadedFile('file', { required: true, options: fileUploadOptions() })
+    file: Express.Multer.File,
+    @BodyParam('lectureId') lectureId: number,
+    @BodyParam('year') year: number,
+    @BodyParam('semester') semester: number
+  ): Promise<{
+    errors: Error[];
+  }> {
+    if (!lectureId || !year || !semester)
+      throw new Error('Provide necessary info.');
+    const result = await Container.get(GradeService).createBulk(
+      lectureId,
+      year,
+      semester,
+      file
+    );
+    return result;
+  }
+
   @Put('/:id')
   @ResponseSchema(GradeResponse)
   @OpenAPI({
@@ -192,7 +222,10 @@ export class GradeController {
       },
     },
   })
-  public updateGrade(@Param('id') id: number, @Body() grade: UpdateGradeBody) {
+  public updateGrade(
+    @Param('id') id: number,
+    @Body() grade: UpdateGradeBody
+  ): Promise<Grade> {
     return Container.get(GradeService).updateGrade(id, grade);
   }
 
@@ -205,7 +238,7 @@ export class GradeController {
       },
     },
   })
-  public removeGrade(@Param('id') id: number) {
+  public removeGrade(@Param('id') id: number): Promise<Grade> {
     return Container.get(GradeService).delete(id);
   }
 }

@@ -1,7 +1,11 @@
 import 'reflect-metadata';
-import { TeachingHistory } from '@/models/TeachingHistory';
 import {
-  Authorized,
+  TeachingHistory,
+  TeachingHistoryCreateInput,
+  TeachingHistoryUpdateInput,
+} from '@/models/TeachingHistory';
+import {
+  // Authorized,
   Body,
   Delete,
   Get,
@@ -14,10 +18,6 @@ import { TeachingHistoryService } from '@/services/TeachingHistoryService';
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 import { TeachingHistoryResponse } from './response/TeachingHistoryResponse';
 
-import {
-  CreateTeachingHistoryBody,
-  UpdateTeachingHistoryBody,
-} from './request/TeachingHistoryRequest';
 import Container from 'typedi';
 
 @JsonController('/teaching-history')
@@ -90,7 +90,7 @@ export class TeachingHistoryController {
     },
   })
   public createTeachingHistory(
-    @Body() teaches: CreateTeachingHistoryBody
+    @Body() teaches: TeachingHistoryCreateInput
   ): Promise<TeachingHistory> {
     return Container.get(TeachingHistoryService).createTeachingHistory(teaches);
   }
@@ -108,7 +108,7 @@ export class TeachingHistoryController {
   public async updatePorto(
     @Param('lid') lid: number,
     @Param('tid') tid: number,
-    @Body() teaches: UpdateTeachingHistoryBody
+    @Body() teaches: TeachingHistoryUpdateInput
     // @Body() prototype: UpdatePortoBody
   ): Promise<TeachingHistory> {
     return await Container.get(TeachingHistoryService).updateTeachingHistory(
@@ -118,9 +118,8 @@ export class TeachingHistoryController {
     );
   }
 
-  //TODO: Is this necessary?
   // @Authorized([UserRole.ADMIN, UserRole.TEACHER])
-  @Put('/:id')
+  @Put('/teachers/:tid/lectures/:lid')
   @ResponseSchema(TeachingHistoryResponse)
   @OpenAPI({
     description: 'Update teaching information',
@@ -131,17 +130,19 @@ export class TeachingHistoryController {
     },
   })
   public async updateTeachingHistory(
-    @Param('id') id: number,
-    @Body() teaches: UpdateTeachingHistoryBody
-  ) {
-    return await Container.get(TeachingHistoryService).update(
-      id,
-      teaches as TeachingHistory
+    @Param('tid') tid: number,
+    @Param('lid') lid: number,
+    @Body() teaches: TeachingHistoryUpdateInput
+  ): Promise<TeachingHistory> {
+    return await Container.get(TeachingHistoryService).updateTeachingHistory(
+      tid,
+      lid,
+      teaches
     );
   }
 
   // @Authorized([UserRole.ADMIN, UserRole.TEACHER])
-  @Delete('/:id')
+  @Delete('/teachers/:tid/lectures/:lid')
   @OpenAPI({
     description: 'Delete teaching information by ID',
     responses: {
@@ -150,7 +151,13 @@ export class TeachingHistoryController {
       },
     },
   })
-  public removeTeachingHistory(@Param('id') id: number) {
-    return Container.get(TeachingHistoryService).deleteTeachingHistory(id);
+  public removeTeachingHistory(
+    @Param('tid') tid: number,
+    @Param('lid') lid: number
+  ): Promise<TeachingHistory> {
+    return Container.get(TeachingHistoryService).deleteTeachingHistory(
+      tid,
+      lid
+    );
   }
 }

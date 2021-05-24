@@ -144,7 +144,6 @@ export class LectureHistoryController {
   public async removeLecture(
     @Param('sid') sid: number,
     @Param('lid') lid: number
-    // @Body() lecture: LectureHistoryUpdateInput
   ): Promise<LectureHistory> {
     return await Container.get(LectureHistoryService).deleteLectureHistory(
       sid,

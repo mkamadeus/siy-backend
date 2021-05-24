@@ -1,5 +1,5 @@
 import { Exclude } from 'class-transformer';
-import { IsEnum, IsNumber, IsString } from 'class-validator';
+import { /* IsEnum,*/ IsNumber, IsString } from 'class-validator';
 
 export class UserResponse {
   @IsNumber()
@@ -9,7 +9,7 @@ export class UserResponse {
   public username: string;
 
   @IsString()
-  // @Exclude()
+  @Exclude()
   public password: string;
 
   @IsString()
