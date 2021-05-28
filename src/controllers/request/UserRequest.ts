@@ -1,4 +1,4 @@
-import { IsString } from "class-validator";
+import { IsOptional, IsString } from 'class-validator';
 
 export class CreateUserBody {
   @IsString()
@@ -6,4 +6,8 @@ export class CreateUserBody {
 
   @IsString()
   public password: string;
+
+  @IsString()
+  @IsOptional()
+  public role: string;
 }

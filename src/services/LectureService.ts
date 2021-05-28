@@ -1,108 +1,117 @@
-import { CourseAssessment } from "@/controllers/response/CourseAssessmentResponse";
-import { GradeResponse } from "@/controllers/response/StudentGradeResponse";
-import Lecture from "@/entity/Lecture";
-import { IndexValueEnum } from "@/enum/IndexEnum";
-import { LoEntry } from "@/enum/LoEnum";
-import { LectureRating } from "@/enum/LectureRatingEnum";
-import Container, { Service } from "typedi";
-import { getRepository, Repository } from "typeorm";
-import { CourseService } from "./CourseService";
-import { RatingQuestionnaireService } from "./RatingQuestionnaireService";
-import { StudentGradeService } from "./StudentGradeService";
-import { TeachesService } from "./TeachesService";
+import { CourseAssessment } from '@/controllers/response/CourseAssessmentResponse';
+import Container, { Service } from 'typedi';
+import { CourseService } from './CourseService';
+import { GradeService } from './GradeService';
+import { TeachingHistoryService } from './TeachingHistoryService';
+import { prisma } from '@/repository/prisma';
+import { Lecture } from '@prisma/client';
+import { LectureCreateInput, LectureUpdateInput } from '@/models/Lecture';
+import { RatingQuestionnaireService } from './RatingQuestionnaireService';
+import { calculateAverageRatingofAllQuestionnaires } from '@/utils/RatingQuestionnaireUtils';
+import { calculateLoAssessment } from '@/utils/LoAssessmentUtils';
+import {
+  calculateCourseAssessment,
+  calculateCourseOutcome,
+  scaleToIndex,
+} from '@/utils/CourseAssessmentUtils';
 
 @Service()
 export class LectureService {
-  private lectureRepository: Repository<Lecture> = getRepository(
-    Lecture,
-    process.env.NODE_ENV === "test" ? "test" : "default"
-  );
-
   /**
    * Get all Lectures
    */
-  public async getAll(): Promise<Lecture[]> {
-    return await this.lectureRepository.find().then((cls) => cls);
+  public async getAllLectures(): Promise<Lecture[]> {
+    const lectures = await prisma.lecture.findMany();
+    return lectures;
   }
 
   /**
    * Get lecture by database ID
    * @param id ID of the lecture
    */
-  public async getOne(id: number): Promise<Lecture> {
-    return await this.lectureRepository.findOne({ where: { id } });
+  public async getLectureById(id: number): Promise<Lecture> {
+    const lecture = await prisma.lecture.findFirst({ where: { id } });
+    return lecture;
   }
 
-  public async getByCourse(id: number): Promise<Lecture[]> {
-    return await this.lectureRepository.find({ where: { courseId: id } });
+  /**
+   * Get lecture by course ID
+   * @param id Course ID
+   * @returns Lecture with specific course ID
+   */
+  public async getLectureByCourse(courseId: number): Promise<Lecture[]> {
+    const lectures = await prisma.lecture.findMany({ where: { courseId } });
+    return lectures;
   }
 
-  public async getByYear(year: number): Promise<Lecture[]> {
-    return await this.lectureRepository.find({ where: { year: year } });
+  /**
+   * Get lecture by year
+   * @param year Lecture year
+   * @returns Lecture with specific year
+   */
+  public async getLectureByYear(year: number): Promise<Lecture[]> {
+    const lectures = await prisma.lecture.findMany({ where: { year } });
+    return lectures;
   }
 
-  public async getByYearSemester(
+  /**
+   * Get lecture by lecture by year and semester
+   * @param year Lecture year
+   * @returns Lecture with specific year
+   */
+  public async getLectureBySemester(
     year: number,
     semester: number
   ): Promise<Lecture[]> {
-    return await this.lectureRepository.find({
-      where: { year: year, semester: semester },
+    const lectures = await prisma.lecture.findMany({
+      where: { year, semester },
     });
+    return lectures;
   }
 
+  public async getLoAssessmentbySemester(
+    year: number,
+    semester: number
+  ): Promise<number[]> {
+    const lectures = await this.getLectureBySemester(year, semester);
+
+    const ca: number[] = [];
+    const kmtWeight = [];
+
+    for (const lecture of lectures) {
+      ca.push(await this.getCourseAssessmentByID(lecture.id));
+      kmtWeight.push(await this.getKMT(lecture.id));
+    }
+
+    const result = calculateLoAssessment(ca, kmtWeight, lectures);
+
+    return result;
+  }
   /**
    * Get Course Outcome per LO by lecture ID
    * @param id ID of the lecture
    * @param lo type of lo
    */
-  public async getCourseOutcomeLO(id: number, lo: string): Promise<number> {
-    const grades = await Container.get(StudentGradeService).getByLectureId(id);
-    var totalLO = 0;
-    grades.forEach((grade) => {
-      if (lo == "A") {
-        totalLO += grade.loA;
-      } else if (lo == "B") {
-        totalLO += grade.loB;
-      } else if (lo == "C") {
-        totalLO += grade.loC;
-      } else if (lo == "D") {
-        totalLO += grade.loD;
-      } else if (lo == "E") {
-        totalLO += grade.loE;
-      } else if (lo == "F") {
-        totalLO += grade.loF;
-      } else if (lo == "G") {
-        totalLO += grade.loG;
-      }
-    });
-    if (totalLO == null || grades.length == 0) {
-      return 0;
-    }
-    return totalLO / grades.length;
-  }
+  // public async getCourseOutcomeLo(id: number): Promise<number[]> {
+  //   const grades = await Container.get(GradeService).getGradesByLectureId(id);
+  //   const lo = calculateCourseOutcome(grades);
+  //   return lo;
+  // }
 
   /**
    * Get Course Outcome by lecture ID
    * @param id ID of the lecture
    */
   public async getCourseOutcome(lectureId: number): Promise<number> {
-    const grades = await Container.get(StudentGradeService).getByLectureId(
+    const grades = await Container.get(GradeService).getGradesByLectureId(
       lectureId
     );
-    var totalIdx = 0;
 
-    grades.forEach((grade) => {
-      var index = IndexValueEnum[grade.index];
-      totalIdx += index;
-    });
+    const result = calculateCourseOutcome(grades);
 
-    var totalStudent = grades.length;
-    if (totalStudent > 0) {
-      return totalIdx / totalStudent;
-    } else {
-      return -1;
-    }
+    return result;
 
+    // Uncomment for course outcome calculation per LO
     // const lect = this.getOne(id);
     // var kmtA = (await lect).loAKMTWeight;
     // if (kmtA == null) {
@@ -155,17 +164,9 @@ export class LectureService {
     // );
   }
 
-  public async getKMT(lectureId: number) {
-    const lecture = await this.getOne(lectureId);
-    const listKMT: LoEntry = {
-      loA: lecture.loAKMTWeight,
-      loB: lecture.loBKMTWeight,
-      loC: lecture.loCKMTWeight,
-      loD: lecture.loDKMTWeight,
-      loE: lecture.loEKMTWeight,
-      loF: lecture.loFKMTWeight,
-      loG: lecture.loGKMTWeight,
-    };
+  public async getKMT(lectureId: number): Promise<number[]> {
+    const lecture = await this.getLectureById(lectureId);
+    const listKMT = lecture.loKmtWeight;
 
     return listKMT;
   }
@@ -174,55 +175,14 @@ export class LectureService {
    * Get Lecture Rating by Lecture
    * @param lecture Lecture
    */
-  public async getLectureRating(lecture: Lecture) {
+  public async getLectureRating(lecture: Lecture): Promise<number> {
     const questionnaires = await Container.get(
       RatingQuestionnaireService
-    ).getByLectureId(lecture.id);
-    //console.log(questionnaires);
-    const totalRating: LectureRating = {
-      m1: 0,
-      m2: 0,
-      m3: 0,
-      m4: 0,
-      m5: 0,
-      m6: 0,
-      m7: 0,
-      m8: 0,
-      m9: 0,
-      m10: 0,
-      m11: 0,
-      m12: 0,
-    };
-    const countQuestionnaire = questionnaires.length;
-    questionnaires.forEach((rate) => {
-      totalRating.m1 += rate.ratingM_1;
-      totalRating.m2 += rate.ratingM_2;
-      totalRating.m3 += rate.ratingM_3;
-      totalRating.m4 += rate.ratingM_4;
-      totalRating.m5 += rate.ratingM_5;
-      totalRating.m6 += rate.ratingM_6;
-      totalRating.m7 += rate.ratingM_7;
-      totalRating.m8 += rate.ratingM_8;
-      totalRating.m9 += rate.ratingM_9;
-      totalRating.m10 += rate.ratingM_10;
-      totalRating.m11 += rate.ratingM_11;
-      totalRating.m12 += rate.ratingM_12;
-    });
+    ).getRatingQuestionnaireByLectureId(lecture.id);
 
-    const averageRating: LectureRating = {
-      m1: totalRating.m1 / countQuestionnaire,
-      m2: totalRating.m1 / countQuestionnaire,
-      m3: totalRating.m1 / countQuestionnaire,
-      m4: totalRating.m1 / countQuestionnaire,
-      m5: totalRating.m1 / countQuestionnaire,
-      m6: totalRating.m1 / countQuestionnaire,
-      m7: totalRating.m1 / countQuestionnaire,
-      m8: totalRating.m1 / countQuestionnaire,
-      m9: totalRating.m1 / countQuestionnaire,
-      m10: totalRating.m1 / countQuestionnaire,
-      m11: totalRating.m1 / countQuestionnaire,
-      m12: totalRating.m1 / countQuestionnaire,
-    };
+    const averageRating = calculateAverageRatingofAllQuestionnaires(
+      questionnaires
+    );
 
     return averageRating;
   }
@@ -232,106 +192,91 @@ export class LectureService {
    * @param id ID of the lecture
    */
   public async getLecturePortofolioByID(lectureId: number): Promise<number> {
-    const teachers = await Container.get(TeachesService).getByLectureId(
-      lectureId
-    );
-    var total = 0;
-    if (lectureId == 2) {
-      console.log(teachers);
-    }
+    const teachers = await Container.get(
+      TeachingHistoryService
+    ).getTeachingHistoryByLectureId(lectureId);
+    let total = 0;
+
     teachers.forEach(async (teacher) => {
-      total += teacher.portofolio;
+      total += teacher.portfolio;
     });
-    if (teachers.length > 0) {
-      return total / teachers.length;
-    } else {
-      return -1;
-    }
+
+    return total > 0 ? total / teachers.length : 0;
   }
 
   /**
    * Get Course Assessment by lecture ID
    * @param id ID of the lecture
    */
-  public async getCourseAssessmentByID(lectureId: number) {
-    const lecture = await this.getOne(lectureId);
-    var courseOutcome = await this.getCourseOutcome(lectureId);
+  public async getCourseAssessmentByID(lectureId: number): Promise<number> {
+    const lecture = await this.getLectureById(lectureId);
+    const courseOutcome = await this.getCourseOutcome(lectureId);
     const rating = await this.getLectureRating(lecture);
-    var portofolio = await this.getLecturePortofolioByID(lectureId);
+    const portofolio = await this.getLecturePortofolioByID(lectureId);
 
-    const averageRating = this.getAverageRating(rating);
-
-    // console.log(courseOutcome);
-    // console.log(averageRating);
-    // console.log(portofolio);
-    if (averageRating > 0 && portofolio > 0 && courseOutcome > 0) {
-      portofolio = this.scaleToIndex(portofolio);
-      return 0.5 * courseOutcome + 0.4 * averageRating + 0.1 * portofolio;
-    } else {
-      return -1;
-    }
+    return calculateCourseAssessment(courseOutcome, rating, portofolio);
   }
 
   /**
    * Get All Detailed Course Assessment
    */
-  public async getCourseAssessment() {
-    const lectures = await this.getAll();
+  public async getCourseAssessment(): Promise<CourseAssessment[]> {
+    const lectures = await this.getAllLectures();
     return await this.getDetailedCA(lectures);
   }
 
-  public async getCourseAssessmentByTeacherId(teacherId: number) {
-    const teaches = await Container.get(TeachesService).getInstancesByTeacherId(
-      teacherId
-    );
-    var lectures: Lecture[] = [];
+  public async getCourseAssessmentByTeacherId(
+    teacherId: number
+  ): Promise<CourseAssessment[]> {
+    const teaches = await Container.get(
+      TeachingHistoryService
+    ).getTeachingHistoryByTeacherId(teacherId);
+    const lectures: Lecture[] = [];
     for (const teach of teaches) {
-      lectures.push(await this.getOne(teach.lectureId));
+      lectures.push(teach.lecture);
     }
 
     return await this.getDetailedCA(lectures);
   }
 
-  public async getDetailedCA(lectures: Lecture[]) {
-    var results: CourseAssessment[] = [];
+  public async getDetailedCA(lectures: Lecture[]): Promise<CourseAssessment[]> {
+    const results: CourseAssessment[] = [];
     for (const lecture of lectures) {
-      //console.log("foreach");
-      // console.log(lecture);
-      var result: CourseAssessment = {
+      const result: CourseAssessment = {
         id: -1,
-        code: "code",
-        name: "name",
+        code: 'code',
+        name: 'name',
         courseOutcome: -1,
         questionnaires: -1,
         portofolio: -1,
         courseAssessment: -1,
-        mark: "mark",
+        mark: 'mark',
       };
-      //console.log("after declaring course assessment");
-      //console.log(lecture.courseId);
 
-      const course = await Container.get(CourseService).getOne(
+      const course = await Container.get(CourseService).getCourseById(
         lecture.courseId
       );
-      //console.log("getCourse");
-      //console.log(course);
-      const rating = await this.getLectureRating(lecture);
-      const averageRating = this.getAverageRating(rating);
-      var porto = await this.getLecturePortofolioByID(lecture.id);
+      const questionnaires = await Container.get(
+        RatingQuestionnaireService
+      ).getRatingQuestionnaireByLectureId(lecture.id);
+      const averageRating = calculateAverageRatingofAllQuestionnaires(
+        questionnaires
+      );
+      const porto = await this.getLecturePortofolioByID(lecture.id);
 
       result.id = lecture.id;
       result.code = course.name;
       result.courseOutcome = await this.getCourseOutcome(lecture.id);
       result.questionnaires = averageRating;
-      result.portofolio = this.scaleToIndex(porto);
+      result.portofolio = scaleToIndex(porto);
       result.courseAssessment = await this.getCourseAssessmentByID(lecture.id);
 
       if (result.courseAssessment > 3) {
-        result.mark = "MANTAIN";
+        result.mark = 'MANTAIN';
       } else if (result.courseAssessment == -1) {
-        result.mark = "MISSING DATA";
+        result.mark = 'MISSING DATA';
       } else {
-        result.mark = "IMPROVE";
+        result.mark = 'IMPROVE';
       }
 
       results.push(result);
@@ -339,52 +284,37 @@ export class LectureService {
     return results;
   }
 
-  // utils
-  public scaleToIndex(number: number) {
-    if (number != -1) {
-      return ((number - 0) * (4 - 0)) / (100 - 0) + 0;
-    } else {
-      return -1;
-    }
-  }
-
-  public getAverageRating(rating: LectureRating) {
-    const totalRating =
-      rating.m1 +
-      rating.m2 +
-      rating.m3 +
-      rating.m4 +
-      rating.m5 +
-      rating.m6 +
-      rating.m7 +
-      rating.m8 +
-      rating.m9 +
-      rating.m10 +
-      rating.m11 +
-      rating.m12;
-    var averageRating = totalRating > 0 ? totalRating / 12 : -1;
-
-    return averageRating;
-  }
-
-  public async create(lecture: Lecture): Promise<Lecture> {
-    return await this.lectureRepository.save(lecture);
-  }
-
-  public async update(id: number, lecture: Lecture): Promise<Lecture> {
-    lecture.id = id;
-    await this.lectureRepository.update(id, lecture);
-    var grades = await Container.get(StudentGradeService).getByLectureId(
+  public async createLecture(data: LectureCreateInput): Promise<Lecture> {
+    const lecture = await prisma.lecture.create({ data });
+    // Update grades
+    const grades = await Container.get(GradeService).getGradesByLectureId(
       lecture.id
     );
     grades.forEach((grade) => {
-      Container.get(StudentGradeService).updateLO(grade);
+      Container.get(GradeService).updateAll(grade);
     });
-    return await this.getOne(id);
+    return lecture;
   }
 
-  public async delete(id: number): Promise<void> {
-    await this.lectureRepository.delete(id);
-    return;
+  public async updateLecture(
+    id: number,
+    data: LectureUpdateInput
+  ): Promise<Lecture> {
+    const lecture = await prisma.lecture.update({ data, where: { id } });
+
+    // Update grades
+    const grades = await Container.get(GradeService).getGradesByLectureId(
+      lecture.id
+    );
+    grades.forEach((grade) => {
+      Container.get(GradeService).updateAll(grade);
+    });
+
+    return lecture;
+  }
+
+  public async deleteLecture(id: number): Promise<Lecture> {
+    const lecture = await prisma.lecture.delete({ where: { id } });
+    return lecture;
   }
 }

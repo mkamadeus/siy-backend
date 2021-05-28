@@ -1,14 +1,14 @@
-import { getMetadataArgsStorage } from "routing-controllers";
-import { routingControllersToSpec } from "routing-controllers-openapi";
-import { defaultMetadataStorage } from "class-transformer/cjs/storage";
-import { Express } from "express";
-import { validationMetadatasToSchemas } from "class-validator-jsonschema";
+import { getMetadataArgsStorage } from 'routing-controllers';
+import { routingControllersToSpec } from 'routing-controllers-openapi';
+import { defaultMetadataStorage } from 'class-transformer/cjs/storage';
+import { Express } from 'express';
+import { validationMetadatasToSchemas } from 'class-validator-jsonschema';
 
-export const redocLoader = (expressApp: Express) => {
+export const redocLoader = (expressApp: Express): void => {
   const storage = getMetadataArgsStorage();
   const schemas = validationMetadatasToSchemas({
     classTransformerMetadataStorage: defaultMetadataStorage,
-    refPointerPrefix: "#/components/schemas/",
+    refPointerPrefix: '#/components/schemas/',
   });
   const spec = routingControllersToSpec(
     storage,
@@ -48,7 +48,7 @@ export const redocLoader = (expressApp: Express) => {
     </body>
   </html>
   `;
-  expressApp.use("/docs", (req, res) => {
+  expressApp.use('/docs', (req, res) => {
     res.send(redocPage);
   });
 };

@@ -1,6 +1,4 @@
-import { Type } from "class-transformer";
-import { IsNumber, IsString, ValidateNested } from "class-validator";
-import { GradeResponse } from "./StudentGradeResponse";
+import { IsNumber, IsString } from 'class-validator';
 
 export class StudentResponse {
   @IsNumber()
@@ -17,8 +15,4 @@ export class StudentResponse {
 
   @IsNumber()
   public ipk: number;
-
-  @ValidateNested()
-  @Type(() => GradeResponse)
-  public studentGrades: GradeResponse[];
 }

@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional} from "class-validator";
+import { IsNumber, IsOptional } from 'class-validator';
 
 export class CreateLectureBody {
   @IsNumber()
@@ -23,4 +23,14 @@ export class UpdateLectureBody {
   @IsNumber()
   @IsOptional()
   public year: number;
+}
+
+export class GetLecturesQuery {
+  @IsNumber()
+  @IsOptional()
+  public year?: number;
+
+  @IsNumber()
+  @IsOptional()
+  public semester?: number;
 }

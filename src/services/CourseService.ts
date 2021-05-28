@@ -1,36 +1,34 @@
-import Course from "@/entity/Course";
-import { Service } from "typedi";
-import { getRepository, Repository } from "typeorm";
+import { prisma } from '@/repository/prisma';
+import { Course, CourseCreateInput, CourseUpdateInput } from '@/models/Course';
+import { Service } from 'typedi';
 
 @Service()
 export class CourseService {
-  private courseRepository: Repository<Course> = getRepository(
-    Course,
-    process.env.NODE_ENV === "test" ? "test" : "default"
-  );
-
-  public async getAll(): Promise<Course[]> {
-    return await this.courseRepository.find().then((course) => course);
+  public async getAllCourses(): Promise<Course[]> {
+    const courses = await prisma.course.findMany();
+    return courses;
   }
 
-  public async getOne(id: number): Promise<Course> {
-    return await this.courseRepository
-      .findOne({ where: { id } })
-      .then((course) => course);
+  public async getCourseById(id: number): Promise<Course> {
+    const course = await prisma.course.findUnique({ where: { id } });
+    return course;
   }
 
-  public async create(course: Course): Promise<Course> {
-    return await this.courseRepository.save(course);
+  public async createCourse(data: CourseCreateInput): Promise<Course> {
+    const course = await prisma.course.create({ data });
+    return course;
   }
 
-  public async update(id: number, course: Course): Promise<Course> {
-    course.id = id;
-    await this.courseRepository.update(id, course);
-    return await this.getOne(id);
+  public async updateCourse(
+    id: number,
+    data: CourseUpdateInput
+  ): Promise<Course> {
+    const course = await prisma.course.update({ data, where: { id } });
+    return course;
   }
 
-  public async delete(id: number): Promise<void> {
-    await this.courseRepository.delete(id);
-    return;
+  public async deleteCourse(id: number): Promise<Course> {
+    const course = await prisma.course.delete({ where: { id } });
+    return course;
   }
 }

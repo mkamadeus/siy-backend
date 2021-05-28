@@ -1,30 +1,18 @@
-import { IndexEnum } from "@/enum/IndexEnum";
-import { IsArray, IsEnum, IsNumber, IsString } from "class-validator";
+import { StudentGradeIndex } from '@prisma/client';
+import { IsArray, IsEnum, IsNumber, IsString } from 'class-validator';
 
 export class GradeResponse {
-  @IsNumber()
-  public id: number;
+  @IsEnum(StudentGradeIndex)
+  public grade: StudentGradeIndex;
 
-  @IsNumber()
-  public studentId: number;
-
-  @IsNumber()
-  public lectureId: number;
-
-  @IsNumber()
-  public semester: number;
-
-  @IsNumber()
-  public year: number;
-
-  @IsEnum(IndexEnum)
-  public index: string;
-
-  @IsNumber()
-  public midTest: number;
+  @IsArray()
+  public lo: number[];
 
   @IsNumber()
   public quiz: number;
+
+  @IsNumber()
+  public midTest: number;
 
   @IsNumber()
   public finalTest: number;
