@@ -50,7 +50,7 @@ export class SessionService {
         user.id
       );
       result.userData = student;
-    } else if (user.role === UserRole.TEACHER) {
+    } else if (user.role === UserRole.TEACHER || user.role === UserRole.ADMIN) {
       const teacher = await Container.get(TeacherService).getTeacherByUserId(
         user.id
       );
